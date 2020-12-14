@@ -1,130 +1,65 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-    makeStyles,
-    Box,
-    TextField,
-    FormHelperText,
-    FormControl,
-    FormControlLabel,
-    Checkbox
-} from '@material-ui/core';
-import {selectToolName, selectParameters} from '../../api/test/selectors';
-import {getToolParameterSet} from '../../api/test/thunks';
-
-function simpleParameterFactory({name, value, comment, dataType, required}) {
-    switch (dataType) {
-        case 'CHAR':
-        case 'STRING':
-            return (
-                <TextField
-                    label={name}
-                    defaultValue={value}
-                    helperText={comment}
-                    type="text"
-                    required={required}
-                />
-            );
-        case 'LONG':
-        case 'INT':
-        case 'BYTE':
-        case 'SHORT':
-            return (
-                <TextField
-                    label={name}
-                    defaultValue={value}
-                    helperText={comment}
-                    type="number"
-                    required={required}
-                    InputProps={{
-                        step: 1
-                    }}
-                />
-            );
-        case 'FLOAT':
-        case 'DOUBLE':
-            return (
-                <TextField
-                    label={name}
-                    defaultValue={value}
-                    helperText={comment}
-                    type="number"
-                    required={required}
-                    InputProps={{
-                        step: 'any'
-                    }}
-                />
-            );
-        case 'BOOLEAN':
-            const spaceLessIdentifier = name.replace(/ /g, '');
-            return (
-                <FormControl>
-                    <FormControlLabel
-                        label={name}
-                        control={
-                            <Checkbox
-                                defaultChecked={value}
-                                name={spaceLessIdentifier}
-                                id={spaceLessIdentifier}
-                            />
-                        }
-                    />
-                    <FormHelperText>{comment}</FormHelperText>
-                </FormControl>
-            );
-        default:
-            break;
-    }
-}
-
-const useStyles = makeStyles(() => ({
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'start'
-    },
-    formItem: {
-        marginTop: '20px'
-    }
-}));
-
-function parameterFactory({type, ...properties}) {
-    const parameterType = type.split('.').pop();
-    switch (parameterType) {
-        case 'SimpleParameter':
-            return simpleParameterFactory(properties);
-        default:
-            break;
-    }
-}
+import {useForm} from 'react-hook-form';
+import {Box, Button} from '@material-ui/core';
+import {selectParameterSet, selectToolName, selectParameters} from '../../api/test/selectors';
+import {thunks as testThunks} from '../../api/test/thunks';
+import {parameterFactory} from '../../utils/parameter-factory';
+import {useStyles} from './styles';
 
 export function TestEnvironmentView() {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const parameterSet = useSelector(selectParameterSet);
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
+    const {control, handleSubmit} = useForm();
+
+    const onSubmit = (data) => {
+        console.log('onSubmit', data);
+        const updatedParameters = parameters.map((parameter) => {
+            const spaceLessIdentifier = parameter.name.replace(/ /g, '_');
+            const parameterType = parameter.type.split('.').pop();
+            switch (parameterType) {
+                case 'SimpleParameter':
+                    return {...parameter, value: data[spaceLessIdentifier]};
+                case 'FileParameter':
+                    return {...parameter, fileContents: data[spaceLessIdentifier]};
+                default:
+                    return {};
+            }
+        });
+        const updatedParameterSet = {
+            ...parameterSet,
+            parameters: updatedParameters
+        };
+        dispatch(testThunks.parameterSet.post(updatedParameterSet));
+    };
 
     useEffect(() => {
         if (!toolName) {
-            dispatch(getToolParameterSet());
+            dispatch(testThunks.parameterSet.fetch());
         }
     });
 
     return (
         <Box>
             <Box component="p">Dies ist eine Ansicht für Testzwecke</Box>
-            <Box component="p">
-                Es wurden Daten für folgendes Tool geladen: {toolName}
-            </Box>
-            <form className={classes.form}>
+            <Box component="p">Es wurden Daten für folgendes Tool geladen: {toolName}</Box>
+            <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
                 {parameters &&
                     parameters.map((parameter) => {
+                        const inputItemClasses = classes.inputItem;
+                        const formItemFieldClasses = `${classes.formItem} ${classes.formField}`;
                         return (
-                            <Box className={classes.formItem} key={parameter.name}>
-                                {parameterFactory(parameter)}
+                            <Box className={formItemFieldClasses} key={parameter.name}>
+                                {parameterFactory({...parameter, control, inputItemClasses})}
                             </Box>
                         );
                     })}
+                <Button className={classes.formItem} variant="contained" color="primary" type="submit">
+                    Submit
+                </Button>
             </form>
         </Box>
     );

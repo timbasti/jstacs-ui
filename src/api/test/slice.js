@@ -1,9 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {
-    getParameterSetStart,
-    getParameterSetSuccess,
-    getParameterSetFailure
-} from './reducers';
+import {thunks as testThunks} from './thunks';
 
 export const testSlice = createSlice({
     name: 'test',
@@ -13,14 +9,37 @@ export const testSlice = createSlice({
         parameterSet: {
             type: null,
             toolName: null,
-            errorMessage: null,
             parameters: null
         }
     },
-    reducers: {
-        getParameterSetStart,
-        getParameterSetSuccess,
-        getParameterSetFailure
+    reducers: {},
+    extraReducers: {
+        [testThunks.parameterSet.fetch.pending]: (state) => {
+            state.error = null;
+            state.processing = true;
+        },
+        [testThunks.parameterSet.fetch.fulfilled]: (state, action) => {
+            const {type, toolName, parameters} = action.payload;
+            state.processing = false;
+            state.parameterSet = {type, toolName, parameters};
+        },
+        [testThunks.parameterSet.fetch.rejected]: (state, action) => {
+            state.error = action.payload;
+            state.processing = false;
+        },
+        [testThunks.parameterSet.post.pending]: (state) => {
+            state.error = null;
+            state.processing = true;
+        },
+        [testThunks.parameterSet.post.fulfilled]: (state, action) => {
+            const {type, toolName, parameters} = action.payload;
+            state.processing = false;
+            state.parameterSet = {type, toolName, parameters};
+        },
+        [testThunks.parameterSet.post.rejected]: (state, action) => {
+            state.error = action.payload;
+            state.processing = false;
+        }
     }
 });
 

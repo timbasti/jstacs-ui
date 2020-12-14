@@ -1,18 +1,25 @@
-import axios from 'axios';
-import {
-    getParameterSetStart,
-    getParameterSetSuccess,
-    getParameterSetFailure
-} from './actions';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+import {requests} from './requests';
 
-export const getToolParameterSet = () => (dispatch) => {
-    dispatch(getParameterSetStart());
-    axios
-        .get('http://localhost:8080/test')
-        .then((response) => {
-            dispatch(getParameterSetSuccess(response.data));
-        })
-        .catch((error) => {
-            dispatch(getParameterSetFailure(error));
-        });
+const fetchParameterSet = createAsyncThunk(
+    'test/parameterSet/fetch',
+    async () => {
+        const response = await requests.parameterSet.fetch();
+        return response.data;
+    }
+);
+
+const postParameterSet = createAsyncThunk(
+    'test/parameterSet/post',
+    async (parameterSet) => {
+        const response = await requests.parameterSet.post(parameterSet);
+        return response.data;
+    }
+);
+
+export const thunks = {
+    parameterSet: {
+        fetch: fetchParameterSet,
+        post: postParameterSet
+    }
 };
