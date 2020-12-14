@@ -39,10 +39,10 @@ export const FileInput = React.forwardRef(({name, label, value, comment, onChang
         });
     };
 
-    const handleFileDataChanged = (evnt) => {
+    /* const handleFileDataChanged = (evnt) => {
         console.log('handleFileDataChanged', evnt.target.value);
         onChange(evnt.target.value);
-    };
+    }; */
 
     const handleOptionClick = (clickedOption) => {
         switch (clickedOption) {
