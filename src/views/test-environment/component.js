@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useForm} from 'react-hook-form';
 import {Box, Button} from '@material-ui/core';
-import {selectParameterSet, selectToolName, selectParameters} from '../../api/test/selectors';
+import {selectToolName, selectParameters} from '../../api/test/selectors';
 import {thunks as testThunks} from '../../api/test/thunks';
 import {parameterFactory} from '../../utils/parameter-factory';
 import {useStyles} from './styles';
@@ -10,30 +10,12 @@ import {useStyles} from './styles';
 export function TestEnvironmentView() {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const parameterSet = useSelector(selectParameterSet);
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
     const {control, handleSubmit} = useForm();
 
-    const onSubmit = (data) => {
-        console.log('onSubmit', data);
-        const updatedParameters = parameters.map((parameter) => {
-            const spaceLessIdentifier = parameter.name.replace(/ /g, '_');
-            const parameterType = parameter.type.split('.').pop();
-            switch (parameterType) {
-                case 'SimpleParameter':
-                    return {...parameter, value: data[spaceLessIdentifier]};
-                case 'FileParameter':
-                    return {...parameter, fileContents: data[spaceLessIdentifier]};
-                default:
-                    return {};
-            }
-        });
-        const updatedParameterSet = {
-            ...parameterSet,
-            parameters: updatedParameters
-        };
-        dispatch(testThunks.parameterSet.post(updatedParameterSet));
+    const onSubmit = (formData) => {
+        dispatch(testThunks.parameterSet.update(formData));
     };
 
     useEffect(() => {

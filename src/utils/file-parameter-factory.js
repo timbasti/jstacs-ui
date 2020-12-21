@@ -24,7 +24,7 @@ function FileInputController({
             name={spaceLessIdentifier}
             label={name}
             comment={comment}
-            defaultValue={fileContents}
+            defaultValue={fileContents.fileName ? fileContents.fileName : ''}
             required={required}
             className={inputItemClasses}
             rules={rules}

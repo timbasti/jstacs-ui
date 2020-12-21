@@ -1,3 +1,3 @@
 import {drawerSlice} from './slice';
 
-export const {openDrawer, closeDrawer} = drawerSlice.actions;
+export const {open, close} = drawerSlice.actions;

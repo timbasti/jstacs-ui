@@ -14,7 +14,7 @@ import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 import logo from '../../assets/logo.png';
 import {selectPaletteType} from '../../api/theme/selectors';
 import {changeApplicationTheme} from '../../api/theme/actions';
-import {openDrawer} from '../../api/drawer/actions';
+import {open as openDrawer} from '../../api/drawer/actions';
 
 const useStyles = makeStyles((theme) => ({
     logo: {

@@ -17,7 +17,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import {makeStyles} from '@material-ui/core';
 
 import {selectDrawerOpenState} from '../../api/drawer/selectors';
-import {closeDrawer} from '../../api/drawer/actions';
+import {close as closeDrawer} from '../../api/drawer/actions';
 
 const drawerWidth = 240;
 
