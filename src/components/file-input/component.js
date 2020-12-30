@@ -1,41 +1,38 @@
-import React from 'react';
+import React, {useState, useEffect, forwardRef} from 'react';
 import {TextField, Box} from '@material-ui/core';
 import {saveAs} from 'file-saver';
 import {SplitButton} from '../split-button/component';
+
+function getFileUrl(fileName) {
+    return `${process.env.REACT_APP_SERVICE_HOST}/files/${fileName}`;
+}
 
 function saveFile(fileName) {
     if (!fileName) {
         return;
     }
-    const fileUrl = `${process.env.REACT_APP_SERVICE_HOST}/files/${fileName}`;
+    const fileUrl = getFileUrl(fileName);
     saveAs(fileUrl, fileName);
 }
 
-const options = ['Datei laden', 'Datei speichern', 'Zurücksetzen'];
+const options = ['Datei laden', 'Datei speichern'];
 
-// TODO: Check for name
-export const FileInput = React.forwardRef(
-    ({name, label, value, comment, onChange}, inputRef) => {
-        const [file, setFile] = React.useState({
-            name: value,
-            content: null
+export const FileInput = forwardRef(
+    ({label, fileName, comment, onChange}, inputRef) => {
+        const [file, setFile] = useState({
+            name: fileName
         });
 
-        React.useEffect(() => {
-            if (file.content) {
-                onChange(file.content);
-            }
-        });
+        useEffect((updatedFile) => {
+            onChange(updatedFile);
+        }, [file, onChange]);
 
         const handleFileInputChanged = (evnt) => {
             const loadedFile = evnt.target.files[0];
             if (!loadedFile) {
                 return;
             }
-            setFile({
-                name: loadedFile.name,
-                content: loadedFile
-            });
+            setFile(loadedFile);
         };
 
         const handleOptionClick = (clickedOption) => {
@@ -45,12 +42,6 @@ export const FileInput = React.forwardRef(
                     break;
                 case 1:
                     saveFile(file.name);
-                    break;
-                case 2:
-                    setFile({
-                        name: value,
-                        content: null
-                    });
                     break;
                 default:
                     break;
@@ -65,7 +56,7 @@ export const FileInput = React.forwardRef(
                     helperText={comment}
                     label={label}
                     disabled
-                    variant="filled"
+                    variant="outlined"
                 />
                 <input
                     type="file"

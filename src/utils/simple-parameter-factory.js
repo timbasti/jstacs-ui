@@ -1,17 +1,33 @@
 import React from 'react';
 import {Controller} from 'react-hook-form';
-import {TextField, FormHelperText, FormControl, FormControlLabel, Checkbox} from '@material-ui/core';
+import {
+    TextField,
+    FormHelperText,
+    FormControl,
+    FormControlLabel,
+    Checkbox
+} from '@material-ui/core';
 
 function getSpaceLessIdentifier(identifier) {
     return identifier.replace(/ /g, '_');
 }
 
-function TextFieldController({name, value, comment, required, control, inputItemClasses, rules, inputType}) {
+function createTextField({
+    name,
+    value,
+    comment,
+    required,
+    control,
+    register,
+    inputItemClasses,
+    rules,
+    inputType,
+    registerOptions
+}) {
     const spaceLessIdentifier = getSpaceLessIdentifier(name);
     return (
-        <Controller
-            as={TextField}
-            control={control}
+        <TextField
+            inputRef={register(registerOptions)}
             name={spaceLessIdentifier}
             label={name}
             defaultValue={value}
@@ -20,12 +36,11 @@ function TextFieldController({name, value, comment, required, control, inputItem
             required={required}
             variant="filled"
             className={inputItemClasses}
-            rules={rules}
         />
     );
 }
 
-function CheckBoxController({name, value, comment, control, inputItemClasses}) {
+function createCheckBox({name, value, comment, control, inputItemClasses}) {
     const spaceLessIdentifier = getSpaceLessIdentifier(name);
     return (
         <FormControl className={inputItemClasses}>
@@ -36,7 +51,12 @@ function CheckBoxController({name, value, comment, control, inputItemClasses}) {
                         control={control}
                         name={spaceLessIdentifier}
                         defaultValue={value}
-                        render={({onChange, value}) => <Checkbox onChange={(e) => onChange(e.target.checked)} checked={value} />}
+                        render={({onChange, value}) => (
+                            <Checkbox
+                                onChange={(e) => onChange(e.target.checked)}
+                                checked={value}
+                            />
+                        )}
                     />
                 }
             />
@@ -45,50 +65,44 @@ function CheckBoxController({name, value, comment, control, inputItemClasses}) {
     );
 }
 
-export function simpleParameterFactory({dataType, required, ...props}) {
+export function createSimpleParameterInput({dataType, required, ...props}) {
     switch (dataType) {
         case 'CHAR':
         case 'STRING':
-            return (
-                <TextFieldController
-                    {...props}
-                    required={required}
-                    inputType="text"
-                    rules={{
-                        required
-                    }}
-                />
-            );
+            return createTextField({
+                ...props,
+                required,
+                inputType: 'text',
+                registerOptions: {
+                    required
+                }
+            });
         case 'LONG':
         case 'INT':
         case 'BYTE':
         case 'SHORT':
-            return (
-                <TextFieldController
-                    {...props}
-                    required={required}
-                    inputType="number"
-                    rules={{
-                        required,
-                        valueAsNumber: true
-                    }}
-                />
-            );
+            return createTextField({
+                ...props,
+                required,
+                inputType: 'number',
+                registerOptions: {
+                    required,
+                    valueAsNumber: true
+                }
+            });
         case 'FLOAT':
         case 'DOUBLE':
-            return (
-                <TextFieldController
-                    {...props}
-                    required={required}
-                    inputType="number"
-                    rules={{
-                        required,
-                        valueAsNumber: true
-                    }}
-                />
-            );
+            return createTextField({
+                ...props,
+                required,
+                inputType: 'number',
+                registerOptions: {
+                    required,
+                    valueAsNumber: true
+                }
+            });
         case 'BOOLEAN':
-            return <CheckBoxController {...props} />;
+            return createCheckBox({...props});
         default:
             break;
     }

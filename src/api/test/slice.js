@@ -14,17 +14,19 @@ export const testSlice = createSlice({
     },
     reducers: {},
     extraReducers: {
-        [testThunks.parameterSet.fetch.pending]: (state) => {
+        [testThunks.parameterSet.fetch.pending]: (state, action) => {
+            console.log(action);
             state.error = null;
             state.processing = true;
         },
         [testThunks.parameterSet.fetch.fulfilled]: (state, action) => {
-            const {type, toolName, parameters} = action.payload;
+            const {data: parameterSet} = action.payload;
             state.processing = false;
-            state.parameterSet = {type, toolName, parameters};
+            state.parameterSet = parameterSet;
         },
         [testThunks.parameterSet.fetch.rejected]: (state, action) => {
-            state.error = action.payload;
+            const {data: error} = action.payload; 
+            state.error = error;
             state.processing = false;
         },
         [testThunks.parameterSet.post.pending]: (state) => {
@@ -32,12 +34,13 @@ export const testSlice = createSlice({
             state.processing = true;
         },
         [testThunks.parameterSet.post.fulfilled]: (state, action) => {
-            const {type, toolName, parameters} = action.payload;
+            const {data: parameterSet} = action.payload;
             state.processing = false;
-            state.parameterSet = {type, toolName, parameters};
+            state.parameterSet = parameterSet;
         },
         [testThunks.parameterSet.post.rejected]: (state, action) => {
-            state.error = action.payload;
+            const {data: error} = action.payload; 
+            state.error = error;
             state.processing = false;
         }
     }

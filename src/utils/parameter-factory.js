@@ -1,13 +1,13 @@
-import {simpleParameterFactory} from './simple-parameter-factory';
-import {fileParameterFactory} from './file-parameter-factory';
+import {createSimpleParameterInput} from './simple-parameter-factory';
+import {createFileParameterInput} from './file-parameter-factory';
 
-export function parameterFactory({type, ...properties}) {
+export function createParameterInput({type, ...properties}) {
     const parameterType = type.split('.').pop();
     switch (parameterType) {
         case 'SimpleParameter':
-            return simpleParameterFactory(properties);
+            return createSimpleParameterInput(properties);
         case 'FileParameter':
-            return fileParameterFactory(properties);
+            return createFileParameterInput(properties);
         default:
             break;
     }
