@@ -13,7 +13,7 @@ function getUpdatedParameters(formData, state) {
             case 'SimpleParameter':
                 return {...parameter, value: formData[spaceLessIdentifier]};
             case 'FileParameter':
-                if (formData[spaceLessIdentifier].hasOwnProperty('size')) {
+                if (formData[spaceLessIdentifier].size !== undefined) {
                     files.push(formData[spaceLessIdentifier]);
                 }
                 return {
@@ -46,7 +46,6 @@ const postParameterSet = createAsyncThunk(
 const updateParameterSet = createAsyncThunk(
     'test/parameterSet/update',
     async (formData, {dispatch, getState}) => {
-        console.log(formData);
         const state = getState();
         const {updatedParameters, files} = getUpdatedParameters(
             formData,

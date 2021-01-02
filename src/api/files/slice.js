@@ -2,6 +2,15 @@ import {createSlice} from '@reduxjs/toolkit';
 import {actions as filesAction} from './actions';
 import {thunks as filesThunks} from './thunks';
 
+function createInitialUploadState(fileName) {
+    return {
+        fileName: fileName,
+        progress: 0,
+        processing: false,
+        error: null
+    }
+} 
+
 export const filesSlice = createSlice({
     name: 'files',
     initialState: {
@@ -10,13 +19,10 @@ export const filesSlice = createSlice({
     },
     reducers: {},
     extraReducers: {
-        [filesThunks.allFiles.post.pending]: (state, action) => {
-            console.log('filesThunks.allFiles.post.pending', action);
-            state.processing = true;
-        },
-        [filesAction.allFiles.post.init]: (state, action) => {
-            const {uploads} = action.payload;
+        [filesThunks.allFiles.post.pending]: (state, {meta}) => {
+            const uploads = meta.arg.map((file) => createInitialUploadState(file.name));
             state.uploads = uploads;
+            state.processing = true;
         },
         [filesThunks.allFiles.post.fulfilled]: (state) => {
             state.processing = false;
@@ -24,11 +30,8 @@ export const filesSlice = createSlice({
         [filesThunks.allFiles.post.rejected]: (state) => {
             state.processing = false;
         },
-        [filesThunks.singleFile.post.pending]: (state, action) => {
-            console.log('filesAction.singleFile.post.pending', action);
-        },
-        [filesAction.singleFile.post.init]: (state, action) => {
-            const {uploadIndex} = action.payload;
+        [filesThunks.singleFile.post.pending]: (state, {meta}) => {
+            const {uploadIndex} = meta.arg;
             state.uploads[uploadIndex].processing = true;
         },
         [filesAction.singleFile.post.inform]: (state, action) => {

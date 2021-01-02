@@ -1,75 +1,101 @@
-import React, {useState, useEffect, forwardRef} from 'react';
-import {TextField, Box} from '@material-ui/core';
+import React, {useRef, useState, useEffect} from 'react';
+import {
+    FormControl,
+    InputLabel,
+    FormHelperText,
+    OutlinedInput,
+    Box
+} from '@material-ui/core';
 import {saveAs} from 'file-saver';
 import {SplitButton} from '../split-button/component';
+import {useStyles} from './styles';
 
 function getFileUrl(fileName) {
     return `${process.env.REACT_APP_SERVICE_HOST}/files/${fileName}`;
 }
 
-function saveFile(fileName) {
-    if (!fileName) {
+function saveFile(file) {
+    if (!file.name) {
         return;
     }
-    const fileUrl = getFileUrl(fileName);
-    saveAs(fileUrl, fileName);
+    if (file.hasOwnProperty('size')) {
+        saveAs(file);
+    } else {
+        const fileUrl = getFileUrl(file.name);
+        saveAs(fileUrl, file.name);
+    }
 }
 
-const options = ['Datei laden', 'Datei speichern'];
+const options = ['Load file', 'Save file'];
 
-export const FileInput = forwardRef(
-    ({label, fileName, comment, onChange}, inputRef) => {
-        const [file, setFile] = useState({
-            name: fileName
-        });
+export function FileInput({name, label, value, comment, onChange, className}) {
+    const inputRef = useRef();
+    const labelRef = useRef();
+    const [labelWidth, setLabelWidth] = useState(0);
+    console.log(labelWidth);
+    const classes = useStyles({labelWidth});
 
-        useEffect((updatedFile) => {
-            onChange(updatedFile);
-        }, [file, onChange]);
+    const handleFileInputChanged = (evnt) => {
+        const loadedFile = evnt.target.files[0];
+        if (!loadedFile) {
+            return;
+        }
+        onChange(loadedFile);
+    };
 
-        const handleFileInputChanged = (evnt) => {
-            const loadedFile = evnt.target.files[0];
-            if (!loadedFile) {
-                return;
-            }
-            setFile(loadedFile);
-        };
+    const handleOptionClick = (clickedOption) => {
+        switch (clickedOption) {
+            case 0:
+                inputRef.current.click();
+                break;
+            case 1:
+                saveFile(value);
+                break;
+            default:
+                break;
+        }
+    };
 
-        const handleOptionClick = (clickedOption) => {
-            switch (clickedOption) {
-                case 0:
-                    inputRef.current.click();
-                    break;
-                case 1:
-                    saveFile(file.name);
-                    break;
-                default:
-                    break;
-            }
-        };
+    useEffect(() => {
+        if (labelRef.current) {
+            setLabelWidth(labelRef.current.getClientRects()[0].width + 28);
+        }
+    }, [labelRef, setLabelWidth]);
 
-        return (
-            <Box>
-                <TextField
+    return (
+        <FormControl
+            variant="outlined"
+            className={`${className} ${classes.root}`}
+        >
+            <InputLabel htmlFor={name} ref={labelRef}>
+                {label}
+            </InputLabel>
+            <Box className={classes.input}>
+                <OutlinedInput
+                    id={name}
+                    className={classes.fileDisplay}
                     type="text"
-                    value={file.name}
-                    helperText={comment}
-                    label={label}
+                    value={value.name}
                     disabled
-                    variant="outlined"
-                />
-                <input
-                    type="file"
-                    ref={inputRef}
-                    onChange={handleFileInputChanged}
-                    hidden
+                    label={label}
                 />
                 <SplitButton
+                    defaultSelected={value && value.name ? 1 : 0}
+                    className={classes.fileAction}
                     label="Select file operation"
                     options={options}
                     onClick={handleOptionClick}
                 />
             </Box>
-        );
-    }
-);
+            <FormHelperText className={classes.fileComment}>
+                {comment}
+            </FormHelperText>
+            <input
+                type="file"
+                ref={inputRef}
+                onChange={handleFileInputChanged}
+                hidden
+            />
+        </FormControl>
+    );
+}

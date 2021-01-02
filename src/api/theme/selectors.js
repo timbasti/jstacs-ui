@@ -1,5 +1,5 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {createMuiTheme} from '@material-ui/core';
+import {createMuiTheme, useMediaQuery} from '@material-ui/core';
 
 export const selectState = (state) => state.theme;
 

@@ -1,12 +1,8 @@
 import React from 'react';
-import {Controller} from 'react-hook-form';
 import {
     TextField,
-    FormHelperText,
-    FormControl,
-    FormControlLabel,
-    Checkbox
 } from '@material-ui/core';
+import {ControlledCheckbox} from '../components/controlled-checkbox/component';
 
 function getSpaceLessIdentifier(identifier) {
     return identifier.replace(/ /g, '_');
@@ -40,29 +36,8 @@ function createTextField({
     );
 }
 
-function createCheckBox({name, value, comment, control, inputItemClasses}) {
-    const spaceLessIdentifier = getSpaceLessIdentifier(name);
-    return (
-        <FormControl className={inputItemClasses}>
-            <FormControlLabel
-                label={name}
-                control={
-                    <Controller
-                        control={control}
-                        name={spaceLessIdentifier}
-                        defaultValue={value}
-                        render={({onChange, value}) => (
-                            <Checkbox
-                                onChange={(e) => onChange(e.target.checked)}
-                                checked={value}
-                            />
-                        )}
-                    />
-                }
-            />
-            <FormHelperText>{comment}</FormHelperText>
-        </FormControl>
-    );
+function createCheckBox(props) {
+    return <ControlledCheckbox {...props} />;
 }
 
 export function createSimpleParameterInput({dataType, required, ...props}) {

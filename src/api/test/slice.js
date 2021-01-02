@@ -14,8 +14,7 @@ export const testSlice = createSlice({
     },
     reducers: {},
     extraReducers: {
-        [testThunks.parameterSet.fetch.pending]: (state, action) => {
-            console.log(action);
+        [testThunks.parameterSet.fetch.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
@@ -33,10 +32,8 @@ export const testSlice = createSlice({
             state.error = null;
             state.processing = true;
         },
-        [testThunks.parameterSet.post.fulfilled]: (state, action) => {
-            const {data: parameterSet} = action.payload;
+        [testThunks.parameterSet.post.fulfilled]: (state) => {
             state.processing = false;
-            state.parameterSet = parameterSet;
         },
         [testThunks.parameterSet.post.rejected]: (state, action) => {
             const {data: error} = action.payload; 

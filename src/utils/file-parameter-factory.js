@@ -11,24 +11,25 @@ function createFileInput({
     fileContents,
     comment,
     control,
-    rules,
-    required,
     inputItemClasses
 }) {
     const spaceLessIdentifier = getSpaceLessIdentifier(name);
 
-    // TODO: Remove Controller if possible
     return (
         <Controller
-            as={FileInput}
             control={control}
             name={spaceLessIdentifier}
-            label={name}
-            comment={comment}
-            fileName={fileContents.fileName ? fileContents.fileName : ''}
-            required={required}
-            className={inputItemClasses}
-            rules={rules}
+            defaultValue={{name: fileContents.fileName}}
+            render={({onChange, value}) => (
+                <FileInput
+                    name={spaceLessIdentifier}
+                    onChange={(file) => onChange(file)}
+                    value={value}
+                    label={name}
+                    comment={comment}
+                    className={inputItemClasses}
+                />
+            )}
         />
     );
 }
