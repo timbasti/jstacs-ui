@@ -1,6 +1,9 @@
-import {configureStore} from '@reduxjs/toolkit';
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 import {rootReducer} from './rootReducer';
+import {save, load} from 'redux-localstorage-simple';
 
 export const store = configureStore({
-    reducer: rootReducer
+    reducer: rootReducer,
+    middleware: [...getDefaultMiddleware(), save({states: ['theme']})],
+    preloadedState: load({states: ['theme']})
 });

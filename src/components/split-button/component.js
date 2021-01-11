@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import {useStyles} from "./styles";
 
 export function SplitButton({
     defaultSelected,
@@ -21,6 +22,7 @@ export function SplitButton({
         defaultSelected !== undefined ? defaultSelected : 0
     );
     const anchorRef = React.useRef(null);
+    const classes = useStyles();
 
     const handleClick = () => {
         onClick(selectedIndex);
@@ -64,12 +66,13 @@ export function SplitButton({
                 </Button>
             </ButtonGroup>
             <Popper
+                className={classes.popper}
                 open={open}
                 anchorEl={anchorRef.current}
                 role={undefined}
                 transition
                 disablePortal
-                placement="bottom-end"
+                placement="bottom"
             >
                 {({TransitionProps}) => (
                     <Grow {...TransitionProps}>

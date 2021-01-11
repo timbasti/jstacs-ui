@@ -35,7 +35,7 @@ export function ControlledCheckbox({name, value, comment, control, inputItemClas
                     />
                 }
             />
-            <FormHelperText>{comment}</FormHelperText>
+            <FormHelperText variant="outlined">{comment}</FormHelperText>
         </FormControl>
     );
 }

@@ -32,7 +32,6 @@ export function FileInput({name, label, value, comment, onChange, className}) {
     const inputRef = useRef();
     const labelRef = useRef();
     const [labelWidth, setLabelWidth] = useState(0);
-    console.log(labelWidth);
     const classes = useStyles({labelWidth});
 
     const handleFileInputChanged = (evnt) => {
@@ -58,7 +57,10 @@ export function FileInput({name, label, value, comment, onChange, className}) {
 
     useEffect(() => {
         if (labelRef.current) {
-            setLabelWidth(labelRef.current.getClientRects()[0].width + 28);
+            const padding = 28;
+            const labelWidth = labelRef.current.clientWidth;
+            const scaledWidth = labelWidth * 0.75;
+            setLabelWidth(scaledWidth + padding);
         }
     }, [labelRef, setLabelWidth]);
 
@@ -76,7 +78,7 @@ export function FileInput({name, label, value, comment, onChange, className}) {
                     className={classes.fileDisplay}
                     type="text"
                     value={value.name}
-                    disabled
+                    readOnly={true}
                     label={label}
                 />
                 <SplitButton

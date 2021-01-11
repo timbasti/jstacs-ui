@@ -16,7 +16,7 @@ export function TestEnvironmentView() {
     const dispatch = useDispatch();
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
-    const {control, register, handleSubmit} = useForm();
+    const {control, register, handleSubmit, formState: {errors}} = useForm();
 
     const onSubmit = (formData) => {
         if (Object.keys(formData).length > 0) {
@@ -53,6 +53,7 @@ export function TestEnvironmentView() {
                                         ...parameter,
                                         control,
                                         register,
+                                        errors,
                                         inputItemClasses
                                     })}
                                 </Grid>
