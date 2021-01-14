@@ -20,7 +20,7 @@ function getUpdatedParameters(formData, state) {
                     fileContents: {fileName: formData[spaceLessIdentifier].name}
                 };
             default:
-                return {};
+                return parameter;
         }
     });
     return {updatedParameters, files};
