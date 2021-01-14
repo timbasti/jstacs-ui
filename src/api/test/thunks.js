@@ -1,7 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {requests} from './requests';
 import {selectParameterSet, selectParameters} from './selectors';
-import {actions as filesActions} from '../files/actions';
 import {thunks as filesThunks} from '../files/thunks';
 
 function getUpdatedParameters(formData, state) {
@@ -14,7 +13,9 @@ function getUpdatedParameters(formData, state) {
             case 'SimpleParameter':
                 return {...parameter, value: formData[spaceLessIdentifier]};
             case 'FileParameter':
-                files.push(formData[spaceLessIdentifier]);
+                if (formData[spaceLessIdentifier].size !== undefined) {
+                    files.push(formData[spaceLessIdentifier]);
+                }
                 return {
                     ...parameter,
                     fileContents: {fileName: formData[spaceLessIdentifier].name}
@@ -29,16 +30,16 @@ function getUpdatedParameters(formData, state) {
 const fetchParameterSet = createAsyncThunk(
     'test/parameterSet/fetch',
     async () => {
-        const response = await requests.parameterSet.fetch();
-        return response.data;
+        const {data} = await requests.parameterSet.fetch();
+        return {data};
     }
 );
 
 const postParameterSet = createAsyncThunk(
     'test/parameterSet/post',
     async (parameterSet) => {
-        const response = await requests.parameterSet.post(parameterSet);
-        return response.data;
+        const {data} = await requests.parameterSet.post(parameterSet);
+        return {data};
     }
 );
 
@@ -56,8 +57,6 @@ const updateParameterSet = createAsyncThunk(
             parameters: updatedParameters
         };
         if (files.length > 0) {
-            const fileNames = files.map((file) => file.name);
-            dispatch(filesActions.allFiles.init(fileNames));
             await dispatch(filesThunks.allFiles.post(files));
         }
         await dispatch(postParameterSet(updatedParameterSet));
