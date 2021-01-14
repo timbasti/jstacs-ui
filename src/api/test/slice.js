@@ -19,25 +19,25 @@ export const testSlice = createSlice({
             state.processing = true;
         },
         [testThunks.parameterSet.fetch.fulfilled]: (state, action) => {
-            const {type, toolName, parameters} = action.payload;
+            const {data: parameterSet} = action.payload;
             state.processing = false;
-            state.parameterSet = {type, toolName, parameters};
+            state.parameterSet = parameterSet;
         },
         [testThunks.parameterSet.fetch.rejected]: (state, action) => {
-            state.error = action.payload;
+            const {data: error} = action.payload; 
+            state.error = error;
             state.processing = false;
         },
         [testThunks.parameterSet.post.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [testThunks.parameterSet.post.fulfilled]: (state, action) => {
-            const {type, toolName, parameters} = action.payload;
+        [testThunks.parameterSet.post.fulfilled]: (state) => {
             state.processing = false;
-            state.parameterSet = {type, toolName, parameters};
         },
         [testThunks.parameterSet.post.rejected]: (state, action) => {
-            state.error = action.payload;
+            const {data: error} = action.payload; 
+            state.error = error;
             state.processing = false;
         }
     }

@@ -2,56 +2,50 @@ import {createSlice} from '@reduxjs/toolkit';
 import {actions as filesAction} from './actions';
 import {thunks as filesThunks} from './thunks';
 
-const currentUploadInitialState = {
-    error: null,
-    processing: false,
-    fileName: null
-};
+function createInitialUploadState(fileName) {
+    return {
+        fileName: fileName,
+        progress: 0,
+        processing: false,
+        error: null
+    }
+} 
 
 export const filesSlice = createSlice({
     name: 'files',
     initialState: {
-        error: null,
-        processing: false,
-        currentUpload: currentUploadInitialState,
-        uploadQueue: [],
-        uploads: []
+        uploads: [],
+        processing: false
     },
     reducers: {},
     extraReducers: {
-        [filesAction.allFiles.init]: (state, action) => {
-            state.uploads = [];
-            state.uploadQueue = [...action.payload];
-        },
-        [filesThunks.allFiles.post.pending]: (state) => {
-            state.error = null;
+        [filesThunks.allFiles.post.pending]: (state, {meta}) => {
+            const uploads = meta.arg.map((file) => createInitialUploadState(file.name));
+            state.uploads = uploads;
             state.processing = true;
         },
         [filesThunks.allFiles.post.fulfilled]: (state) => {
             state.processing = false;
-            state.currentUpload = currentUploadInitialState;
         },
-        [filesThunks.allFiles.post.rejected]: (state, action) => {
-            state.error = action.payload;
+        [filesThunks.allFiles.post.rejected]: (state) => {
             state.processing = false;
-            state.currentUpload = currentUploadInitialState;
         },
-        [filesAction.singleFile.init]: (state, action) => {
-            state.currentUpload.fileName = action.payload;
+        [filesThunks.singleFile.post.pending]: (state, {meta}) => {
+            const {uploadIndex} = meta.arg;
+            state.uploads[uploadIndex].processing = true;
         },
-        [filesThunks.singleFile.post.pending]: (state) => {
-            state.currentUpload.error = null;
-            state.currentUpload.processing = true;
+        [filesAction.singleFile.post.inform]: (state, action) => {
+            const {progress, uploadIndex} = action.payload;
+            state.uploads[uploadIndex].progress = progress;
         },
         [filesThunks.singleFile.post.fulfilled]: (state, action) => {
-            const {fileName} = action.payload;
-            state.uploadQueue = state.uploadQueue.filter((entry) => entry !== fileName);
-            state.uploads.push(fileName);
-            state.currentUpload.processing = false;
+            const {uploadIndex} = action.payload;
+            state.uploads[uploadIndex].processing = false;
         },
         [filesThunks.singleFile.post.rejected]: (state, action) => {
-            state.currentUpload.error = action.payload;
-            state.currentUpload.processing = false;
+            const {data, uploadIndex} = action.payload;
+            state.uploads[uploadIndex].processing = false;
+            state.uploads[uploadIndex].error = data;
         }
     }
 });

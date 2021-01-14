@@ -6,38 +6,38 @@ function getSpaceLessIdentifier(identifier) {
     return identifier.replace(/ /g, '_');
 }
 
-function FileInputController({
+function createFileInput({
     name,
     fileContents,
     comment,
     control,
-    rules,
-    required,
     inputItemClasses
 }) {
     const spaceLessIdentifier = getSpaceLessIdentifier(name);
 
     return (
         <Controller
-            as={FileInput}
             control={control}
             name={spaceLessIdentifier}
-            label={name}
-            comment={comment}
-            defaultValue={fileContents.fileName ? fileContents.fileName : ''}
-            required={required}
-            className={inputItemClasses}
-            rules={rules}
+            defaultValue={{name: fileContents.fileName}}
+            render={({onChange, value}) => (
+                <FileInput
+                    name={spaceLessIdentifier}
+                    onChange={(file) => onChange(file)}
+                    value={value}
+                    label={name}
+                    comment={comment}
+                    className={inputItemClasses}
+                />
+            )}
         />
     );
 }
 
-export function fileParameterFactory({required, ...props}) {
-    return (
-        <FileInputController
-            required={required}
-            rules={{required: true}}
-            {...props}
-        />
-    );
+export function createFileParameterInput({required, ...props}) {
+    return createFileInput({
+        required,
+        rules: {required},
+        ...props
+    });
 }

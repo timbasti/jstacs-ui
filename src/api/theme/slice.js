@@ -6,7 +6,7 @@ import {
 export const themeSlice = createSlice({
     name: 'theme',
     initialState: {
-        paletteType: 'dark'
+        paletteType: 'light'
     },
     reducers: {
         changeApplicationTheme
