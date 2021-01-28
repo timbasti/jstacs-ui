@@ -8,29 +8,22 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
-import {useStyles} from "./styles";
+import {useStyles} from './styles';
 
-export function SplitButton({
-    defaultSelected,
-    className,
-    label,
-    options,
-    onClick
-}) {
+export function SplitButton({defaultSelected, className, label, options, onClick, onChange}) {
     const [open, setOpen] = React.useState(false);
-    const [selectedIndex, setSelectedIndex] = React.useState(
-        defaultSelected !== undefined ? defaultSelected : 0
-    );
+    const [selectedIndex, setSelectedIndex] = React.useState(defaultSelected !== undefined ? defaultSelected : 0);
     const anchorRef = React.useRef(null);
     const classes = useStyles();
 
     const handleClick = () => {
-        onClick(selectedIndex);
+        onClick && onClick(selectedIndex);
     };
 
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
+        onChange && onChange(index);
     };
 
     const handleToggle = () => {
@@ -47,12 +40,7 @@ export function SplitButton({
 
     return (
         <React.Fragment>
-            <ButtonGroup
-                className={className}
-                variant="outlined"
-                ref={anchorRef}
-                aria-label="split button"
-            >
+            <ButtonGroup className={className} variant="outlined" ref={anchorRef} aria-label="split button">
                 <Button onClick={handleClick}>{options[selectedIndex]}</Button>
                 <Button
                     size="small"
@@ -83,12 +71,7 @@ export function SplitButton({
                                         <MenuItem
                                             key={option}
                                             selected={index === selectedIndex}
-                                            onClick={(event) =>
-                                                handleMenuItemClick(
-                                                    event,
-                                                    index
-                                                )
-                                            }
+                                            onClick={(event) => handleMenuItemClick(event, index)}
                                         >
                                             {option}
                                         </MenuItem>

@@ -8,8 +8,7 @@ export function NoMatchView() {
     return (
         <Typography variant="body1">
             <Box>
-                Die Ansicht <code>{location.pathname}</code> konnte nicht
-                gefunden werden
+                Die Ansicht <code>{location.pathname}</code> konnte nicht gefunden werden
             </Box>
             <Link component={RouterLink} to="/">
                 Hier kommen Sie zur Startseite

@@ -24,7 +24,7 @@ export const testSlice = createSlice({
             state.parameterSet = parameterSet;
         },
         [testThunks.parameterSet.fetch.rejected]: (state, action) => {
-            const {data: error} = action.payload; 
+            const {data: error} = action.payload;
             state.error = error;
             state.processing = false;
         },
@@ -36,7 +36,7 @@ export const testSlice = createSlice({
             state.processing = false;
         },
         [testThunks.parameterSet.post.rejected]: (state, action) => {
-            const {data: error} = action.payload; 
+            const {data: error} = action.payload;
             state.error = error;
             state.processing = false;
         }

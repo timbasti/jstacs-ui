@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {
-    BrowserRouter as Router,
-} from 'react-router-dom';
+import {BrowserRouter as Router} from 'react-router-dom';
 import {makeStyles} from '@material-ui/core';
-import {selectProcessing as selectFilesProcessing} from "../api/files/selectors";
+import {selectProcessing as selectFilesProcessing} from '../api/files/selectors';
 import {JstacsHeader} from '../components/jstacs-header/component';
 import {JstacsNavigation} from '../components/jstacs-navigation/component';
 import {JstacsMainContent} from '../components/jstacs-main-content/component';
@@ -29,7 +27,7 @@ export function JstacsApp() {
 
     const handleUploadDialogClose = () => {
         setOpenUploadDialog(false);
-    }
+    };
 
     return (
         <div className={classes.root}>

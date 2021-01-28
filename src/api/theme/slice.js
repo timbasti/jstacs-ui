@@ -1,7 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {
-    changeApplicationTheme
-} from './reducers';
+import {changeApplicationTheme} from './reducers';
 
 export const themeSlice = createSlice({
     name: 'theme',

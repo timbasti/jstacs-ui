@@ -8,8 +8,8 @@ function createInitialUploadState(fileName) {
         progress: 0,
         processing: false,
         error: null
-    }
-} 
+    };
+}
 
 export const filesSlice = createSlice({
     name: 'files',

@@ -8,9 +8,7 @@ async function postFile(file, onUploadProgress) {
             'Content-Type': 'multipart/form-data'
         },
         onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-            );
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             onUploadProgress(percentCompleted);
         }
     };

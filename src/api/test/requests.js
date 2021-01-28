@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const testEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/test`
+const testEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/test`;
 
 async function fetchParameterSet() {
     return await axios.get(testEndpoint);

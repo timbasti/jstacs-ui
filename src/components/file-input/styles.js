@@ -9,7 +9,7 @@ export const useStyles = makeStyles({
     fileDisplay: {
         flex: 1,
         height: '56px',
-        minWidth: props => `${props.labelWidth}px`,
+        minWidth: (props) => `${props.labelWidth}px`,
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         '& fieldset': {

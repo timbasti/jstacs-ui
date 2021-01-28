@@ -6,13 +6,7 @@ function getSpaceLessIdentifier(identifier) {
     return identifier.replace(/ /g, '_');
 }
 
-function createFileInput({
-    name,
-    fileContents,
-    comment,
-    control,
-    inputItemClasses
-}) {
+function createFileInput({name, fileContents, comment, control, inputItemClasses}) {
     const spaceLessIdentifier = getSpaceLessIdentifier(name);
 
     return (
@@ -34,10 +28,6 @@ function createFileInput({
     );
 }
 
-export function createFileParameterInput({required, ...props}) {
-    return createFileInput({
-        required,
-        rules: {required},
-        ...props
-    });
+export function createFileParameterInput(props) {
+    return createFileInput(props);
 }

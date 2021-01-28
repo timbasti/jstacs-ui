@@ -1,13 +1,6 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Typography,
-    Hidden,
-    makeStyles
-} from '@material-ui/core';
+import {AppBar, Toolbar, IconButton, Typography, Hidden, makeStyles} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 
@@ -62,11 +55,7 @@ export function JstacsHeader() {
                     </IconButton>
                 </Hidden>
                 <Hidden smDown>
-                    <img
-                        className={classes.logo}
-                        alt="Jstacs logo"
-                        src={logo}
-                    />
+                    <img className={classes.logo} alt="Jstacs logo" src={logo} />
                 </Hidden>
                 <Typography variant="h6" className={classes.title}>
                     Jstacs Online

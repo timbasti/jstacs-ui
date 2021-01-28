@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useForm} from 'react-hook-form';
 import {Box, Button, Grid} from '@material-ui/core';
@@ -16,7 +16,12 @@ export function TestEnvironmentView() {
     const dispatch = useDispatch();
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
-    const {control, register, handleSubmit, formState: {errors}} = useForm();
+    const {
+        control,
+        register,
+        handleSubmit,
+        formState: {errors}
+    } = useForm();
 
     const onSubmit = (formData) => {
         if (Object.keys(formData).length > 0) {
@@ -33,24 +38,20 @@ export function TestEnvironmentView() {
     return (
         <Box>
             <Box component="p">Dies ist eine Ansicht für Testzwecke</Box>
-            <Box component="p">
-                Es wurden Daten für folgendes Tool geladen: {toolName}
-            </Box>
+            <Box component="p">Es wurden Daten für folgendes Tool geladen: {toolName}</Box>
             <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={3}>
+                <Grid container spacing={3} alignContent="flex-start" justify="center">
                     {parameters &&
                         parameters.map((parameter) => {
                             const inputItemClasses = classes.inputItem;
+                            const gritItemProps =
+                                parameter.dataType === 'PARAMETERSET' ? {xs: 12, sm: 12, lg: 9} : {xs: 12, sm: 4, lg: 3};
+                            const fieldName = getSpaceLessIdentifier(parameter.name);
                             return (
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    lg={4}
-                                    key={getSpaceLessIdentifier(parameter.name)}
-                                >
+                                <Grid item {...gritItemProps} key={fieldName}>
                                     {createParameterInput({
                                         ...parameter,
+                                        fieldName,
                                         control,
                                         register,
                                         errors,
@@ -60,11 +61,7 @@ export function TestEnvironmentView() {
                             );
                         })}
                     <Grid item xs={12}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            type="submit"
-                        >
+                        <Button variant="contained" color="primary" type="submit">
                             Submit
                         </Button>
                     </Grid>

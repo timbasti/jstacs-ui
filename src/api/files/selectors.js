@@ -13,19 +13,13 @@ export const selectProcessing = (state) => {
 };
 
 //#region selectors for current upload
-export const selectIndexOfCurrentUpload = createSelector(
-    [selectUploads],
-    (uploads) => {
-        return uploads.findIndex((upload) => upload.processing);
-    }
-);
+export const selectIndexOfCurrentUpload = createSelector([selectUploads], (uploads) => {
+    return uploads.findIndex((upload) => upload.processing);
+});
 
-export const selectHasCurrentUpload = createSelector(
-    [selectIndexOfCurrentUpload],
-    (indexOfCurrentUpload) => {
-        return indexOfCurrentUpload !== -1;
-    }
-);
+export const selectHasCurrentUpload = createSelector([selectIndexOfCurrentUpload], (indexOfCurrentUpload) => {
+    return indexOfCurrentUpload !== -1;
+});
 
 export const selectCurrentUpload = createSelector(
     [selectUploads, selectHasCurrentUpload, selectIndexOfCurrentUpload],
@@ -34,35 +28,23 @@ export const selectCurrentUpload = createSelector(
     }
 );
 
-export const selectFileNameOfCurrentUpload = createSelector(
-    [selectCurrentUpload],
-    (currentUpload) => {
-        return currentUpload && currentUpload.fileName;
-    }
-);
+export const selectFileNameOfCurrentUpload = createSelector([selectCurrentUpload], (currentUpload) => {
+    return currentUpload && currentUpload.fileName;
+});
 
-export const selectProgressOfCurrentUpload = createSelector(
-    [selectCurrentUpload],
-    (currentUpload) => {
-        return currentUpload && currentUpload.progress;
-    }
-);
+export const selectProgressOfCurrentUpload = createSelector([selectCurrentUpload], (currentUpload) => {
+    return currentUpload && currentUpload.progress;
+});
 //#endregion
 
 //#region selectors for failed uploads
-export const selectIndexOfFailedUpload = createSelector(
-    [selectUploads],
-    (uploads) => {
-        return uploads.findIndex((upload) => !!upload.error);
-    }
-);
+export const selectIndexOfFailedUpload = createSelector([selectUploads], (uploads) => {
+    return uploads.findIndex((upload) => !!upload.error);
+});
 
-export const selectHasFailedUpload = createSelector(
-    [selectIndexOfFailedUpload],
-    (indexOfFailedUpload) => {
-        return indexOfFailedUpload !== -1;
-    }
-);
+export const selectHasFailedUpload = createSelector([selectIndexOfFailedUpload], (indexOfFailedUpload) => {
+    return indexOfFailedUpload !== -1;
+});
 
 export const selectFailedUpload = createSelector(
     [selectUploads, selectHasFailedUpload, selectIndexOfFailedUpload],
@@ -71,10 +53,7 @@ export const selectFailedUpload = createSelector(
     }
 );
 
-export const selectErrorOfFailedUpload = createSelector(
-    [selectFailedUpload],
-    (failedUpload) => {
-        return failedUpload && failedUpload.error;
-    }
-);
+export const selectErrorOfFailedUpload = createSelector([selectFailedUpload], (failedUpload) => {
+    return failedUpload && failedUpload.error;
+});
 //#endregion

@@ -1,11 +1,5 @@
 import React, {useRef, useState, useEffect} from 'react';
-import {
-    FormControl,
-    InputLabel,
-    FormHelperText,
-    OutlinedInput,
-    Box
-} from '@material-ui/core';
+import {FormControl, InputLabel, FormHelperText, OutlinedInput, Box} from '@material-ui/core';
 import {saveAs} from 'file-saver';
 import {SplitButton} from '../split-button/component';
 import {useStyles} from './styles';
@@ -65,10 +59,7 @@ export function FileInput({name, label, value, comment, onChange, className}) {
     }, [labelRef, setLabelWidth]);
 
     return (
-        <FormControl
-            variant="outlined"
-            className={`${className} ${classes.root}`}
-        >
+        <FormControl variant="outlined" className={`${className} ${classes.root}`}>
             <InputLabel htmlFor={name} ref={labelRef}>
                 {label}
             </InputLabel>
@@ -89,15 +80,8 @@ export function FileInput({name, label, value, comment, onChange, className}) {
                     onClick={handleOptionClick}
                 />
             </Box>
-            <FormHelperText className={classes.fileComment}>
-                {comment}
-            </FormHelperText>
-            <input
-                type="file"
-                ref={inputRef}
-                onChange={handleFileInputChanged}
-                hidden
-            />
+            <FormHelperText className={classes.fileComment}>{comment}</FormHelperText>
+            <input type="file" ref={inputRef} onChange={handleFileInputChanged} hidden />
         </FormControl>
     );
 }

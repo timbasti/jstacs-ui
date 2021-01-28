@@ -1,17 +1,7 @@
 import React from 'react';
-import {
-    Link as RouterLink
-} from 'react-router-dom';
+import {Link as RouterLink} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-    Toolbar,
-    Hidden,
-    Drawer,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText
-} from '@material-ui/core';
+import {Toolbar, Hidden, Drawer, List, ListItem, ListItemIcon, ListItemText} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import WarningIcon from '@material-ui/icons/Warning';
 import {makeStyles} from '@material-ui/core';
@@ -30,13 +20,13 @@ const useStyles = makeStyles((theme) => ({
     },
     drawerPaper: {
         width: drawerWidth
-    },
+    }
 }));
 
 export function JstacsNavigation() {
     const classes = useStyles();
     const isDrawerOpen = useSelector(selectDrawerOpenState);
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const handleDrawerClose = () => {
         dispatch(closeDrawer());
