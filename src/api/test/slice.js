@@ -1,18 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
+
 import {thunks as testThunks} from './thunks';
 
 export const testSlice = createSlice({
-    name: 'test',
-    initialState: {
-        error: null,
-        processing: false,
-        parameterSet: {
-            type: null,
-            toolName: null,
-            parameters: null
-        }
-    },
-    reducers: {},
     extraReducers: {
         [testThunks.parameterSet.fetch.pending]: (state) => {
             state.error = null;
@@ -40,7 +30,18 @@ export const testSlice = createSlice({
             state.error = error;
             state.processing = false;
         }
-    }
+    },
+    initialState: {
+        error: null,
+        parameterSet: {
+            parameters: null,
+            toolName: null,
+            type: null
+        },
+        processing: false
+    },
+    name: 'test',
+    reducers: {}
 });
 
 export const testReducer = testSlice.reducer;

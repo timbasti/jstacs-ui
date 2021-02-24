@@ -1,95 +1,98 @@
-import React from 'react';
-import {Link as RouterLink} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
-import {Toolbar, Hidden, Drawer, List, ListItem, ListItemIcon, ListItemText} from '@material-ui/core';
+import {Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles, Toolbar} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import WarningIcon from '@material-ui/icons/Warning';
-import {makeStyles} from '@material-ui/core';
+import React, {useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Link as RouterLink} from 'react-router-dom';
 
-import {selectDrawerOpenState} from '../../api/drawer/selectors';
 import {close as closeDrawer} from '../../api/drawer/actions';
+import {selectDrawerOpenState} from '../../api/drawer/selectors';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     drawer: {
         [theme.breakpoints.up('md')]: {
-            width: drawerWidth,
-            flexShrink: 0
+            flexShrink: 0,
+            width: drawerWidth
         }
     },
-    drawerPaper: {
-        width: drawerWidth
-    }
+    drawerPaper: {width: drawerWidth}
 }));
 
-export function JstacsNavigation() {
+const renderNavigationItemList = () => {
+    const navigationItemList =
+        <List>
+            <ListItem
+                button
+                component={RouterLink}
+                to="/"
+            >
+                <ListItemIcon>
+                    <HomeIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Start" />
+            </ListItem>
+
+            <ListItem
+                button
+                component={RouterLink}
+                to="/test"
+            >
+                <ListItemIcon>
+                    <WarningIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Test Umgebung" />
+            </ListItem>
+        </List>;
+    return navigationItemList;
+};
+
+export const JstacsNavigation = () => {
     const classes = useStyles();
     const isDrawerOpen = useSelector(selectDrawerOpenState);
     const dispatch = useDispatch();
 
-    const handleDrawerClose = () => {
+    const handleDrawerBlur = useCallback(() => {
         dispatch(closeDrawer());
-    };
+    }, [dispatch]);
 
     return (
-        <nav id="navigation" className={classes.drawer} aria-label="App menu">
+        <nav
+            className={classes.drawer}
+            id="navigation"
+        >
             <Hidden mdUp>
                 <Drawer
                     ModalProps={{
                         container: document.getElementById('navigation'),
-                        style: {position: 'absolute'},
-                        keepMounted: true
+                        keepMounted: true,
+                        style: {position: 'absolute'}
                     }}
-                    variant="temporary"
-                    classes={{
-                        paper: classes.drawerPaper
-                    }}
+                    classes={{paper: classes.drawerPaper}}
+                    onBlur={handleDrawerBlur}
                     open={isDrawerOpen}
-                    onBlur={handleDrawerClose}
+                    variant="temporary"
                 >
                     <Toolbar />
-                    <List>
-                        <ListItem button component={RouterLink} to="/">
-                            <ListItemIcon>
-                                <HomeIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Start" />
-                        </ListItem>
-                        <ListItem button component={RouterLink} to="/test">
-                            <ListItemIcon>
-                                <WarningIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Test Umgebung" />
-                        </ListItem>
-                    </List>
+
+                    {renderNavigationItemList()}
                 </Drawer>
             </Hidden>
+
             <Hidden smDown>
                 <Drawer
-                    variant="permanent"
-                    classes={{
-                        paper: classes.drawerPaper
-                    }}
+                    classes={{paper: classes.drawerPaper}}
                     open
+                    variant="permanent"
                 >
                     <Toolbar />
-                    <List>
-                        <ListItem button component={RouterLink} to="/">
-                            <ListItemIcon>
-                                <HomeIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Start" />
-                        </ListItem>
-                        <ListItem button component={RouterLink} to="/test">
-                            <ListItemIcon>
-                                <WarningIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Test Umgebung" />
-                        </ListItem>
-                    </List>
+
+                    {renderNavigationItemList()}
                 </Drawer>
             </Hidden>
         </nav>
     );
-}
+};

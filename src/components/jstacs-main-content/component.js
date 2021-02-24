@@ -1,36 +1,50 @@
+import {makeStyles, Toolbar} from '@material-ui/core';
 import React from 'react';
-import {Switch, Route} from 'react-router-dom';
-import {Toolbar} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core';
+import {Route, Switch} from 'react-router-dom';
 
 import {HomeView} from '../../views/home/component';
 import {NoMatchView} from '../../views/no-match/component';
 import {TestEnvironmentView} from '../../views/test-environment/component';
 
-const useStyles = makeStyles((theme) => ({
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3)
-    }
-}));
+const useStyles = makeStyles((theme) => {
+    const contentSpacing = 3;
+    return {
+        content: {
+            flexGrow: 1,
+            padding: theme.spacing(contentSpacing)
+        }
+    };
+});
 
-export function JstacsMainContent() {
+export const JstacsMainContent = () => {
     const classes = useStyles();
 
     return (
-        <main id="content" className={classes.content}>
+        <main
+            className={classes.content}
+            id="content"
+        >
             <Toolbar />
+
             <Switch>
-                <Route exact path="/">
+                <Route
+                    exact
+                    path="/"
+                >
                     <HomeView />
                 </Route>
-                <Route exact path="/test">
+
+                <Route
+                    exact
+                    path="/test"
+                >
                     <TestEnvironmentView />
                 </Route>
+
                 <Route path="*">
                     <NoMatchView />
                 </Route>
             </Switch>
         </main>
     );
-}
+};

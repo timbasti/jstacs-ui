@@ -1,17 +1,51 @@
-import React, {useEffect} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {useForm} from 'react-hook-form';
 import {Box, Button, Grid} from '@material-ui/core';
-import {selectToolName, selectParameters} from '../../api/test/selectors';
+import React, {useEffect} from 'react';
+import {useForm} from 'react-hook-form';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {selectParameters, selectToolName} from '../../api/test/selectors';
 import {thunks as testThunks} from '../../api/test/thunks';
 import {createParameterInput} from '../../utils/parameter-factory';
 import {useStyles} from './styles';
 
-function getSpaceLessIdentifier(identifier) {
-    return identifier.replace(/ /g, '_');
-}
+const getSpaceLessIdentifier = (identifier) => identifier.replace(/ /gu, '_');
 
-export function TestEnvironmentView() {
+const createParameterInputFields = ({parameters, inputItemClasses, register, control, errors}) => parameters &&
+    parameters.map((parameter) => {
+        const gritItemProps =
+            parameter.dataType === 'PARAMETERSET'
+                ? {
+                    lg: 9,
+                    sm: 12,
+                    xs: 12
+                }
+                : {
+                    lg: 3,
+                    sm: 4,
+                    xs: 12
+                };
+        const fieldName = getSpaceLessIdentifier(parameter.name);
+        return (
+            <Grid
+                item
+                key={fieldName}
+                lg={gritItemProps.lg}
+                sm={gritItemProps.sm}
+                xs={gritItemProps.xs}
+            >
+                {createParameterInput({
+                    ...parameter,
+                    control,
+                    errors,
+                    fieldName,
+                    inputItemClasses,
+                    register
+                })}
+            </Grid>
+        );
+    });
+
+export const TestEnvironmentView = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const toolName = useSelector(selectToolName);
@@ -24,6 +58,7 @@ export function TestEnvironmentView() {
     } = useForm();
 
     const onSubmit = (formData) => {
+        console.log('onSubmit', formData);
         if (Object.keys(formData).length > 0) {
             dispatch(testThunks.parameterSet.update(formData));
         }
@@ -37,31 +72,42 @@ export function TestEnvironmentView() {
 
     return (
         <Box>
-            <Box component="p">Dies ist eine Ansicht für Testzwecke</Box>
-            <Box component="p">Es wurden Daten für folgendes Tool geladen: {toolName}</Box>
-            <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={3} alignContent="flex-start" justify="center">
-                    {parameters &&
-                        parameters.map((parameter) => {
-                            const inputItemClasses = classes.inputItem;
-                            const gritItemProps =
-                                parameter.dataType === 'PARAMETERSET' ? {xs: 12, sm: 12, lg: 9} : {xs: 12, sm: 4, lg: 3};
-                            const fieldName = getSpaceLessIdentifier(parameter.name);
-                            return (
-                                <Grid item {...gritItemProps} key={fieldName}>
-                                    {createParameterInput({
-                                        ...parameter,
-                                        fieldName,
-                                        control,
-                                        register,
-                                        errors,
-                                        inputItemClasses
-                                    })}
-                                </Grid>
-                            );
-                        })}
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" type="submit">
+            <Box component="p">
+                Dies ist eine Ansicht für Testzwecke
+            </Box>
+
+            <Box component="p">
+                Es wurden Daten für folgendes Tool geladen:
+                {toolName}
+            </Box>
+
+            <form
+                className={classes.form}
+                onSubmit={handleSubmit(onSubmit)}
+            >
+                <Grid
+                    alignContent="flex-start"
+                    container
+                    justify="center"
+                    spacing={3}
+                >
+                    {createParameterInputFields({
+                        control,
+                        errors,
+                        inputItemClasses: classes.inputItem,
+                        parameters,
+                        register
+                    })}
+
+                    <Grid
+                        item
+                        xs={12}
+                    >
+                        <Button
+                            color="primary"
+                            type="submit"
+                            variant="contained"
+                        >
                             Submit
                         </Button>
                     </Grid>
@@ -69,4 +115,4 @@ export function TestEnvironmentView() {
             </form>
         </Box>
     );
-}
+};

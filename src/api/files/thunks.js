@@ -1,25 +1,28 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {actions} from './actions';
 import {requests} from './requests';
 
 const postFile = createAsyncThunk('files/single-file/post', async ({file, uploadIndex}, {dispatch}) => {
-    const onUploadProgress = (progress) => dispatch(actions.singleFile.post.inform({progress, uploadIndex}));
+    const onUploadProgress = (progress) => dispatch(actions.singleFile.post.inform({
+        progress,
+        uploadIndex
+    }));
     const {data} = await requests.file.post(file, onUploadProgress);
-    return {data, uploadIndex};
+    return {
+        data,
+        uploadIndex
+    };
 });
 
-const postFiles = createAsyncThunk('files/all-files/post', async (files, {dispatch}) => {
-    for (let index = 0; index < files.length; index++) {
-        const file = files[index];
-        await dispatch(postFile({file, uploadIndex: index}));
-    }
+const postFiles = createAsyncThunk('files/all-files/post', (files, {dispatch}) => {
+    Promise.all(files.map((file, uploadIndex) => dispatch(postFile({
+        file,
+        uploadIndex
+    }))));
 });
 
 export const thunks = {
-    singleFile: {
-        post: postFile
-    },
-    allFiles: {
-        post: postFiles
-    }
+    allFiles: {post: postFiles},
+    singleFile: {post: postFile}
 };

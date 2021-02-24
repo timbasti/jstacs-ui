@@ -1,5 +1,5 @@
-import {createSelector} from '@reduxjs/toolkit';
 import {createMuiTheme} from '@material-ui/core';
+import {createSelector} from '@reduxjs/toolkit';
 
 export const selectState = (state) => state.theme;
 
@@ -8,39 +8,9 @@ export const selectPaletteType = (state) => {
     return themeState.paletteType;
 };
 
-function createLightTheme() {
-    return createMuiTheme({
-        palette: {
-            type: 'light'
-        }
-    });
-}
+const createLightTheme = () => createMuiTheme({palette: {type: 'light'}});
 
-function createDarkTheme() {
-    return createMuiTheme({
-        palette: {
-            type: 'dark'
-        }
-    });
-}
-
-function createArcTheme() {
-    return createMuiTheme({
-        palette: {
-            type: 'dark',
-            primary: {
-                main: '#5294e2'
-            },
-            secondary: {
-                main: '#CC575D'
-            },
-            background: {
-                default: '#383c4a',
-                paper: '#4b5162'
-            }
-        }
-    });
-}
+const createDarkTheme = () => createMuiTheme({palette: {type: 'dark'}});
 
 export const selectMuiTheme = createSelector([selectPaletteType], (paletteType) => {
     if (paletteType === 'light') {

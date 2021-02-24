@@ -1,54 +1,121 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {requests} from './requests';
-import {selectParameterSet, selectParameters} from './selectors';
+import {produce} from 'immer';
+
 import {thunks as filesThunks} from '../files/thunks';
+import {requests} from './requests';
+import {selectParameters, selectParameterSet} from './selectors';
 
-function updateParameters() {}
+const updateSimpleParameter = (inputValue, simpleParameter) => ({
+    updatedParameter: {
+        ...simpleParameter,
+        value: inputValue
+    }
+});
 
-function getUpdatedParameters(formData, parameters) {
-    const files = [];
-    const updatedParameters = parameters.map((parameter) => {
-        const spaceLessIdentifier = parameter.name.replace(/ /g, '_');
-        const parameterType = parameter.type.split('.').pop();
-        switch (parameterType) {
-            case 'SimpleParameter':
-                return {...parameter, value: formData[spaceLessIdentifier]};
-            case 'FileParameter':
-                if (formData[spaceLessIdentifier].size !== undefined) {
-                    files.push(formData[spaceLessIdentifier]);
-                }
-                return {
-                    ...parameter,
-                    fileContents: {fileName: formData[spaceLessIdentifier].name}
-                };
-            case 'SelectionParameter':
-                const selectionParameterFormData = formData[spaceLessIdentifier];
-                const parameterCollections = parameter.parametersInCollection;
-                const selectedCollection = parameterCollections[selectionParameterFormData.selection];
+const updateFileParameter = (inputValue, fileParameter) => {
+    const newFiles = [];
+    if (inputValue > 0) {
+        newFiles.push(inputValue);
+    }
+    const updatedParameter = {
+        ...fileParameter,
+        fileContents: {fileName: inputValue.name}
+    };
+    return {
+        newFiles,
+        updatedParameter
+    };
+};
 
-                const {updatedParameters: updatedParametersInCollection, files: filesForCollection} = getUpdatedParameters(
-                    selectionParameterFormData,
-                    selectedCollection.parameters
-                );
-                if (filesForCollection.length > 0) {
-                    files.push(...filesForCollection);
-                }
-                const updatedCollection = {...selectedCollection, parameters: updatedParametersInCollection};
-                const updatedCollectionList = [...parameterCollections];
-                updatedCollectionList[selectionParameterFormData.selection] = updatedCollection;
-                const updatedParameter = {
-                    ...parameter,
-                    parametersInCollection: updatedCollectionList,
-                    value: selectionParameterFormData.selection
-                };
-                return updatedParameter;
-            default:
-                return parameter;
+const updateParameterSetContainer = (inputValues, parameterSetContainer) => {
+    const selectedParameterSet = parameterSetContainer.value;
+    const {newFiles, updatedParameters} = updateParameters(inputValues, selectedParameterSet.parameters);
+    console.log('updateParameterSetContainer', newFiles, updatedParameters);
+    const updatedParameterSet = {
+        ...selectedParameterSet,
+        parameters: updatedParameters
+    };
+    return {
+        newFiles,
+        updatedParameterSetContainer: {
+            ...parameterSetContainer,
+            value: updatedParameterSet
         }
+    };
+};
+
+const updateSelectionParameter = (selectionParameterValue, selectionParameter) => {
+    console.log('updateSelectionParameter >>>', selectionParameterValue, selectionParameter);
+    const {selected, selectedName, ...otherFormData} = selectionParameterValue;
+
+    if (selectionParameter.isAtomic) {
+        return {
+            updatedParameter: {
+                ...selectionParameter,
+                selected,
+                selectedName
+            }
+        };
+    }
+
+    const nonAtomicParameterSet = selectionParameter.parametersInCollection;
+    const selectedParameterSetContainer = nonAtomicParameterSet.parameters[selected];
+    const {newFiles, updatedParameterSetContainer} = updateParameterSetContainer(otherFormData, selectedParameterSetContainer);
+    const updatedParameters = produce(nonAtomicParameterSet.parameters, (parametersDraft) => {
+        parametersDraft[selected] = updatedParameterSetContainer;
+    });
+    return {
+        newFiles,
+        updatedParameter: {
+            ...selectionParameter,
+            parametersInCollection: {
+                ...nonAtomicParameterSet,
+                parameters: updatedParameters
+            },
+            selected,
+            selectedName
+        }
+    };
+};
+
+const updateParameter = (inputValue, parameter) => {
+    const parameterType = parameter.type.split('.').pop();
+    switch (parameterType) {
+    case 'SimpleParameter':
+        return updateSimpleParameter(inputValue, parameter);
+    case 'FileParameter':
+        return updateFileParameter(inputValue, parameter);
+    case 'SelectionParameter':
+        return updateSelectionParameter(inputValue, parameter);
+    default:
+        // TODO: Maybe throw an error or something
+        return {
+            newFiles: [],
+            updatedParameter: parameter
+        };
+    }
+};
+
+const updateParameters = (formData, parameters) => {
+    const collectedNewFiles = [];
+    const updatedParameters = parameters.map((parameter) => {
+        const spaceLessIdentifier = parameter.name.replace(/ /gu, '_');
+        const formInputValue = formData[spaceLessIdentifier];
+        // TODO: Maybe throw an error or something
+        if (formInputValue === undefined) {
+            return parameter;
+        }
+        const {newFiles = [], updatedParameter} = updateParameter(formInputValue, parameter);
+        console.log('updateParameters', newFiles, updatedParameter);
+        collectedNewFiles.push(...newFiles);
+        return updatedParameter;
     });
 
-    return {updatedParameters, files};
-}
+    return {
+        newFiles: collectedNewFiles,
+        updatedParameters
+    };
+};
 
 const fetchParameterSet = createAsyncThunk('test/parameterSet/fetch', async () => {
     const {data} = await requests.parameterSet.fetch();
@@ -61,16 +128,18 @@ const postParameterSet = createAsyncThunk('test/parameterSet/post', async (param
 });
 
 const updateParameterSet = createAsyncThunk('test/parameterSet/update', async (formData, {dispatch, getState}) => {
+    console.log('updateParameterSet', formData);
     const state = getState();
     const parameters = selectParameters(state);
-    const {updatedParameters, files} = getUpdatedParameters(formData, parameters);
+    const {updatedParameters, newFiles} = updateParameters(formData, parameters);
+    console.log('updateParameterSet >>>', updatedParameters, newFiles);
     const parameterSet = selectParameterSet(state);
     const updatedParameterSet = {
         ...parameterSet,
         parameters: updatedParameters
     };
-    if (files.length > 0) {
-        await dispatch(filesThunks.allFiles.post(files));
+    if (newFiles.length > 0) {
+        await dispatch(filesThunks.allFiles.post(newFiles));
     }
     await dispatch(postParameterSet(updatedParameterSet));
 });

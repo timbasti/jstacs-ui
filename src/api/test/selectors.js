@@ -17,18 +17,10 @@ export const selectParameterSet = (state) => {
     return testState.parameterSet;
 };
 
-export const selectHasError = createSelector([selectError], (error) => {
-    return !!error;
-});
+export const selectHasError = createSelector([selectError], (error) => Boolean(error));
 
-export const selectToolName = createSelector([selectParameterSet], (parameterSet) => {
-    return parameterSet && parameterSet.toolName;
-});
+export const selectToolName = createSelector([selectParameterSet], (parameterSet) => parameterSet && parameterSet.toolName);
 
-export const selectParameters = createSelector([selectParameterSet], (parameterSet) => {
-    return parameterSet && parameterSet.parameters;
-});
+export const selectParameters = createSelector([selectParameterSet], (parameterSet) => parameterSet && parameterSet.parameters);
 
-export const selectNumberOfParameters = createSelector([selectParameters], (parameters) => {
-    return parameters ? parameters.length : 0;
-});
+export const selectNumberOfParameters = createSelector([selectParameters], (parameters) => (parameters ? parameters.length : 0));

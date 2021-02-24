@@ -1,14 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
+
 import {changeApplicationTheme} from './reducers';
 
 export const themeSlice = createSlice({
+    initialState: {paletteType: 'light'},
     name: 'theme',
-    initialState: {
-        paletteType: 'light'
-    },
-    reducers: {
-        changeApplicationTheme
-    }
+    reducers: {changeApplicationTheme}
 });
 
 export const themeReducer = themeSlice.reducer;
