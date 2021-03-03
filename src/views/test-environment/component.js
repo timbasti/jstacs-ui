@@ -1,6 +1,6 @@
 import {Box, Button, Grid} from '@material-ui/core';
 import React, {useEffect} from 'react';
-import {useForm} from 'react-hook-form';
+import {FormProvider, useForm} from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {selectParameters, selectToolName} from '../../api/test/selectors';
@@ -8,9 +8,7 @@ import {thunks as testThunks} from '../../api/test/thunks';
 import {createParameterInput} from '../../utils/parameter-factory';
 import {useStyles} from './styles';
 
-const getSpaceLessIdentifier = (identifier) => identifier.replace(/ /gu, '_');
-
-const createParameterInputFields = ({parameters, inputItemClasses, register, control, errors}) => parameters &&
+const createParameterInputFields = (parameters, inputItemClasses) => parameters &&
     parameters.map((parameter) => {
         const gritItemProps =
             parameter.dataType === 'PARAMETERSET'
@@ -24,23 +22,15 @@ const createParameterInputFields = ({parameters, inputItemClasses, register, con
                     sm: 4,
                     xs: 12
                 };
-        const fieldName = getSpaceLessIdentifier(parameter.name);
         return (
             <Grid
                 item
-                key={fieldName}
+                key={parameter.name}
                 lg={gritItemProps.lg}
                 sm={gritItemProps.sm}
                 xs={gritItemProps.xs}
             >
-                {createParameterInput({
-                    ...parameter,
-                    control,
-                    errors,
-                    fieldName,
-                    inputItemClasses,
-                    register
-                })}
+                {createParameterInput(parameter, inputItemClasses)}
             </Grid>
         );
     });
@@ -50,12 +40,7 @@ export const TestEnvironmentView = () => {
     const dispatch = useDispatch();
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
-    const {
-        control,
-        register,
-        handleSubmit,
-        formState: {errors}
-    } = useForm();
+    const {handleSubmit, ...formProperties} = useForm();
 
     const onSubmit = (formData) => {
         console.log('onSubmit', formData);
@@ -81,38 +66,37 @@ export const TestEnvironmentView = () => {
                 {toolName}
             </Box>
 
-            <form
-                className={classes.form}
-                onSubmit={handleSubmit(onSubmit)}
+            <FormProvider
+                {...formProperties}
+                handleSubmit={handleSubmit}
             >
-                <Grid
-                    alignContent="flex-start"
-                    container
-                    justify="center"
-                    spacing={3}
+                <form
+                    className={classes.form}
+                    onSubmit={handleSubmit(onSubmit)}
                 >
-                    {createParameterInputFields({
-                        control,
-                        errors,
-                        inputItemClasses: classes.inputItem,
-                        parameters,
-                        register
-                    })}
-
                     <Grid
-                        item
-                        xs={12}
+                        alignContent="flex-start"
+                        container
+                        justify="center"
+                        spacing={5}
                     >
-                        <Button
-                            color="primary"
-                            type="submit"
-                            variant="contained"
+                        {createParameterInputFields(parameters, classes.inputItem)}
+
+                        <Grid
+                            item
+                            xs={12}
                         >
-                            Submit
-                        </Button>
+                            <Button
+                                color="primary"
+                                type="submit"
+                                variant="contained"
+                            >
+                                Submit
+                            </Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </form>
+                </form>
+            </FormProvider>
         </Box>
     );
 };

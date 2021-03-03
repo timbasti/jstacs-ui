@@ -1,22 +1,21 @@
 import {Checkbox, FormControl, FormControlLabel, FormHelperText} from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Controller} from 'react-hook-form';
+import {Controller, useFormContext} from 'react-hook-form';
 
 import {useCheckboxStyles} from './styles';
 
-const createCheckedChangedHandler = (onChange) => (changeEvent) => onChange(changeEvent.target.checked);
-
-const createUncontrolledInput = () => ({onChange, value}) => {
-    const handleCheckedChange = createCheckedChangedHandler(onChange);
-    return <Checkbox
-        checked={value}
-        onChange={handleCheckedChange}
-    />;
-};
-
-const ControlledCheckbox = ({name, fieldName, value, comment, control, inputItemClasses}) => {
+const UncontrolledCheckbox = ({name, defaultChecked, helperText, inputItemClasses}) => {
+    const {control} = useFormContext();
     const classes = useCheckboxStyles();
+
+    const createUncontrolledInput = () => ({onChange, value}) => {
+        const createChangeHandler = (handleChange) => (changeEvent) => handleChange(changeEvent.target.checked);
+        return <Checkbox
+            checked={value}
+            onChange={createChangeHandler(onChange)}
+        />;
+    };
 
     return (
         <FormControl className={inputItemClasses}>
@@ -25,8 +24,8 @@ const ControlledCheckbox = ({name, fieldName, value, comment, control, inputItem
                 control={
                     <Controller
                         control={control}
-                        defaultValue={value}
-                        name={fieldName}
+                        defaultValue={defaultChecked}
+                        name={name}
                         render={createUncontrolledInput()}
                     />
                 }
@@ -34,25 +33,23 @@ const ControlledCheckbox = ({name, fieldName, value, comment, control, inputItem
             />
 
             <FormHelperText variant="outlined">
-                {comment}
+                {helperText}
             </FormHelperText>
         </FormControl>
     );
 };
 
-ControlledCheckbox.propTypes = {
-    comment: PropTypes.string,
-    control: PropTypes.shape().isRequired,
-    fieldName: PropTypes.string.isRequired,
+UncontrolledCheckbox.propTypes = {
+    defaultChecked: PropTypes.bool,
+    helperText: PropTypes.string,
     inputItemClasses: PropTypes.string,
-    name: PropTypes.string.isRequired,
-    value: PropTypes.bool
+    name: PropTypes.string.isRequired
 };
 
-ControlledCheckbox.defaultProps = {
-    comment: '',
-    inputItemClasses: '',
-    value: false
+UncontrolledCheckbox.defaultProps = {
+    defaultChecked: false,
+    helperText: '',
+    inputItemClasses: ''
 };
 
-export {ControlledCheckbox};
+export {UncontrolledCheckbox};

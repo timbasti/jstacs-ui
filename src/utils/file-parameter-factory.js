@@ -1,37 +1,37 @@
 import React from 'react';
-import {Controller} from 'react-hook-form';
+import {Controller, useFormContext} from 'react-hook-form';
 
 import {FileInput} from '../components/file-input/component';
 
-const getSpaceLessIdentifier = (identifier) => identifier.replace(/ /gu, '_');
+const UncontrolledFileInput = ({name, label, defaultFile, helperText, className}) => {
+    const {control} = useFormContext();
 
-const handleFileChange = (onChange) => (file) => onChange(file);
+    const renderInput = () => ({onChange, value}) => {
+        const createChangeHandler = (handleChange) => (file) => handleChange(file);
+        return (
+            <FileInput
+                className={className}
+                file={value}
+                helperText={helperText}
+                label={label}
+                onChange={createChangeHandler(onChange)}
+            />
+        );
+    };
 
-const renderInput = ({comment, inputItemClasses, name, spaceLessIdentifier}) => ({onChange, value}) => <FileInput
-    className={inputItemClasses}
-    comment={comment}
-    label={name}
-    name={spaceLessIdentifier}
-    onChange={handleFileChange(onChange)}
-    value={value}
-/>;
-
-const createControlledFileInput = ({name, fileContents, comment, control, inputItemClasses}) => {
-    const spaceLessIdentifier = getSpaceLessIdentifier(name);
-
-    return (
-        <Controller
-            control={control}
-            defaultValue={{name: fileContents.fileName}}
-            name={spaceLessIdentifier}
-            render={renderInput({
-                comment,
-                inputItemClasses,
-                name,
-                spaceLessIdentifier
-            })}
-        />
-    );
+    return <Controller
+        control={control}
+        defaultValue={defaultFile}
+        name={name}
+        render={renderInput()}
+    />;
 };
 
-export const createFileParameterInput = (props) => createControlledFileInput(props);
+export const createFileParameterInput = (parameter, inputItemClasses) => <UncontrolledFileInput
+    className={inputItemClasses}
+    defaultFile={parameter.fileContents}
+    helperText={parameter.comment}
+    label={parameter.name}
+    name={parameter.name}
+/>;
+

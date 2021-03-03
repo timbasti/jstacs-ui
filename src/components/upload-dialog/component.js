@@ -6,12 +6,12 @@ import {useSelector} from 'react-redux';
 import {selectUploads} from '../../api/files/selectors';
 import {useUploadDialogStyles, useUploadItemStyles} from './styles';
 
-const UploadItem = ({fileName, progress}) => {
+const UploadItem = ({name, progress}) => {
     const classes = useUploadItemStyles();
     return (
         <Paper className={classes.root}>
             <Typography>
-                {fileName}
+                {name}
             </Typography>
 
             <LinearProgress
@@ -35,8 +35,8 @@ const UploadList = () => {
     return (
         <DialogContent>
             {uploads.map((upload) => <UploadItem
-                fileName={upload.fileName}
-                key={upload.fileName}
+                key={upload.name}
+                name={upload.name}
                 progress={upload.progress}
             />)}
         </DialogContent>
@@ -73,7 +73,7 @@ const UploadDialog = ({open, onClose}) => {
 };
 
 UploadItem.propTypes = {
-    fileName: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     progress: PropTypes.number.isRequired
 };
 

@@ -1,37 +1,90 @@
-/* eslint-disable react/jsx-handler-names */
-/* eslint-disable react/jsx-no-bind */
 import {ErrorMessage} from '@hookform/error-message';
-import {Grid} from '@material-ui/core';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
+import {MenuItem, TextField, withStyles} from '@material-ui/core';
+import MuiAccordion from '@material-ui/core/Accordion';
+import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
+import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormLabel from '@material-ui/core/FormLabel';
+import Grid from '@material-ui/core/Grid';
 import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+import MuiRadioGroup from '@material-ui/core/RadioGroup';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import InfoIcon from '@material-ui/icons/Info';
 import PropTypes from 'prop-types';
-import React, {useCallback, useRef} from 'react';
-import {Controller} from 'react-hook-form';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {Controller, useFormContext} from 'react-hook-form';
 
 import {createParameterInput} from './parameter-factory';
 
-const getSpaceLessIdentifier = (identifier) => identifier.replace(/ /gu, '_');
+const RadioGroupContext = React.createContext();
 
 const queryObject = (object, path) => path
     .split('.')
     .reduce((currentObject, key) => (currentObject && currentObject[key] ? currentObject[key] : undefined), object);
 
-const FieldSetSelectionItem = ({fieldSet, expanded, index, register, selectionListName}) => {
-    console.log('FieldSetSelectionItem', expanded);
-    const radioRef = useRef(null);
+const HiddenInput = ({name, value}) => {
+    const {register} = useFormContext();
 
-    const handleAccordionSummaryClick = useCallback(() => {
-        radioRef.current.click();
-        radioRef.current.focus();
-    }, [radioRef]);
+    return <input
+        name={name}
+        ref={register({valueAsNumber: true})}
+        type="hidden"
+        value={value}
+    />;
+};
+
+const Accordion = withStyles({
+    expanded: {},
+    root: {
+        '&$expanded': {margin: 'auto 0'},
+        '&:before': {display: 'none'},
+        '&:not(:last-child)': {borderBottom: 0},
+        border: '1px solid rgba(0, 0, 0, .125)',
+        boxShadow: 'none'
+    }
+})(MuiAccordion);
+
+const AccordionSummary = withStyles({
+    content: {'&$expanded': {margin: '12px 0'}},
+    expanded: {},
+    root: {
+        '&$expanded': {minHeight: 56},
+        backgroundColor: 'rgba(0, 0, 0, .03)',
+        borderBottom: '1px solid rgba(0, 0, 0, .125)',
+        marginBottom: -1,
+        minHeight: 56
+    }
+})(MuiAccordionSummary);
+
+const AccordionDetails = withStyles({root: {padding: 20}})(MuiAccordionDetails);
+
+const RadioControlledAccordion = ({listIndex, radioLabel, radioValue, listName, children}) => {
+    const radioRef = useRef(null);
+    const [expanded, expand] = useState(false);
+    const currentSelectedValue = useContext(RadioGroupContext);
+
+    useEffect(() => {
+        const istSelected = radioValue === currentSelectedValue;
+        expand(istSelected);
+    }, [currentSelectedValue, expand, radioValue]);
+
+    const handleAccordionSummaryClick = useCallback(
+        (clickEvent) => {
+            radioRef.current.click();
+            radioRef.current.focus();
+            clickEvent.stopPropagation();
+            clickEvent.preventDefault();
+        },
+        [radioRef]
+    );
+
+    const handleRadioChanged = useCallback(() => {
+        expand(radioRef.current.checked);
+    }, [expand, radioRef]);
 
     return (
         <Accordion
@@ -44,155 +97,152 @@ const FieldSetSelectionItem = ({fieldSet, expanded, index, register, selectionLi
                 onClick={handleAccordionSummaryClick}
             >
                 <FormControlLabel
-                    control={<Radio />}
+                    control={<Radio onChange={handleRadioChanged} />}
                     inputRef={radioRef}
-                    label={fieldSet.name}
-                    value={fieldSet.name}
+                    label={radioLabel}
+                    value={radioValue}
                 />
 
-                <input
-                    name={`${selectionListName}.selected`}
-                    ref={register({valueAsNumber: true})}
-                    type="hidden"
-                    value={index}
+                <HiddenInput
+                    name={`${listName}.selected`}
+                    value={listIndex}
                 />
             </AccordionSummary>
 
             <AccordionDetails>
-                {fieldSet.content}
+                {children}
             </AccordionDetails>
         </Accordion>
     );
 };
 
-FieldSetSelectionItem.propTypes = {
-    expanded: PropTypes.bool,
-    fieldSet: PropTypes.shape().isRequired,
-    index: PropTypes.number.isRequired,
-    register: PropTypes.func.isRequired,
-    selectionListName: PropTypes.string.isRequired
+RadioControlledAccordion.propTypes = {
+    children: PropTypes.node.isRequired,
+    listIndex: PropTypes.number.isRequired,
+    listName: PropTypes.string.isRequired,
+    radioLabel: PropTypes.string.isRequired,
+    radioValue: PropTypes.string.isRequired
 };
 
-FieldSetSelectionItem.defaultProps = {expanded: false};
+const RadioGroup = withStyles({root: {display: 'block'}})(MuiRadioGroup);
 
-const createFieldsetSelectionList = ({fieldSets, value, register, selectionListName}) => {
-    console.log('createFieldsetSelectionList', value);
+const UncontrolledRadioGroup = ({children, defaultSelected, name}) => {
+    const {control} = useFormContext();
+
+    const renderRadioGroup = () => ({onChange, value}) => {
+        const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
+        const radioGroup =
+            <RadioGroupContext.Provider value={value}>
+                <RadioGroup
+                    onChange={createChangeHanlder(onChange)}
+                    value={value}
+                >
+                    {children}
+                </RadioGroup>
+            </RadioGroupContext.Provider>;
+        return radioGroup;
+    };
+
+    return (
+        <Controller
+            control={control}
+            defaultValue={defaultSelected}
+            name={name}
+            render={renderRadioGroup()}
+            rules={{required: true}}
+        />
+    );
+};
+
+const createFieldsetSelectionList = (inputSets, listName) => {
     const fieldsetSelectionList =
-        fieldSets &&
-        fieldSets.map((fieldSet, index) => <FieldSetSelectionItem
-            expanded={value === fieldSet.name}
-            fieldSet={fieldSet}
-            index={index}
-            key={fieldSet.name}
-            register={register}
-            selectionListName={selectionListName}
-        />);
+        inputSets &&
+        inputSets.map((inputSet, index) => <RadioControlledAccordion
+            key={inputSet.name}
+            listIndex={index}
+            listName={listName}
+            radioLabel={inputSet.name}
+            radioValue={inputSet.name}
+        >
+            {inputSet.content}
+        </RadioControlledAccordion>);
     return fieldsetSelectionList;
 };
 
-const createRadioGroupChangedHandler = (onChange) => (changeEvent) => {
-    console.log('createRadioGroupChangedHandler', typeof changeEvent.target.value);
-    return onChange(changeEvent.target.value);
-};
+const InputSetSelection = ({defaultSelected, className, inputSets, label, helperText, name, listName}) => {
+    const {errors} = useFormContext();
+    const hasError = Boolean(queryObject(errors, name));
 
-const renderRadioGroup = ({fieldSets, register, selectionListName}) => ({onChange, value}) => {
-    const handleCheckedChange = createRadioGroupChangedHandler(onChange);
-    const radioGroup =
-        <RadioGroup
-            onChange={handleCheckedChange}
-            value={value}
-        >
-            {createFieldsetSelectionList({
-                fieldSets,
-                register,
-                selectionListName,
-                value
-            })}
-        </RadioGroup>;
-    return radioGroup;
-};
-
-const fieldsetSelectionInput = ({
-    control,
-    selectedName,
-    className,
-    fieldSets,
-    label,
-    helperText,
-    name,
-    error,
-    register,
-    selectionListName
-}) => {
-    console.log('fieldsetSelectionInput', selectedName);
-    const selectionInput =
+    return (
         <FormControl
             className={className}
-            error={error}
+            error={hasError}
         >
+            <ErrorMessage
+                as="span"
+                errors={errors}
+                name={name}
+                style={{color: '#f44336'}}
+            />
+
             <FormLabel required>
                 {label}
             </FormLabel>
 
-            <Controller
-                control={control}
-                defaultValue={selectedName}
+            <UncontrolledRadioGroup
+                defaultSelected={defaultSelected}
                 name={name}
-                render={renderRadioGroup({
-                    fieldSets,
-                    register,
-                    selectionListName
-                })}
-                rules={{required: true}}
-            />
+            >
+                {createFieldsetSelectionList(inputSets, listName)}
+            </UncontrolledRadioGroup>
 
             <FormHelperText>
                 {helperText}
             </FormHelperText>
-        </FormControl>;
-    return selectionInput;
+        </FormControl>
+    );
 };
 
-const createParameterInputFields = ({selectionName, parameters, inputItemClasses, register, control, errors}) => parameters &&
-    parameters.map((parameter) => {
-        const gritItemProps =
-            parameter.dataType === 'PARAMETERSET'
-                ? {
-                    lg: 9,
-                    sm: 12,
-                    xs: 12
-                }
-                : {
-                    lg: 4,
-                    sm: 6,
-                    xs: 12
-                };
-        const fieldId = getSpaceLessIdentifier(parameter.name);
-        const fieldName = `${selectionName}.${fieldId}`;
-        return (
-            <Grid
-                item
-                key={fieldName}
-                lg={gritItemProps.lg}
-                sm={gritItemProps.sm}
-                xs={gritItemProps.xs}
-            >
-                {createParameterInput({
-                    ...parameter,
-                    control,
-                    errors,
-                    fieldName,
-                    inputItemClasses,
-                    register
-                })}
-            </Grid>
-        );
-    });
+const createParameterInputFields = ({selectionName, parameters, inputItemClasses}) => {
+    // TODO: Calculate grid properties
+    // eslint-disable-next-line no-unused-vars
+    const numberOfParameters = 0;
+    return (
+        parameters &&
+        parameters.map((parameter) => {
+            const gritItemProps =
+                parameter.dataType === 'PARAMETERSET'
+                    ? {
+                        lg: 9,
+                        sm: 12,
+                        xs: 12
+                    }
+                    : {
+                        lg: 4,
+                        sm: 6,
+                        xs: 12
+                    };
+            const fieldId = parameter.name;
+            const fieldName = `${selectionName}.${fieldId}`;
+            return (
+                <Grid
+                    item
+                    key={fieldName}
+                    lg={gritItemProps.lg}
+                    sm={gritItemProps.sm}
+                    xs={gritItemProps.xs}
+                >
+                    {createParameterInput(parameter, inputItemClasses, selectionName)}
+                </Grid>
+            );
+        })
+    );
+};
 
-const createExtendedSelectionField = ({parametersInCollection, name, control, errors, register, inputItemClasses}) => {
+const createExtendedSelectionField = ({parametersInCollection, name}, inputItemClasses) => {
     const selectionParameters = parametersInCollection && parametersInCollection.parameters || [];
-    const selectionName = getSpaceLessIdentifier(name);
-    return selectionParameters.map((selectionParameter, index) => {
+    const selectionName = name;
+    return selectionParameters.map((selectionParameter) => {
         const fieldSetName = selectionParameter.name;
         const {parameters} = selectionParameter.value;
         return {
@@ -201,14 +251,11 @@ const createExtendedSelectionField = ({parametersInCollection, name, control, er
         alignContent="flex-start"
         container
         justify="center"
-        spacing={3}
+        spacing={5}
     >
         {createParameterInputFields({
-            control,
-            errors,
             inputItemClasses,
             parameters,
-            register,
             selectionName
         })}
     </Grid>,
@@ -217,79 +264,136 @@ const createExtendedSelectionField = ({parametersInCollection, name, control, er
     });
 };
 
-export const createSelectionForParameterSet = ({
-    control,
-    errors,
-    name,
-    inputItemClasses,
-    selectedName,
-    fieldSets,
-    label,
-    helperText,
-    register
-}) => {
-    const fieldSelectionInput =
-        <>
-            <ErrorMessage
-                as="span"
-                errors={errors}
-                name={`${name}.selected`}
-                style={{color: '#f44336'}}
-            />
-
-            {fieldsetSelectionInput({
-                className: inputItemClasses,
-                control,
-                error: Boolean(queryObject(errors, `${name}.selectedName`)),
-                fieldSets,
-                helperText,
-                label,
-                name: `${name}.selectedName`,
-                register,
-                selectedName,
-                selectionListName: name
-            })}
-        </>;
-    return fieldSelectionInput;
+export const createSelectionForParameterSets = (parameter, inputItemClasses) => {
+    const inputSets = createExtendedSelectionField(parameter, inputItemClasses);
+    const setSelectionName = `${parameter.name}.selectedName`;
+    const inputSetSelection =
+        <InputSetSelection
+            className={inputItemClasses}
+            defaultSelected={parameter.selectedName}
+            helperText={parameter.comment}
+            inputSets={inputSets}
+            label={parameter.name}
+            listName={parameter.name}
+            name={setSelectionName}
+        />;
+    return inputSetSelection;
 };
 
-export const createSelectionParameterInput = ({
-    dataType,
-    parametersInCollection,
-    inputItemClasses,
-    name,
-    errors,
-    register,
-    selectedName,
-    control,
-    ...otherProps
-}) => {
-    const testArgs = {
-        fieldSets: createExtendedSelectionField({
-            control,
-            errors,
-            inputItemClasses,
-            name,
-            parametersInCollection,
-            register,
-            ...otherProps
-        }),
-        helperText: 'Some fancy helper text',
-        label: 'Some  fancy label'
-    };
+const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label, name, options}) => {
+    const {control} = useFormContext();
 
-    switch (dataType) {
+    const renderOptions = useCallback(
+        () => options.map(({key}) => <MenuItem
+            key={key}
+            value={key}
+        >
+            {key}
+        </MenuItem>),
+        [options]
+    );
+
+    const renderOptionsDescription = useCallback(
+        () => options.map(({key, value}) => <Typography
+            component="div"
+            key={key}
+            variant="caption"
+        >
+            {`${key}: ${value}`}
+        </Typography>),
+        [options]
+    );
+
+    const renderSelect = useCallback(
+        () => ({onChange, value}) => {
+            const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
+            return (
+                <TextField
+                    className={className}
+                    helperText={
+                        <>
+                            <Typography
+                                style={{
+                                    marginRight: 5,
+                                    verticalAlign: 'middle'
+                                }}
+                                variant="caption"
+                            >
+                                {helperText}
+                            </Typography>
+
+                            <Tooltip
+                                enterTouchDelay="0"
+                                title={
+                                    <>
+                                        <Typography>
+                                            The following options are available.
+                                        </Typography>
+
+                                        {renderOptionsDescription()}
+                                    </>
+                                }
+                            >
+                                <InfoIcon
+                                    style={{
+                                        fontSize: 15,
+                                        verticalAlign: 'middle'
+                                    }}
+                                />
+                            </Tooltip>
+                        </>
+                    }
+                    label={label}
+                    onChange={createChangeHanlder(onChange)}
+                    select
+                    value={value}
+                    variant="filled"
+                >
+                    {renderOptions()}
+                </TextField>
+            );
+        },
+        [className, helperText, label, renderOptions, renderOptionsDescription]
+    );
+
+    return <Controller
+        control={control}
+        defaultValue={defaultSelected}
+        name={name}
+        render={renderSelect()}
+    />;
+};
+
+const createSimpleParameterSelection = (parameter, inputItemClasses) => {
+    const {
+        comment,
+        name,
+        parametersInCollection: {parameters},
+        selectedName
+    } = parameter;
+
+    const options = parameters.map(({name: optionName, value}) => ({
+        key: optionName,
+        value
+    }));
+
+    return (
+        <UncontrolledSimpleSelect
+            className={inputItemClasses}
+            defaultSelected={selectedName}
+            helperText={comment}
+            label={name}
+            name={name}
+            options={options}
+        />
+    );
+};
+
+export const createSelectionParameterInput = (parameter, inputItemClasses) => {
+    switch (parameter.dataType) {
     case 'PARAMETERSET':
-        return createSelectionForParameterSet({
-            control,
-            errors,
-            inputItemClasses,
-            name,
-            register,
-            selectedName,
-            ...testArgs
-        });
+        return createSelectionForParameterSets(parameter, inputItemClasses);
     default:
-        return undefined;
+        return createSimpleParameterSelection(parameter, inputItemClasses);
     }
 };

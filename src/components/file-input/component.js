@@ -6,7 +6,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {SplitButton} from '../split-button/component';
 import {useStyles} from './styles';
 
-const getFileUrl = (fileName) => `${process.env.REACT_APP_SERVICE_HOST}/files/${fileName}`;
+const getFileUrl = (name) => `${process.env.REACT_APP_SERVICE_HOST}/files/${name}`;
 
 const saveFile = (file) => {
     if (!file.name) {
@@ -22,7 +22,7 @@ const saveFile = (file) => {
 
 const options = ['Load file', 'Save file'];
 
-const FileInput = ({name, label, value, comment, onChange, className}) => {
+const FileInput = ({name, label, file, helperText, onChange, className}) => {
     const inputRef = useRef();
     const labelRef = useRef();
     const [labelWidth, setLabelWidth] = useState(0);
@@ -46,13 +46,13 @@ const FileInput = ({name, label, value, comment, onChange, className}) => {
                 inputRef.current.click();
                 break;
             case 1:
-                saveFile(value);
+                saveFile(file);
                 break;
             default:
                 break;
             }
         },
-        [inputRef, value]
+        [inputRef, file]
     );
 
     useEffect(() => {
@@ -84,12 +84,12 @@ const FileInput = ({name, label, value, comment, onChange, className}) => {
                     label={label}
                     readOnly
                     type="text"
-                    value={value.name}
+                    value={file && file.name}
                 />
 
                 <SplitButton
                     className={classes.fileAction}
-                    defaultSelected={value && value.name ? 1 : 0}
+                    defaultSelected={file && file.name ? 1 : 0}
                     label="Select file operation"
                     onClick={handleOptionClick}
                     options={options}
@@ -97,7 +97,7 @@ const FileInput = ({name, label, value, comment, onChange, className}) => {
             </Box>
 
             <FormHelperText className={classes.fileComment}>
-                {comment}
+                {helperText}
             </FormHelperText>
 
             <input
@@ -112,19 +112,20 @@ const FileInput = ({name, label, value, comment, onChange, className}) => {
 
 FileInput.propTypes = {
     className: PropTypes.string,
-    comment: PropTypes.string,
+    file: PropTypes.shape({name: PropTypes.string.isRequired}),
+    helperText: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    value: PropTypes.shape({name: PropTypes.string.isRequired})
+    onChange: PropTypes.func
 };
 
 FileInput.defaultProps = {
     className: '',
-    comment: '',
+    file: {name: ''},
+    helperText: '',
     label: '',
     name: '',
-    value: {name: ''}
+    onChange: () => {}
 };
 
 export {FileInput};

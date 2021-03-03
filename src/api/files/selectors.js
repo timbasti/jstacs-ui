@@ -35,7 +35,7 @@ export const selectCurrentUpload = createSelector(
 
 export const selectFileNameOfCurrentUpload = createSelector(
     selectCurrentUpload,
-    (currentUpload) => currentUpload && currentUpload.fileName
+    (currentUpload) => currentUpload && currentUpload.name
 );
 
 export const selectProgressOfCurrentUpload = createSelector(

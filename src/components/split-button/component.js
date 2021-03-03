@@ -65,7 +65,6 @@ const SplitButton = ({defaultSelected, className, options, onClick, onChange}) =
             <Popper
                 anchorEl={anchorRef.current}
                 className={classes.popper}
-                disablePortal
                 open={open}
                 placement="bottom"
                 role={undefined}

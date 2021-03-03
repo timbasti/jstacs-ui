@@ -19,7 +19,7 @@ const updateFileParameter = (inputValue, fileParameter) => {
     }
     const updatedParameter = {
         ...fileParameter,
-        fileContents: {fileName: inputValue.name}
+        fileContents: {name: inputValue.name}
     };
     return {
         newFiles,
@@ -46,18 +46,17 @@ const updateParameterSetContainer = (inputValues, parameterSetContainer) => {
 
 const updateSelectionParameter = (selectionParameterValue, selectionParameter) => {
     console.log('updateSelectionParameter >>>', selectionParameterValue, selectionParameter);
-    const {selected, selectedName, ...otherFormData} = selectionParameterValue;
 
     if (selectionParameter.isAtomic) {
         return {
             updatedParameter: {
                 ...selectionParameter,
-                selected,
-                selectedName
+                selectedName: selectionParameterValue
             }
         };
     }
 
+    const {selected, selectedName, ...otherFormData} = selectionParameterValue;
     const nonAtomicParameterSet = selectionParameter.parametersInCollection;
     const selectedParameterSetContainer = nonAtomicParameterSet.parameters[selected];
     const {newFiles, updatedParameterSetContainer} = updateParameterSetContainer(otherFormData, selectedParameterSetContainer);
@@ -97,10 +96,10 @@ const updateParameter = (inputValue, parameter) => {
 };
 
 const updateParameters = (formData, parameters) => {
+    console.log('updateParameters', formData, parameters);
     const collectedNewFiles = [];
     const updatedParameters = parameters.map((parameter) => {
-        const spaceLessIdentifier = parameter.name.replace(/ /gu, '_');
-        const formInputValue = formData[spaceLessIdentifier];
+        const formInputValue = formData[parameter.name];
         // TODO: Maybe throw an error or something
         if (formInputValue === undefined) {
             return parameter;

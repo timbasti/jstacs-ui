@@ -3,9 +3,9 @@ import {createSlice} from '@reduxjs/toolkit';
 import {actions as filesAction} from './actions';
 import {thunks as filesThunks} from './thunks';
 
-const createInitialUploadState = (fileName) => ({
+const createInitialUploadState = (name) => ({
     error: null,
-    fileName,
+    name,
     processing: false,
     progress: 0
 });
