@@ -1,33 +1,37 @@
 import React from 'react';
-import {Controller} from 'react-hook-form';
+import {Controller, useFormContext} from 'react-hook-form';
+
 import {FileInput} from '../components/file-input/component';
 
-function getSpaceLessIdentifier(identifier) {
-    return identifier.replace(/ /g, '_');
-}
+const UncontrolledFileInput = ({name, label, defaultFile, helperText, className}) => {
+    const {control} = useFormContext();
 
-function createFileInput({name, fileContents, comment, control, inputItemClasses}) {
-    const spaceLessIdentifier = getSpaceLessIdentifier(name);
+    const renderInput = () => ({onChange, value}) => {
+        const createChangeHandler = (handleChange) => (file) => handleChange(file);
+        return (
+            <FileInput
+                className={className}
+                file={value}
+                helperText={helperText}
+                label={label}
+                onChange={createChangeHandler(onChange)}
+            />
+        );
+    };
 
-    return (
-        <Controller
-            control={control}
-            name={spaceLessIdentifier}
-            defaultValue={{name: fileContents.fileName}}
-            render={({onChange, value}) => (
-                <FileInput
-                    name={spaceLessIdentifier}
-                    onChange={(file) => onChange(file)}
-                    value={value}
-                    label={name}
-                    comment={comment}
-                    className={inputItemClasses}
-                />
-            )}
-        />
-    );
-}
+    return <Controller
+        control={control}
+        defaultValue={defaultFile}
+        name={name}
+        render={renderInput()}
+    />;
+};
 
-export function createFileParameterInput(props) {
-    return createFileInput(props);
-}
+export const createFileParameterInput = (parameter, inputItemClasses) => <UncontrolledFileInput
+    className={inputItemClasses}
+    defaultFile={parameter.fileContents}
+    helperText={parameter.comment}
+    label={parameter.name}
+    name={parameter.name}
+/>;
+

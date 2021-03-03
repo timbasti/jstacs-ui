@@ -2,13 +2,15 @@ import axios from 'axios';
 
 const testEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/test`;
 
-async function fetchParameterSet() {
-    return await axios.get(testEndpoint);
-}
+const fetchParameterSet = async () => {
+    const response = await axios.get(testEndpoint);
+    return response;
+};
 
-async function postParameterSet(parameterSet) {
-    return await axios.post(testEndpoint, parameterSet);
-}
+const postParameterSet = async (parameterSet) => {
+    const response = await axios.post(testEndpoint, parameterSet);
+    return response;
+};
 
 export const requests = {
     parameterSet: {

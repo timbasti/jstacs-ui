@@ -1,16 +1,14 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export const drawerSlice = createSlice({
+    initialState: {open: false},
     name: 'drawer',
-    initialState: {
-        open: false
-    },
     reducers: {
-        open: (state) => {
-            state.open = true;
-        },
         close: (state) => {
             state.open = false;
+        },
+        open: (state) => {
+            state.open = true;
         }
     }
 });

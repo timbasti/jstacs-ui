@@ -1,137 +1,181 @@
-import React from 'react';
-import {TextField} from '@material-ui/core';
-import {ControlledCheckbox} from '../components/controlled-checkbox/component';
-import {minMaxErrorMessage, patternErrorMessage, requiredValueErrorMessage, singleCharErrorMessage} from './error-messages';
 import {ErrorMessage} from '@hookform/error-message';
+import {TextField} from '@material-ui/core';
+import React, {useCallback} from 'react';
+import {Controller, useFormContext} from 'react-hook-form';
+import NumberFormat from 'react-number-format';
 
-const queryObject = (object, path) =>
-    path.split('.').reduce((currentObject, key) => (currentObject && currentObject[key] ? currentObject[key] : undefined), object);
+import {UncontrolledCheckbox} from '../components/controlled-checkbox/component';
+import {minMaxErrorMessage, patternErrorMessage, requiredValueErrorMessage, singleCharErrorMessage} from './error-messages';
 
-function createNumberField({name, fieldName, value, comment, required, register, inputItemClasses, minValue, maxValue, errors}) {
+const numberTypeMinMaxDefaultMap = {
+    BYTE: {
+        maxValue: 127,
+        minValue: -128
+    },
+    DOUBLE: {
+        maxValue: Number.MAX_VALUE,
+        minValue: Number.MIN_VALUE
+    },
+    FLOAT: {
+        maxValue: 3.4028235e38,
+        minValue: 1.4e-45
+    },
+    INT: {
+        maxValue: 2147483647,
+        minValue: -2147483648
+    },
+    LONG: {
+        maxValue: Number.MAX_SAFE_INTEGER,
+        minValue: Number.MIN_SAFE_INTEGER
+    },
+    SHORT: {
+        maxValue: 32767,
+        minValue: -32768
+    }
+};
+
+const queryObject = (object, path) => path
+    .split('.')
+    .reduce((currentObject, key) => (currentObject && currentObject[key] ? currentObject[key] : undefined), object);
+
+const CreateNumberField = ({parameter, inputItemClasses, parentName}) => {
+    const {errors, control} = useFormContext();
+
+    const {lowerBound, upperBound} = parameter.validator || {};
+    const minValue = typeof lowerBound === 'number' ? lowerBound : numberTypeMinMaxDefaultMap[parameter.dataType].minValue;
+    const maxValue = typeof upperBound === 'number' ? upperBound : numberTypeMinMaxDefaultMap[parameter.dataType].maxValue;
     const registerOptions = {
-        required: requiredValueErrorMessage(),
-        valueAsNumber: true,
-        min: {value: minValue, message: minMaxErrorMessage(minValue, maxValue)},
-        max: {value: maxValue, message: minMaxErrorMessage(minValue, maxValue)}
-    };
-
-    return (
-        <React.Fragment>
-            <ErrorMessage style={{color: '#f44336'}} name={fieldName} errors={errors} as="span" />
-            <TextField
-                inputRef={register(registerOptions)}
-                name={fieldName}
-                label={name}
-                defaultValue={value}
-                helperText={comment}
-                type="number"
-                variant="filled"
-                className={inputItemClasses}
-                error={!!queryObject(errors, fieldName)}
-            />
-        </React.Fragment>
-    );
-}
-
-function createTextField({
-    name,
-    fieldName,
-    value,
-    comment,
-    required,
-    register,
-    inputItemClasses,
-    patternExpression,
-    maxLength,
-    errors
-}) {
-    const registerOptions = {
-        required: requiredValueErrorMessage(),
-        pattern: {
-            value: patternExpression,
-            message: patternErrorMessage(patternErrorMessage)
+        max: {
+            message: minMaxErrorMessage(minValue, maxValue),
+            value: maxValue
         },
+        min: {
+            message: minMaxErrorMessage(minValue, maxValue),
+            value: minValue
+        },
+        required: requiredValueErrorMessage(),
+        valueAsNumber: true
+    };
+
+    const createNumberFormatTextField = useCallback(
+        () => ({onChange, value}) => {
+            const createChangeHanlder = (handleChange) => (values) => handleChange(values.floatValue);
+            return (
+                <NumberFormat
+                    className={inputItemClasses}
+                    customInput={TextField}
+                    error={Boolean(queryObject(errors, parentName ? `${parentName}.${parameter.name}` : parameter.name))}
+                    helperText={parameter.comment}
+                    isNumericString
+                    label={parameter.name}
+                    onValueChange={createChangeHanlder(onChange)}
+                    thousandSeparator
+                    value={value}
+                    variant="filled"
+                />
+            );
+        },
+        [errors, inputItemClasses, parameter, parentName]
+    );
+
+    return (
+        <>
+            <ErrorMessage
+                as="span"
+                errors={errors}
+                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
+                style={{color: '#f44336'}}
+            />
+
+            <Controller
+                control={control}
+                defaultValue={parameter.value}
+                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
+                render={createNumberFormatTextField()}
+                rules={registerOptions}
+            />
+        </>
+    );
+};
+
+const CreateTextField = ({parameter, inputItemClasses, parentName}) => {
+    const {errors, register} = useFormContext();
+
+    const maxCharacterLength = parameter.dataType === 'CHAR' ? 1 : undefined;
+    const patternExpression = parameter.validator && parameter.validator.regExp || '';
+    const registerOptions = {
         maxLength: {
-            value: maxLength,
-            message: singleCharErrorMessage()
-        }
+            message: singleCharErrorMessage(),
+            value: maxCharacterLength
+        },
+        pattern: {
+            message: patternErrorMessage(patternErrorMessage),
+            value: patternExpression
+        },
+        required: requiredValueErrorMessage()
     };
 
     return (
-        <React.Fragment>
-            <ErrorMessage style={{color: '#f44336'}} name={fieldName} errors={errors} as="span" />
+        <>
+            <ErrorMessage
+                as="span"
+                errors={errors}
+                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
+                style={{color: '#f44336'}}
+            />
+
             <TextField
+                className={inputItemClasses}
+                defaultValue={parameter.value}
+                error={Boolean(queryObject(errors, parentName ? `${parentName}.${parameter.name}` : parameter.name))}
+                helperText={parameter.comment}
                 inputRef={register(registerOptions)}
-                name={fieldName}
-                label={name}
-                defaultValue={value}
-                helperText={comment}
+                label={parameter.name}
+                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
                 type="text"
                 variant="filled"
-                className={inputItemClasses}
-                error={!!queryObject(errors, fieldName)}
             />
-        </React.Fragment>
+        </>
     );
-}
+};
 
-function createCheckBox(props) {
-    return <ControlledCheckbox {...props} />;
-}
+const createCheckbox = (parameter, inputItemClasses, parentName) => {
+    const controlledCheckbox =
+        <UncontrolledCheckbox
+            defaultValue={parameter.value}
+            helperText={parameter.comment}
+            inputItemClasses={inputItemClasses}
+            name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
+        />;
+    return controlledCheckbox;
+};
 
-export function createSimpleParameterInput({dataType, validator, ...otherProps}) {
-    switch (dataType) {
-        case 'CHAR': {
-            const patternExpression = (validator && validator.regExp) || '';
-            return createTextField({
-                ...otherProps,
-                patternExpression,
-                maxLength: 1
-            });
-        }
-        case 'STRING': {
-            const patternExpression = (validator && validator.regExp) || '';
-            return createTextField({...otherProps, patternExpression});
-        }
-        case 'LONG': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : Number.MIN_SAFE_INTEGER;
-            const maxValue = typeof upperBound === 'number' ? upperBound : Number.MAX_SAFE_INTEGER;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'INT': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : -2147483648;
-            const maxValue = typeof upperBound === 'number' ? upperBound : 2147483647;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'SHORT': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : -32768;
-            const maxValue = typeof upperBound === 'number' ? upperBound : 32767;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'BYTE': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : -128;
-            const maxValue = typeof upperBound === 'number' ? upperBound : 127;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'DOUBLE': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : Number.MIN_VALUE;
-            const maxValue = typeof upperBound === 'number' ? upperBound : Number.MAX_VALUE;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'FLOAT': {
-            const {lowerBound, upperBound} = validator || {};
-            const minValue = typeof lowerBound === 'number' ? lowerBound : 1.4e-45;
-            const maxValue = typeof upperBound === 'number' ? upperBound : 3.4028235e38;
-            return createNumberField({...otherProps, minValue, maxValue});
-        }
-        case 'BOOLEAN':
-            return createCheckBox(otherProps);
-        default:
-            break;
+// TODO: We need the parent name of selection parameter here
+export const createSimpleParameterInput = (parameter, inputItemClasses, parentName) => {
+    switch (parameter.dataType) {
+    case 'CHAR':
+    case 'STRING': {
+        return <CreateTextField
+            inputItemClasses={inputItemClasses}
+            parameter={parameter}
+            parentName={parentName}
+        />;
     }
-}
+    case 'LONG':
+    case 'INT':
+    case 'SHORT':
+    case 'BYTE':
+    case 'DOUBLE':
+    case 'FLOAT': {
+        return <CreateNumberField
+            inputItemClasses={inputItemClasses}
+            parameter={parameter}
+            parentName={parentName}
+        />;
+    }
+    case 'BOOLEAN':
+        return createCheckbox(parameter, inputItemClasses, parentName);
+    default:
+        return undefined;
+    }
+};

@@ -1,14 +1,14 @@
+import './index.css';
+
+import {ConnectedRouter} from 'connected-react-router';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {ConnectedRouter} from 'connected-react-router';
 
+import {JstacsAppShell} from './app/jstacs-app-shell';
+import * as serviceWorker from './serviceWorker';
 import {store} from './store';
 import {history} from './store/history';
-import * as serviceWorker from './serviceWorker';
-import {JstacsAppShell} from './app/jstacs-app-shell';
-
-import './index.css';
 
 ReactDOM.render(
     <Provider store={store}>

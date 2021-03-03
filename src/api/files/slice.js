@@ -1,23 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
+
 import {actions as filesAction} from './actions';
 import {thunks as filesThunks} from './thunks';
 
-function createInitialUploadState(fileName) {
-    return {
-        fileName: fileName,
-        progress: 0,
-        processing: false,
-        error: null
-    };
-}
+const createInitialUploadState = (name) => ({
+    error: null,
+    name,
+    processing: false,
+    progress: 0
+});
 
 export const filesSlice = createSlice({
-    name: 'files',
-    initialState: {
-        uploads: [],
-        processing: false
-    },
-    reducers: {},
     extraReducers: {
         [filesThunks.allFiles.post.pending]: (state, {meta}) => {
             const uploads = meta.arg.map((file) => createInitialUploadState(file.name));
@@ -47,7 +40,13 @@ export const filesSlice = createSlice({
             state.uploads[uploadIndex].processing = false;
             state.uploads[uploadIndex].error = data;
         }
-    }
+    },
+    initialState: {
+        processing: false,
+        uploads: []
+    },
+    name: 'files',
+    reducers: {}
 });
 
 export const filesReducer = filesSlice.reducer;

@@ -1,44 +1,90 @@
-import React from 'react';
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Paper, Typography} from '@material-ui/core';
+import PropTypes from 'prop-types';
+import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Typography, LinearProgress} from '@material-ui/core';
+
 import {selectUploads} from '../../api/files/selectors';
 import {useUploadDialogStyles, useUploadItemStyles} from './styles';
 
-function UploadItem({fileName, progress}) {
+const UploadItem = ({name, progress}) => {
     const classes = useUploadItemStyles();
     return (
         <Paper className={classes.root}>
-            <Typography>{fileName}</Typography>
-            <LinearProgress variant="determinate" value={progress} />
-            <Typography>Uploaded: {progress}%</Typography>
+            <Typography>
+                {name}
+            </Typography>
+
+            <LinearProgress
+                value={progress}
+                variant="determinate"
+            />
+
+            <Typography>
+                Uploaded:
+                {progress}
+                %
+            </Typography>
         </Paper>
     );
-}
+};
 
-function UploadList() {
+// TODO: Change key of upload item: Use also tool name to identify uploaded file
+const UploadList = () => {
     const uploads = useSelector(selectUploads);
 
     return (
         <DialogContent>
-            {uploads.map((upload, uploadIndex) => (
-                <UploadItem key={uploadIndex} fileName={upload.fileName} progress={upload.progress} />
-            ))}
+            {uploads.map((upload) => <UploadItem
+                key={upload.name}
+                name={upload.name}
+                progress={upload.progress}
+            />)}
         </DialogContent>
     );
-}
+};
 
-export function UploadDialog({open, onClose}) {
+const UploadDialog = ({open, onClose}) => {
     const classes = useUploadDialogStyles();
 
+    const handleClose = useCallback(onClose, [onClose]);
+
     return (
-        <Dialog open={open} onClose={onClose} PaperProps={{className: classes.paper}}>
-            <DialogTitle>Upload Progress</DialogTitle>
+        <Dialog
+            PaperProps={{className: classes.paper}}
+            onClose={handleClose}
+            open={open}
+        >
+            <DialogTitle>
+                Upload Progress
+            </DialogTitle>
+
             <UploadList />
+
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>
+                <Button
+                    onClick={handleClose}
+                    variant="outlined"
+                >
                     Close
                 </Button>
             </DialogActions>
         </Dialog>
     );
-}
+};
+
+UploadItem.propTypes = {
+    name: PropTypes.string.isRequired,
+    progress: PropTypes.number.isRequired
+};
+
+UploadDialog.propTypes = {
+    onClose: PropTypes.func,
+    open: PropTypes.bool
+};
+
+UploadDialog.defaultProps = {
+    onClose: undefined,
+    open: false
+};
+
+export {UploadDialog};

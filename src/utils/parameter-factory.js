@@ -1,17 +1,17 @@
-import {createSimpleParameterInput} from './simple-parameter-factory';
 import {createFileParameterInput} from './file-parameter-factory';
 import {createSelectionParameterInput} from './selection-parameter-factory';
+import {createSimpleParameterInput} from './simple-parameter-factory';
 
-export function createParameterInput({type, ...properties}) {
-    const parameterType = type.split('.').pop();
+export const createParameterInput = (parameter, inputItemClasses, parentName) => {
+    const parameterType = parameter.type.split('.').pop();
     switch (parameterType) {
-        case 'SimpleParameter':
-            return createSimpleParameterInput(properties);
-        case 'FileParameter':
-            return createFileParameterInput(properties);
-        case 'SelectionParameter':
-            return createSelectionParameterInput(properties);
-        default:
-            break;
+    case 'SimpleParameter':
+        return createSimpleParameterInput(parameter, inputItemClasses, parentName);
+    case 'FileParameter':
+        return createFileParameterInput(parameter, inputItemClasses, parentName);
+    case 'SelectionParameter':
+        return createSelectionParameterInput(parameter, inputItemClasses, parentName);
+    default:
+        return undefined;
     }
-}
+};
