@@ -5,6 +5,7 @@ import {Route, Switch} from 'react-router-dom';
 import {HomeView} from '../../views/home/component';
 import {NoMatchView} from '../../views/no-match/component';
 import {TestEnvironmentView} from '../../views/test-environment/component';
+import {ToolsView} from '../../views/tools/component';
 
 const useStyles = makeStyles((theme) => {
     const contentSpacing = 3;
@@ -39,6 +40,13 @@ export const JstacsMainContent = () => {
                     path="/test"
                 >
                     <TestEnvironmentView />
+                </Route>
+
+                <Route
+                    exact
+                    path="/tools"
+                >
+                    <ToolsView />
                 </Route>
 
                 <Route path="*">
