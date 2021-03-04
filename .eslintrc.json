@@ -167,6 +167,7 @@
             }
         ],
         "prefer-destructuring": "off",
-        "no-empty-function": "off"
+        "no-empty-function": "off",
+        "max-statements": "off"
     }
 }

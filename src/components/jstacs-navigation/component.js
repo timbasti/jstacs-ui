@@ -1,5 +1,6 @@
 import {Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles, Toolbar} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
+import LaunchIcon from '@material-ui/icons/Launch';
 import WarningIcon from '@material-ui/icons/Warning';
 import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -45,6 +46,18 @@ const renderNavigationItemList = () => {
                 </ListItemIcon>
 
                 <ListItemText primary="Test Umgebung" />
+            </ListItem>
+
+            <ListItem
+                button
+                component={RouterLink}
+                to="/tools"
+            >
+                <ListItemIcon>
+                    <LaunchIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Tool Launcher" />
             </ListItem>
         </List>;
     return navigationItemList;
