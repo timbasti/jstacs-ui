@@ -1,12 +1,32 @@
-import {Box, Button, Grid, MenuItem, TextField} from '@material-ui/core';
-import React, {useCallback, useEffect} from 'react';
+import {
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    MenuItem,
+    Paper,
+    Tab,
+    Tabs,
+    TextField,
+    Typography
+} from '@material-ui/core';
+import React, {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
+import ReactMarkdown from 'react-markdown';
 import {useDispatch, useSelector} from 'react-redux';
+import gfm from 'remark-gfm';
 
 import {selectAvailableTools, selectNumberOfTools, selectParameters, selectToolName} from '../../api/tools/selectors';
 import {thunks as toolsThunks} from '../../api/tools/thunks';
+import {FileItemContext, fileItemReducer} from '../../utils/file-context';
 import {createParameterInput} from '../../utils/parameter-factory';
-import {useStyles} from './styles';
+import {cardActionStyles, useStyles} from './styles';
 
 const createParameterInputFields = (parameters, inputItemClasses) => parameters &&
     parameters.map((parameter) => {
@@ -35,21 +55,44 @@ const createParameterInputFields = (parameters, inputItemClasses) => parameters 
         );
     });
 
+const TabPanel = (props) => {
+    const {children, value, index} = props;
+
+    return (
+        <div
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            role="tabpanel"
+        >
+            {value === index &&
+                <Box p={3}>
+                    <Typography component="div">
+                        {children}
+                    </Typography>
+                </Box>}
+        </div>
+    );
+};
+
 export const ToolsView = () => {
     const classes = useStyles();
+    const cardActionClasses = cardActionStyles();
     const dispatch = useDispatch();
+    const [selectedTool, setSelectedTool] = useState(0);
+    const [openHelpText, setOpenHelpText] = useState(false);
+    const [openCitation, setOpenCitation] = useState(false);
     const availableTools = useSelector(selectAvailableTools);
-    const numberOfAvailableTools = useSelector(selectNumberOfTools);
-    const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
     const {handleSubmit, ...formProperties} = useForm();
-
-    /* const onSubmit = (formData) => {
-        console.log('onSubmit', formData);
-        if (Object.keys(formData).length > 0) {
-            dispatch(toolsThunks.parameterSet.update(formData));
-        }
-    }; */
+    const [fileItems, setFileItem] = useReducer(fileItemReducer, {});
+    const fileContext = useMemo(
+        () => ({
+            fileItems,
+            setFileItem
+        }),
+        [fileItems, setFileItem]
+    );
+    const [selectedSection, setSelectedSection] = useState(0);
 
     useEffect(() => {
         if (!availableTools) {
@@ -57,19 +100,40 @@ export const ToolsView = () => {
         }
     }, [availableTools, dispatch]);
 
-    /* useEffect(() => {
-        if (numberOfAvailableTools > 0 && !toolName) {
-            dispatch(toolsThunks.parameterSet.fetch());
+    const onSubmit = (formData) => {
+        if (Object.keys(formData).length > 0) {
+            dispatch(toolsThunks.parameterSet.post(selectedTool));
         }
-    }, [toolName, numberOfAvailableTools, dispatch]); */
+    };
 
     const handleToolSelectionChange = useCallback(
         (event) => {
-            const selectedTool = event.target.value;
-            dispatch(toolsThunks.parameterSet.fetch(selectedTool));
+            const newSelectedTool = event.target.value;
+            setSelectedTool(newSelectedTool);
         },
-        [dispatch]
+        [setSelectedTool]
     );
+
+    const handleToggleHelpText = useCallback(() => {
+        setOpenHelpText(!openHelpText);
+    }, [openHelpText, setOpenHelpText]);
+
+    const handleToggleCitation = useCallback(() => {
+        setOpenCitation(!openCitation);
+    }, [openCitation, setOpenCitation]);
+
+    const handleSectionChange = useCallback(
+        (event, newSelectedSection) => {
+            setSelectedSection(newSelectedSection);
+        },
+        [setSelectedSection]
+    );
+
+    const handleLoadToolClick = useCallback(() => {
+        if (availableTools && availableTools[selectedTool] && availableTools[selectedTool].type) {
+            dispatch(toolsThunks.parameterSet.fetch(availableTools[selectedTool].type));
+        }
+    }, [availableTools, selectedTool, dispatch]);
 
     return (
         <Box>
@@ -77,57 +141,191 @@ export const ToolsView = () => {
                 A view to show available tools and to load the parameters.
             </Box>
 
-            <TextField
-                helperText="Please select a tool"
-                label="Tool Selection"
-                onChange={handleToolSelectionChange}
-                select
-            >
-                {availableTools &&
-                    availableTools.map((tool) => <MenuItem
-                        key={tool}
-                        value={tool}
-                    >
-                        {tool}
-                    </MenuItem>)}
-            </TextField>
-
-            <Box component="p">
-                Es wurden Daten für folgendes Tool geladen:
-                {toolName}
-            </Box>
-
-            <FormProvider
-                {...formProperties}
-                handleSubmit={handleSubmit}
-            >
-                <form
-                    className={classes.form}
-                    onSubmit={handleSubmit()}
+            {availableTools &&
+                <TextField
+                    helperText="Please select a tool"
+                    label="Tool Selection"
+                    onChange={handleToolSelectionChange}
+                    select
+                    value={selectedTool}
+                    variant="filled"
                 >
-                    <Grid
-                        alignContent="flex-start"
-                        container
-                        justify="center"
-                        spacing={5}
+                    {availableTools.map(({type, toolName}, toolIndex) => <MenuItem
+                        key={type}
+                        value={toolIndex}
                     >
-                        {createParameterInputFields(parameters, classes.inputItem)}
+                        {toolName}
+                    </MenuItem>)}
+                </TextField>}
 
-                        <Grid
-                            item
-                            xs={12}
+            <Card>
+                <CardContent>
+                    <Typography
+                        color="textSecondary"
+                        gutterBottom
+                    >
+                        {availableTools && availableTools[selectedTool].type}
+                    </Typography>
+
+                    <Typography
+                        component="h2"
+                        variant="h5"
+                    >
+                        {availableTools && availableTools[selectedTool].toolName}
+                    </Typography>
+
+                    <Typography color="textSecondary">
+                        {'Version: '}
+
+                        {availableTools && availableTools[selectedTool].toolVersion}
+                    </Typography>
+
+                    <Typography
+                        component="p"
+                        variant="body2"
+                    >
+                        {availableTools && availableTools[selectedTool].description}
+                    </Typography>
+                </CardContent>
+
+                <CardActions className={cardActionClasses.root}>
+                    <Button
+                        onClick={handleLoadToolClick}
+                        size="small"
+                    >
+                        Load Tool
+                    </Button>
+
+                    {availableTools && availableTools[selectedTool].helpText &&
+                        <Button
+                            onClick={handleToggleHelpText}
+                            size="small"
                         >
-                            <Button
-                                color="primary"
-                                type="submit"
-                                variant="contained"
+                            Show Help Text
+                        </Button>}
+
+                    {availableTools && availableTools[selectedTool].references &&
+                        <Button
+                            onClick={handleToggleCitation}
+                            size="small"
+                        >
+                            Show Citation
+                        </Button>}
+                </CardActions>
+            </Card>
+
+            <Paper>
+                <Tabs
+                    onChange={handleSectionChange}
+                    value={selectedSection}
+                >
+                    <Tab label="Parameters" />
+
+                    <Tab label="Results" />
+                </Tabs>
+
+                <TabPanel
+                    index={0}
+                    value={selectedSection}
+                >
+                    <FormProvider
+                        {...formProperties}
+                        handleSubmit={handleSubmit}
+                    >
+                        <FileItemContext.Provider value={fileContext}>
+                            <form
+                                className={classes.form}
+                                onSubmit={handleSubmit()}
                             >
-                                Submit
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </form>
-            </FormProvider>
+                                <Grid
+                                    alignContent="flex-start"
+                                    container
+                                    justify="center"
+                                    spacing={5}
+                                >
+                                    {createParameterInputFields(parameters, classes.inputItem)}
+
+                                    <Grid
+                                        item
+                                        xs={12}
+                                    >
+                                        <Button
+                                            color="primary"
+                                            type="submit"
+                                            variant="contained"
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </form>
+                        </FileItemContext.Provider>
+                    </FormProvider>
+                </TabPanel>
+
+                <TabPanel
+                    index={1}
+                    value={selectedSection}
+                >
+                    Fancy Results
+                </TabPanel>
+            </Paper>
+
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                onBackdropClick={handleToggleHelpText}
+                open={openHelpText}
+            >
+                <DialogTitle>
+                    Help Text
+                </DialogTitle>
+
+                <DialogContent>
+                    <ReactMarkdown plugins={[gfm]}>
+                        {availableTools && availableTools[selectedTool].helpText}
+                    </ReactMarkdown>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        onClick={handleToggleHelpText}
+                        size="small"
+                    >
+                        Close Help Text
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                onBackdropClick={handleToggleCitation}
+                open={openCitation}
+            >
+                <DialogTitle>
+                    Citation
+                </DialogTitle>
+
+                <DialogContent>
+                    {availableTools &&
+                        availableTools[selectedTool].references &&
+                        availableTools[selectedTool].references.map((reference) => <pre key={btoa(reference)}>
+                            <code>
+                                {reference}
+                            </code>
+                        </pre>)}
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        onClick={handleToggleCitation}
+                        size="small"
+                    >
+                        Close Citation
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

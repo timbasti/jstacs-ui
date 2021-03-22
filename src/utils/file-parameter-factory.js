@@ -14,6 +14,7 @@ const UncontrolledFileInput = ({name, label, defaultFile, helperText, className}
                 file={value}
                 helperText={helperText}
                 label={label}
+                name={name}
                 onChange={createChangeHandler(onChange)}
             />
         );
@@ -34,4 +35,3 @@ export const createFileParameterInput = (parameter, inputItemClasses) => <Uncont
     label={parameter.name}
     name={parameter.name}
 />;
-
