@@ -1,10 +1,11 @@
 import {Box, Button, Grid} from '@material-ui/core';
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo, useReducer} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {selectParameters, selectToolName} from '../../api/test/selectors';
 import {thunks as testThunks} from '../../api/test/thunks';
+import {FileItemContext, fileItemReducer} from '../../utils/file-context';
 import {createParameterInput} from '../../utils/parameter-factory';
 import {useStyles} from './styles';
 
@@ -42,8 +43,16 @@ export const TestEnvironmentView = () => {
     const parameters = useSelector(selectParameters);
     const {handleSubmit, ...formProperties} = useForm();
 
+    const [fileItems, setFileItem] = useReducer(fileItemReducer, {});
+    const fileContext = useMemo(
+        () => ({
+            fileItems,
+            setFileItem
+        }),
+        [fileItems, setFileItem]
+    );
+
     const onSubmit = (formData) => {
-        console.log('onSubmit', formData);
         if (Object.keys(formData).length > 0) {
             dispatch(testThunks.parameterSet.update(formData));
         }
@@ -70,32 +79,34 @@ export const TestEnvironmentView = () => {
                 {...formProperties}
                 handleSubmit={handleSubmit}
             >
-                <form
-                    className={classes.form}
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    <Grid
-                        alignContent="flex-start"
-                        container
-                        justify="center"
-                        spacing={5}
+                <FileItemContext.Provider value={fileContext}>
+                    <form
+                        className={classes.form}
+                        onSubmit={handleSubmit(onSubmit)}
                     >
-                        {createParameterInputFields(parameters, classes.inputItem)}
-
                         <Grid
-                            item
-                            xs={12}
+                            alignContent="flex-start"
+                            container
+                            justify="center"
+                            spacing={5}
                         >
-                            <Button
-                                color="primary"
-                                type="submit"
-                                variant="contained"
+                            {createParameterInputFields(parameters, classes.inputItem)}
+
+                            <Grid
+                                item
+                                xs={12}
                             >
-                                Submit
-                            </Button>
+                                <Button
+                                    color="primary"
+                                    type="submit"
+                                    variant="contained"
+                                >
+                                    Submit
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </form>
+                    </form>
+                </FileItemContext.Provider>
             </FormProvider>
         </Box>
     );

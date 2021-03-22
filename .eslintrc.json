@@ -1,36 +1,13 @@
 {
-    "plugins": [
-        "sort-keys-fix",
-        "simple-import-sort",
-        "import"
-    ],
-    "extends": [
-        "eslint:all",
-        "plugin:react/all",
-        "react-app"
-    ],
+    "plugins": ["sort-keys-fix", "simple-import-sort", "import"],
+    "extends": ["eslint:all", "plugin:react/all", "react-app"],
     "rules": {
-        "padded-blocks": [
-            "error",
-            "never"
-        ],
-        "quote-props": [
-            "error",
-            "as-needed"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
+        "padded-blocks": ["error", "never"],
+        "quote-props": ["error", "as-needed"],
+        "quotes": ["error", "single"],
         "sort-keys": "off",
-        "sort-keys-fix/sort-keys-fix": [
-            "error",
-            "asc"
-        ],
-        "one-var": [
-            "error",
-            "never"
-        ],
+        "sort-keys-fix/sort-keys-fix": ["error", "asc"],
+        "one-var": ["error", "never"],
         "max-len": [
             "error",
             {
@@ -38,10 +15,7 @@
             }
         ],
         "no-ternary": "off",
-        "multiline-ternary": [
-            "error",
-            "always-multiline"
-        ],
+        "multiline-ternary": ["error", "always-multiline"],
         "no-extra-parens": [
             "error",
             "all",
@@ -52,11 +26,7 @@
         "no-magic-numbers": [
             "error",
             {
-                "ignore": [
-                    -1,
-                    0,
-                    1
-                ],
+                "ignore": [-1, 0, 1, 2, 3],
                 "ignoreArrayIndexes": true,
                 "ignoreDefaultValues": true
             }
@@ -65,10 +35,7 @@
         "react/jsx-filename-extension": [
             "error",
             {
-                "extensions": [
-                    ".js",
-                    ".jsx"
-                ]
+                "extensions": [".js", ".jsx"]
             }
         ],
         "react/function-component-definition": [
@@ -78,16 +45,10 @@
                 "unnamedComponents": "arrow-function"
             }
         ],
-        "function-paren-newline": [
-            "error",
-            "multiline"
-        ],
+        "function-paren-newline": ["error", "multiline"],
         "react/display-name": "off",
         "react/jsx-wrap-multilines": "off",
-        "react/jsx-closing-bracket-location": [
-            "error",
-            "line-aligned"
-        ],
+        "react/jsx-closing-bracket-location": ["error", "line-aligned"],
         "react/forbid-component-props": "off",
         "react/prop-types": [
             "error",
@@ -99,15 +60,12 @@
         "max-lines-per-function": [
             "error",
             {
-                "max": 120,
+                "max": 300,
                 "skipComments": true,
                 "skipBlankLines": true
             }
         ],
-        "function-call-argument-newline": [
-            "error",
-            "consistent"
-        ],
+        "function-call-argument-newline": ["error", "consistent"],
         "object-curly-newline": [
             "error",
             {
@@ -139,7 +97,7 @@
         "react/jsx-max-depth": [
             "error",
             {
-                "max": 6
+                "max": 8
             }
         ],
         "react/jsx-handler-names": [

@@ -299,7 +299,7 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
             key={key}
             variant="caption"
         >
-            {`${key}: ${value}`}
+            {key === value ? key : `${key}: ${value}`}
         </Typography>),
         [options]
     );
@@ -323,7 +323,7 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
                             </Typography>
 
                             <Tooltip
-                                enterTouchDelay="0"
+                                enterTouchDelay={0}
                                 title={
                                     <>
                                         <Typography>

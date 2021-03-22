@@ -14,7 +14,7 @@ const updateSimpleParameter = (inputValue, simpleParameter) => ({
 
 const updateFileParameter = (inputValue, fileParameter) => {
     const newFiles = [];
-    if (inputValue > 0) {
+    if (inputValue.size > 0) {
         newFiles.push(inputValue);
     }
     const updatedParameter = {
@@ -30,7 +30,6 @@ const updateFileParameter = (inputValue, fileParameter) => {
 const updateParameterSetContainer = (inputValues, parameterSetContainer) => {
     const selectedParameterSet = parameterSetContainer.value;
     const {newFiles, updatedParameters} = updateParameters(inputValues, selectedParameterSet.parameters);
-    console.log('updateParameterSetContainer', newFiles, updatedParameters);
     const updatedParameterSet = {
         ...selectedParameterSet,
         parameters: updatedParameters
@@ -45,8 +44,6 @@ const updateParameterSetContainer = (inputValues, parameterSetContainer) => {
 };
 
 const updateSelectionParameter = (selectionParameterValue, selectionParameter) => {
-    console.log('updateSelectionParameter >>>', selectionParameterValue, selectionParameter);
-
     if (selectionParameter.isAtomic) {
         return {
             updatedParameter: {
@@ -80,10 +77,12 @@ const updateSelectionParameter = (selectionParameterValue, selectionParameter) =
 const updateParameter = (inputValue, parameter) => {
     const parameterType = parameter.type.split('.').pop();
     switch (parameterType) {
+    case 'DataColumnParameter':
     case 'SimpleParameter':
         return updateSimpleParameter(inputValue, parameter);
     case 'FileParameter':
         return updateFileParameter(inputValue, parameter);
+    case 'EnumParameter':
     case 'SelectionParameter':
         return updateSelectionParameter(inputValue, parameter);
     default:
@@ -96,7 +95,6 @@ const updateParameter = (inputValue, parameter) => {
 };
 
 const updateParameters = (formData, parameters) => {
-    console.log('updateParameters', formData, parameters);
     const collectedNewFiles = [];
     const updatedParameters = parameters.map((parameter) => {
         const formInputValue = formData[parameter.name];
@@ -105,7 +103,6 @@ const updateParameters = (formData, parameters) => {
             return parameter;
         }
         const {newFiles = [], updatedParameter} = updateParameter(formInputValue, parameter);
-        console.log('updateParameters', newFiles, updatedParameter);
         collectedNewFiles.push(...newFiles);
         return updatedParameter;
     });
@@ -127,11 +124,9 @@ const postParameterSet = createAsyncThunk('test/parameterSet/post', async (param
 });
 
 const updateParameterSet = createAsyncThunk('test/parameterSet/update', async (formData, {dispatch, getState}) => {
-    console.log('updateParameterSet', formData);
     const state = getState();
     const parameters = selectParameters(state);
     const {updatedParameters, newFiles} = updateParameters(formData, parameters);
-    console.log('updateParameterSet >>>', updatedParameters, newFiles);
     const parameterSet = selectParameterSet(state);
     const updatedParameterSet = {
         ...parameterSet,

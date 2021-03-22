@@ -20,7 +20,7 @@ export const useStyles = makeStyles({
         borderTopRightRadius: 0,
         flex: 1,
         height: '56px',
-        minWidth: (props) => `${props.labelWidth}px`
+        minWidth: ({labelWidth}) => `${labelWidth}px`
     },
     input: {
         display: 'flex',
