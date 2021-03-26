@@ -15,8 +15,8 @@ const postFile = createAsyncThunk('files/single-file/post', async ({file, upload
     };
 });
 
-const postFiles = createAsyncThunk('files/all-files/post', (files, {dispatch}) => {
-    Promise.all(files.map((file, uploadIndex) => dispatch(postFile({
+const postFiles = createAsyncThunk('files/all-files/post', async (files, {dispatch}) => {
+    await Promise.all(files.map((file, uploadIndex) => dispatch(postFile({
         file,
         uploadIndex
     }))));
