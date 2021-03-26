@@ -22,6 +22,11 @@ export const selectParameterSet = (state) => {
     return toolsState.parameterSet;
 };
 
+export const selectResults = (state) => {
+    const toolsState = selectState(state);
+    return toolsState.results;
+};
+
 export const selectHasError = createSelector([selectError], (error) => Boolean(error));
 
 export const selectToolName = createSelector([selectParameterSet], (parameterSet) => parameterSet && parameterSet.toolName);

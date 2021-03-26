@@ -9,6 +9,8 @@ import {
     DialogContent,
     DialogTitle,
     Grid,
+    List,
+    ListItem,
     MenuItem,
     Paper,
     Tab,
@@ -16,15 +18,23 @@ import {
     TextField,
     Typography
 } from '@material-ui/core';
+import {AddBoxSharp} from '@material-ui/icons';
 import React, {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
 import {useDispatch, useSelector} from 'react-redux';
 import gfm from 'remark-gfm';
 
-import {selectAvailableTools, selectNumberOfTools, selectParameters, selectToolName} from '../../api/tools/selectors';
+import {
+    selectAvailableTools,
+    selectNumberOfTools,
+    selectParameters,
+    selectResults,
+    selectToolName
+} from '../../api/tools/selectors';
 import {thunks as toolsThunks} from '../../api/tools/thunks';
-import {FileItemContext, fileItemReducer} from '../../utils/file-context';
+import {saveFile} from '../../helpers/file-helpers';
+import {FileItemProvider} from '../../utils/file-context';
 import {createParameterInput} from '../../utils/parameter-factory';
 import {cardActionStyles, useStyles} from './styles';
 
@@ -83,15 +93,9 @@ export const ToolsView = () => {
     const [openCitation, setOpenCitation] = useState(false);
     const availableTools = useSelector(selectAvailableTools);
     const parameters = useSelector(selectParameters);
+    const results = useSelector(selectResults);
     const {handleSubmit, ...formProperties} = useForm();
-    const [fileItems, setFileItem] = useReducer(fileItemReducer, {});
-    const fileContext = useMemo(
-        () => ({
-            fileItems,
-            setFileItem
-        }),
-        [fileItems, setFileItem]
-    );
+    const [fileItems, setFileItems] = useState({});
     const [selectedSection, setSelectedSection] = useState(0);
 
     useEffect(() => {
@@ -100,11 +104,27 @@ export const ToolsView = () => {
         }
     }, [availableTools, dispatch]);
 
-    const onSubmit = (formData) => {
-        if (Object.keys(formData).length > 0) {
-            dispatch(toolsThunks.parameterSet.post(selectedTool));
-        }
-    };
+    const onSubmit = useCallback(
+        (values) => {
+            console.log(values, fileItems);
+
+            if (availableTools[selectedTool] && Object.keys(values).length > 0) {
+                dispatch(toolsThunks.tools.execute({
+                    files: Object.values(fileItems),
+                    tool: availableTools[selectedTool].type,
+                    values
+                }));
+            }
+        },
+        [availableTools, dispatch, fileItems, selectedTool]
+    );
+
+    const handleFileItemsChange = useCallback(
+        (updatedFileItems) => {
+            setFileItems(updatedFileItems);
+        },
+        [setFileItems]
+    );
 
     const handleToolSelectionChange = useCallback(
         (event) => {
@@ -135,141 +155,166 @@ export const ToolsView = () => {
         }
     }, [availableTools, selectedTool, dispatch]);
 
+    const createResultClickHandler = useCallback((resultFile) => () => {
+        console.log(resultFile);
+        saveFile({name: resultFile});
+    }, []);
+
     return (
-        <Box>
-            <Box component="p">
-                A view to show available tools and to load the parameters.
-            </Box>
-
-            {availableTools &&
-                <TextField
-                    helperText="Please select a tool"
-                    label="Tool Selection"
-                    onChange={handleToolSelectionChange}
-                    select
-                    value={selectedTool}
-                    variant="filled"
-                >
-                    {availableTools.map(({type, toolName}, toolIndex) => <MenuItem
-                        key={type}
-                        value={toolIndex}
+        <Grid
+            container
+            direction="column"
+            spacing={3}
+        >
+            <Grid item>
+                {availableTools &&
+                    <TextField
+                        helperText="Please select a tool"
+                        label="Tool Selection"
+                        onChange={handleToolSelectionChange}
+                        select
+                        value={selectedTool}
+                        variant="filled"
                     >
-                        {toolName}
-                    </MenuItem>)}
-                </TextField>}
+                        {availableTools.map(({type, toolName}, toolIndex) => <MenuItem
+                            key={type}
+                            value={toolIndex}
+                        >
+                            {toolName}
+                        </MenuItem>)}
+                    </TextField>}
+            </Grid>
 
-            <Card>
-                <CardContent>
-                    <Typography
-                        color="textSecondary"
-                        gutterBottom
-                    >
-                        {availableTools && availableTools[selectedTool].type}
-                    </Typography>
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <Typography
+                            color="textSecondary"
+                            gutterBottom
+                        >
+                            {availableTools && availableTools[selectedTool].type}
+                        </Typography>
 
-                    <Typography
-                        component="h2"
-                        variant="h5"
-                    >
-                        {availableTools && availableTools[selectedTool].toolName}
-                    </Typography>
+                        <Typography
+                            component="h2"
+                            variant="h5"
+                        >
+                            {availableTools && availableTools[selectedTool].toolName}
+                        </Typography>
 
-                    <Typography color="textSecondary">
-                        {'Version: '}
+                        <Typography color="textSecondary">
+                            {'Version: '}
 
-                        {availableTools && availableTools[selectedTool].toolVersion}
-                    </Typography>
+                            {availableTools && availableTools[selectedTool].toolVersion}
+                        </Typography>
 
-                    <Typography
-                        component="p"
-                        variant="body2"
-                    >
-                        {availableTools && availableTools[selectedTool].description}
-                    </Typography>
-                </CardContent>
+                        <Typography
+                            component="p"
+                            variant="body2"
+                        >
+                            {availableTools && availableTools[selectedTool].description}
+                        </Typography>
+                    </CardContent>
 
-                <CardActions className={cardActionClasses.root}>
-                    <Button
-                        onClick={handleLoadToolClick}
-                        size="small"
-                    >
-                        Load Tool
-                    </Button>
-
-                    {availableTools && availableTools[selectedTool].helpText &&
+                    <CardActions className={cardActionClasses.root}>
                         <Button
-                            onClick={handleToggleHelpText}
+                            onClick={handleLoadToolClick}
                             size="small"
                         >
-                            Show Help Text
-                        </Button>}
+                            Load Tool
+                        </Button>
 
-                    {availableTools && availableTools[selectedTool].references &&
-                        <Button
-                            onClick={handleToggleCitation}
-                            size="small"
-                        >
-                            Show Citation
-                        </Button>}
-                </CardActions>
-            </Card>
-
-            <Paper>
-                <Tabs
-                    onChange={handleSectionChange}
-                    value={selectedSection}
-                >
-                    <Tab label="Parameters" />
-
-                    <Tab label="Results" />
-                </Tabs>
-
-                <TabPanel
-                    index={0}
-                    value={selectedSection}
-                >
-                    <FormProvider
-                        {...formProperties}
-                        handleSubmit={handleSubmit}
-                    >
-                        <FileItemContext.Provider value={fileContext}>
-                            <form
-                                className={classes.form}
-                                onSubmit={handleSubmit()}
+                        {availableTools && availableTools[selectedTool].helpText &&
+                            <Button
+                                onClick={handleToggleHelpText}
+                                size="small"
                             >
-                                <Grid
-                                    alignContent="flex-start"
-                                    container
-                                    justify="center"
-                                    spacing={5}
+                                Show Help Text
+                            </Button>}
+
+                        {availableTools && availableTools[selectedTool].references &&
+                            <Button
+                                onClick={handleToggleCitation}
+                                size="small"
+                            >
+                                Show Citation
+                            </Button>}
+                    </CardActions>
+                </Card>
+            </Grid>
+
+            <Grid item>
+                <Paper>
+                    <Paper
+                        elevation={2}
+                        square
+                    >
+                        <Tabs
+                            onChange={handleSectionChange}
+                            value={selectedSection}
+                        >
+                            <Tab label="Parameters" />
+
+                            <Tab label="Results" />
+                        </Tabs>
+                    </Paper>
+
+                    <Box
+                        hidden={selectedSection !== 0}
+                        p={2}
+                    >
+                        <FormProvider
+                            {...formProperties}
+                            handleSubmit={handleSubmit}
+                        >
+                            <FileItemProvider onChange={handleFileItemsChange}>
+                                <form
+                                    className={classes.form}
+                                    onSubmit={handleSubmit(onSubmit)}
                                 >
-                                    {createParameterInputFields(parameters, classes.inputItem)}
-
                                     <Grid
-                                        item
-                                        xs={12}
+                                        alignContent="flex-start"
+                                        container
+                                        justify="center"
+                                        spacing={2}
                                     >
-                                        <Button
-                                            color="primary"
-                                            type="submit"
-                                            variant="contained"
-                                        >
-                                            Submit
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </form>
-                        </FileItemContext.Provider>
-                    </FormProvider>
-                </TabPanel>
+                                        {createParameterInputFields(parameters, classes.inputItem)}
 
-                <TabPanel
-                    index={1}
-                    value={selectedSection}
-                >
-                    Fancy Results
-                </TabPanel>
-            </Paper>
+                                        <Grid
+                                            item
+                                            xs={12}
+                                        >
+                                            <Button
+                                                color="primary"
+                                                type="submit"
+                                                variant="contained"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </form>
+                            </FileItemProvider>
+                        </FormProvider>
+                    </Box>
+
+                    <Box
+                        hidden={selectedSection !== 1}
+                        p={2}
+                    >
+                        {results &&
+                            <List>
+                                {results.map((result) => <ListItem
+                                    button
+                                    key={result}
+                                    onClick={createResultClickHandler(result)}
+                                >
+                                    {result}
+                                </ListItem>)}
+                            </List>}
+                    </Box>
+                </Paper>
+            </Grid>
 
             <Dialog
                 fullWidth
@@ -326,6 +371,6 @@ export const ToolsView = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Grid>
     );
 };

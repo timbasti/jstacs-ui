@@ -7,14 +7,14 @@ const fetchParameterSet = async () => {
     return response;
 };
 
-const postParameterSet = async (parameterSet) => {
-    const response = await axios.post(testEndpoint, parameterSet);
+const postParameterValues = async (formData) => {
+    const response = await axios.post(testEndpoint, formData);
     return response;
 };
 
 export const requests = {
     parameterSet: {
         fetch: fetchParameterSet,
-        post: postParameterSet
+        post: postParameterValues
     }
 };

@@ -12,15 +12,21 @@ const fetchParameterSet = async (tool) => {
     return response;
 };
 
-const postParameterSet = async (tool, parameterSet) => {
-    const response = await axios.post(`${toolsEndpoint}/${tool}`, parameterSet);
+const postParameterValues = async (tool, formData) => {
+    const response = await axios.post(`${toolsEndpoint}/${tool}`, formData);
+    return response;
+};
+
+const fetchExecutionResults = async (tool) => {
+    const response = await axios.get(`${toolsEndpoint}/${tool}/results`);
     return response;
 };
 
 export const requests = {
     parameterSet: {
         fetch: fetchParameterSet,
-        post: postParameterSet
+        post: postParameterValues
     },
+    results: {fetch: fetchExecutionResults},
     tools: {fetch: fetchTools}
 };

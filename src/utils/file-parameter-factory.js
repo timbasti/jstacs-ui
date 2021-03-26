@@ -1,31 +1,34 @@
-import React from 'react';
-import {Controller, useFormContext} from 'react-hook-form';
+import React, {useCallback, useEffect} from 'react';
+import {useFormContext} from 'react-hook-form';
 
 import {FileInput} from '../components/file-input/component';
+import {requiredValueErrorMessage} from './error-messages';
 
-const UncontrolledFileInput = ({name, label, defaultFile, helperText, className}) => {
-    const {control} = useFormContext();
+const UncontrolledFileInput = ({name, label, defaultFile, helperText, className, required}) => {
+    const {register, setValue} = useFormContext();
 
-    const renderInput = () => ({onChange, value}) => {
-        const createChangeHandler = (handleChange) => (file) => handleChange(file);
-        return (
-            <FileInput
-                className={className}
-                file={value}
-                helperText={helperText}
-                label={label}
-                name={name}
-                onChange={createChangeHandler(onChange)}
-            />
-        );
-    };
+    useEffect(() => {
+        register(name, {validate: (file) => Boolean(file && file.name) || requiredValueErrorMessage()});
+    }, [name, register]);
 
-    return <Controller
-        control={control}
-        defaultValue={defaultFile}
-        name={name}
-        render={renderInput()}
-    />;
+    const handleFileChange = useCallback(
+        (file) => {
+            setValue(name, file);
+        },
+        [name, setValue]
+    );
+
+    return (
+        <FileInput
+            className={className}
+            defaultFile={defaultFile}
+            helperText={helperText}
+            label={label}
+            name={name}
+            onChange={handleFileChange}
+            required={required}
+        />
+    );
 };
 
 export const createFileParameterInput = (parameter, inputItemClasses) => <UncontrolledFileInput
@@ -34,4 +37,6 @@ export const createFileParameterInput = (parameter, inputItemClasses) => <Uncont
     helperText={parameter.comment}
     label={parameter.name}
     name={parameter.name}
+    required={parameter.required}
 />;
+

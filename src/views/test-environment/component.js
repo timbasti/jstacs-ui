@@ -1,11 +1,11 @@
 import {Box, Button, Grid} from '@material-ui/core';
-import React, {useEffect, useMemo, useReducer} from 'react';
+import React, {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {selectParameters, selectToolName} from '../../api/test/selectors';
 import {thunks as testThunks} from '../../api/test/thunks';
-import {FileItemContext, fileItemReducer} from '../../utils/file-context';
+import {FileItemProvider, useFileItemContext} from '../../utils/file-context';
 import {createParameterInput} from '../../utils/parameter-factory';
 import {useStyles} from './styles';
 
@@ -42,21 +42,28 @@ export const TestEnvironmentView = () => {
     const toolName = useSelector(selectToolName);
     const parameters = useSelector(selectParameters);
     const {handleSubmit, ...formProperties} = useForm();
+    const [fileItems, setFileItems] = useState({});
 
-    const [fileItems, setFileItem] = useReducer(fileItemReducer, {});
-    const fileContext = useMemo(
-        () => ({
-            fileItems,
-            setFileItem
-        }),
-        [fileItems, setFileItem]
+    const onSubmit = useCallback(
+        (formData) => {
+            console.log(formData, fileItems);
+
+            if (Object.keys(formData).length > 0) {
+                dispatch(testThunks.parameterSet.update({
+                    files: Object.values(fileItems),
+                    formData
+                }));
+            }
+        },
+        [dispatch, fileItems]
     );
 
-    const onSubmit = (formData) => {
-        if (Object.keys(formData).length > 0) {
-            dispatch(testThunks.parameterSet.update(formData));
-        }
-    };
+    const handleFileItemsChange = useCallback(
+        (updatedFileItems) => {
+            setFileItems(updatedFileItems);
+        },
+        [setFileItems]
+    );
 
     useEffect(() => {
         if (!toolName) {
@@ -79,7 +86,7 @@ export const TestEnvironmentView = () => {
                 {...formProperties}
                 handleSubmit={handleSubmit}
             >
-                <FileItemContext.Provider value={fileContext}>
+                <FileItemProvider onChange={handleFileItemsChange}>
                     <form
                         className={classes.form}
                         onSubmit={handleSubmit(onSubmit)}
@@ -106,7 +113,7 @@ export const TestEnvironmentView = () => {
                             </Grid>
                         </Grid>
                     </form>
-                </FileItemContext.Provider>
+                </FileItemProvider>
             </FormProvider>
         </Box>
     );

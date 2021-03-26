@@ -1,14 +1,24 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Controller, useFormContext} from 'react-hook-form';
 
-import {UncontrolledSimpleSelect} from '../components/simple-select/uncontrolled-component';
+import {ControlledSimpleSelect} from '../components/simple-select/controlled-component';
 import {readFile} from '../helpers/file-helpers';
-import {FileItemContext} from '../utils/file-context';
+import {useFileItemContext} from '../utils/file-context';
 
 const DataColumnSelect = ({dataRef, name, label, defaultSelected, helperText, className}) => {
-    const {fileItems} = useContext(FileItemContext);
+    const {fileItems} = useFileItemContext();
+    const [dataFile, setDataFile] = useState();
     const [dataColumns, setDataColumns] = useState([]);
+    const {control} = useFormContext();
+
     useEffect(() => {
-        const dataFile = fileItems[dataRef];
+        const newDataFile = fileItems[dataRef];
+        if (newDataFile) {
+            setDataFile(newDataFile);
+        }
+    }, [dataRef, fileItems, setDataFile]);
+
+    useEffect(() => {
         if (!dataFile) {
             return;
         }
@@ -21,24 +31,39 @@ const DataColumnSelect = ({dataRef, name, label, defaultSelected, helperText, cl
             }));
             setDataColumns(readedColumns);
         });
-    }, [fileItems, dataRef, setDataColumns]);
+    }, [dataFile, setDataColumns]);
 
-    return (
-        <UncontrolledSimpleSelect
-            className={className}
-            defaultSelected={defaultSelected}
-            helperText={helperText}
-            label={label}
-            name={name}
-            options={dataColumns}
-        />
+    const renderSelect = useCallback(
+        ({value, onChange}) => {
+            const createChangeHandle = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
+            const selected = dataColumns && dataColumns.length > value ? value : '';
+            return (
+                <ControlledSimpleSelect
+                    className={className}
+                    helperText={helperText}
+                    label={label}
+                    name={name}
+                    onChange={createChangeHandle(onChange)}
+                    options={dataColumns}
+                    selected={selected}
+                />
+            );
+        },
+        [className, dataColumns, helperText, label, name]
     );
+
+    return <Controller
+        control={control}
+        defaultValue={defaultSelected}
+        name={name}
+        render={renderSelect}
+    />;
 };
 
 export const createDataColumnParameter = (parameter, inputItemClasses) => <DataColumnSelect
     className={inputItemClasses}
     dataRef={parameter.dataRef}
-    defaultSelected={parameter.value}
+    defaultSelected={parameter.value || ''}
     helperText={parameter.comment}
     label={parameter.name}
     name={parameter.name}
