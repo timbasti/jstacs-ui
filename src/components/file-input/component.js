@@ -1,20 +1,21 @@
 import {Box, FormControl, FormHelperText, InputLabel, OutlinedInput} from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {saveFile} from '../../helpers/file-helpers';
-import {FileItemContext} from '../../utils/file-context';
+import {useFileItemContext} from '../../utils/file-context';
 import {FilePreviewDialog} from '../file-preview-dialog/component';
-import {SplitButton} from '../split-button/component';
+import {SimpleMenu} from '../simple-menu/component';
 import {useStyles} from './styles';
 
-const options = ['Load File', 'Save File', 'Open File'];
+const options = [['load', 'Load File'], ['save', 'Save File'], ['open', 'Open File']];
 
-const FileInput = ({name, label, file, helperText, onChange, className}) => {
+const FileInput = ({name, label, defaultFile, helperText, onChange, className, required}) => {
     const inputRef = useRef();
     const labelRef = useRef();
-    const {setFileItem} = useContext(FileItemContext);
+    const {setFileItem} = useFileItemContext();
     const [labelWidth, setLabelWidth] = useState(0);
+    const [file, setFile] = useState(defaultFile || {});
     const [openFilePreview, setOpenFilePreview] = useState(false);
     const classes = useStyles({labelWidth});
 
@@ -28,21 +29,21 @@ const FileInput = ({name, label, file, helperText, onChange, className}) => {
             if (!loadedFile) {
                 return;
             }
-            onChange(loadedFile);
+            setFile(loadedFile);
         },
-        [onChange]
+        [setFile]
     );
 
     const handleOptionClick = useCallback(
         (clickedOption) => {
             switch (clickedOption) {
-            case 0:
+            case 'load':
                 inputRef.current.click();
                 break;
-            case 1:
+            case 'save':
                 saveFile(file);
                 break;
-            case 2:
+            case 'open':
                 setOpenFilePreview(true);
                 break;
             default:
@@ -52,12 +53,20 @@ const FileInput = ({name, label, file, helperText, onChange, className}) => {
         [inputRef, file]
     );
 
+    const handleFileOpenerClick = useCallback(() => {
+        inputRef.current.click();
+    }, [inputRef]);
+
     useEffect(() => {
+        if (!file.name) {
+            return;
+        }
         setFileItem({
             file,
             ref: name
         });
-    }, [file, name, setFileItem]);
+        onChange({name: file.name});
+    }, [file, name, onChange, setFileItem]);
 
     useEffect(() => {
         if (labelRef.current) {
@@ -72,6 +81,7 @@ const FileInput = ({name, label, file, helperText, onChange, className}) => {
     return (
         <FormControl
             className={`${className} ${classes.root}`}
+            required={required}
             variant="outlined"
         >
             <InputLabel
@@ -85,16 +95,16 @@ const FileInput = ({name, label, file, helperText, onChange, className}) => {
                 <OutlinedInput
                     className={classes.fileDisplay}
                     id={name}
+                    inputProps={{className: classes.nameInput}}
                     label={label}
+                    onClick={handleFileOpenerClick}
                     readOnly
                     type="text"
-                    value={file && file.name}
+                    value={file && file.name || ''}
                 />
 
-                <SplitButton
+                <SimpleMenu
                     className={classes.fileAction}
-                    defaultSelected={file && file.name ? 1 : 0}
-                    label="Select file operation"
                     onClick={handleOptionClick}
                     options={options}
                 />
@@ -122,19 +132,17 @@ const FileInput = ({name, label, file, helperText, onChange, className}) => {
 
 FileInput.propTypes = {
     className: PropTypes.string,
-    file: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        size: PropTypes.number
-    }),
+    defaultFile: PropTypes.shape({name: PropTypes.string}),
     helperText: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    required: PropTypes.bool.isRequired
 };
 
 FileInput.defaultProps = {
     className: '',
-    file: {name: ''},
+    defaultFile: {},
     helperText: '',
     label: '',
     name: '',

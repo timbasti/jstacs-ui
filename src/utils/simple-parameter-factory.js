@@ -142,7 +142,7 @@ const CreateTextField = ({parameter, inputItemClasses, parentName}) => {
 const createCheckbox = (parameter, inputItemClasses, parentName) => {
     const controlledCheckbox =
         <UncontrolledCheckbox
-            defaultValue={parameter.value}
+            defaultChecked={parameter.value}
             helperText={parameter.comment}
             inputItemClasses={inputItemClasses}
             name={parentName ? `${parentName}.${parameter.name}` : parameter.name}

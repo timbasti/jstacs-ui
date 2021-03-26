@@ -1,5 +1,5 @@
 import {ErrorMessage} from '@hookform/error-message';
-import {MenuItem, TextField, withStyles} from '@material-ui/core';
+import {makeStyles, MenuItem, TextField, withStyles} from '@material-ui/core';
 import MuiAccordion from '@material-ui/core/Accordion';
 import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
@@ -62,7 +62,7 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles({root: {padding: 20}})(MuiAccordionDetails);
 
-const RadioControlledAccordion = ({listIndex, radioLabel, radioValue, listName, children}) => {
+const RadioControlledAccordion = ({radioLabel, radioValue, children}) => {
     const radioRef = useRef(null);
     const [expanded, expand] = useState(false);
     const currentSelectedValue = useContext(RadioGroupContext);
@@ -102,11 +102,6 @@ const RadioControlledAccordion = ({listIndex, radioLabel, radioValue, listName, 
                     label={radioLabel}
                     value={radioValue}
                 />
-
-                <HiddenInput
-                    name={`${listName}.selected`}
-                    value={listIndex}
-                />
             </AccordionSummary>
 
             <AccordionDetails>
@@ -118,8 +113,6 @@ const RadioControlledAccordion = ({listIndex, radioLabel, radioValue, listName, 
 
 RadioControlledAccordion.propTypes = {
     children: PropTypes.node.isRequired,
-    listIndex: PropTypes.number.isRequired,
-    listName: PropTypes.string.isRequired,
     radioLabel: PropTypes.string.isRequired,
     radioValue: PropTypes.string.isRequired
 };
@@ -159,8 +152,6 @@ const createFieldsetSelectionList = (inputSets, listName) => {
         inputSets &&
         inputSets.map((inputSet, index) => <RadioControlledAccordion
             key={inputSet.name}
-            listIndex={index}
-            listName={listName}
             radioLabel={inputSet.name}
             radioValue={inputSet.name}
         >
@@ -169,9 +160,15 @@ const createFieldsetSelectionList = (inputSets, listName) => {
     return fieldsetSelectionList;
 };
 
-const InputSetSelection = ({defaultSelected, className, inputSets, label, helperText, name, listName}) => {
+const useSetSelectionStyles = makeStyles((theme) => ({
+    SetSelectionHint: {padding: '0 16px'},
+    SetSelectionLabel: {fontSize: '12px'}
+}));
+
+const InputSetSelection = ({defaultSelected, className, inputSets, label, helperText, name}) => {
     const {errors} = useFormContext();
     const hasError = Boolean(queryObject(errors, name));
+    const classes = useSetSelectionStyles();
 
     return (
         <FormControl
@@ -185,7 +182,10 @@ const InputSetSelection = ({defaultSelected, className, inputSets, label, helper
                 style={{color: '#f44336'}}
             />
 
-            <FormLabel required>
+            <FormLabel
+                className={`${classes.SetSelectionHint} ${classes.SetSelectionLabel}`}
+                required
+            >
                 {label}
             </FormLabel>
 
@@ -193,10 +193,10 @@ const InputSetSelection = ({defaultSelected, className, inputSets, label, helper
                 defaultSelected={defaultSelected}
                 name={name}
             >
-                {createFieldsetSelectionList(inputSets, listName)}
+                {createFieldsetSelectionList(inputSets)}
             </UncontrolledRadioGroup>
 
-            <FormHelperText>
+            <FormHelperText className={classes.SetSelectionHint}>
                 {helperText}
             </FormHelperText>
         </FormControl>
@@ -207,6 +207,7 @@ const createParameterInputFields = ({selectionName, parameters, inputItemClasses
     // TODO: Calculate grid properties
     // eslint-disable-next-line no-unused-vars
     const numberOfParameters = 0;
+    const parentPath = `${selectionName}.parameterSetValues`;
     return (
         parameters &&
         parameters.map((parameter) => {
@@ -232,7 +233,7 @@ const createParameterInputFields = ({selectionName, parameters, inputItemClasses
                     sm={gritItemProps.sm}
                     xs={gritItemProps.xs}
                 >
-                    {createParameterInput(parameter, inputItemClasses, selectionName)}
+                    {createParameterInput(parameter, inputItemClasses, parentPath)}
                 </Grid>
             );
         })
@@ -274,7 +275,6 @@ export const createSelectionForParameterSets = (parameter, inputItemClasses) => 
             helperText={parameter.comment}
             inputSets={inputSets}
             label={parameter.name}
-            listName={parameter.name}
             name={setSelectionName}
         />;
     return inputSetSelection;
@@ -372,6 +372,8 @@ const createSimpleParameterSelection = (parameter, inputItemClasses) => {
         selectedName
     } = parameter;
 
+    const selectionName = `${name}.selectedName`;
+
     const options = parameters.map(({name: optionName, value}) => ({
         key: optionName,
         value
@@ -383,7 +385,7 @@ const createSimpleParameterSelection = (parameter, inputItemClasses) => {
             defaultSelected={selectedName}
             helperText={comment}
             label={name}
-            name={name}
+            name={selectionName}
             options={options}
         />
     );

@@ -138,10 +138,17 @@ const updateParameterSet = createAsyncThunk('test/parameterSet/update', async (f
     await dispatch(postParameterSet(updatedParameterSet));
 });
 
+const postParameterValues = createAsyncThunk('test/parameterSet/update', async ({formData, files}, {dispatch}) => {
+    console.log(formData, files);
+    await dispatch(filesThunks.allFiles.post(files));
+    const {data} = await requests.parameterSet.post(formData);
+    return {data};
+});
+
 export const thunks = {
     parameterSet: {
         fetch: fetchParameterSet,
         post: postParameterSet,
-        update: updateParameterSet
+        update: postParameterValues
     }
 };

@@ -97,7 +97,7 @@
         "react/jsx-max-depth": [
             "error",
             {
-                "max": 8
+                "max": 10
             }
         ],
         "react/jsx-handler-names": [
@@ -126,6 +126,7 @@
         ],
         "prefer-destructuring": "off",
         "no-empty-function": "off",
-        "max-statements": "off"
+        "max-statements": "off",
+        "no-await-in-loop": "off"
     }
 }

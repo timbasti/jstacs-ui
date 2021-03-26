@@ -1,45 +1,62 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-import {thunks as toolsThunks} from './thunks';
+import {thunks} from './thunks';
 
 export const toolsSlice = createSlice({
     extraReducers: {
-        [toolsThunks.tools.fetch.pending]: (state) => {
+        [thunks.tools.fetch.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [toolsThunks.tools.fetch.fulfilled]: (state, action) => {
+        [thunks.tools.fetch.fulfilled]: (state, action) => {
             const {data: availableTools} = action.payload;
             state.processing = false;
             state.available = availableTools;
         },
-        [toolsThunks.tools.fetch.rejected]: (state, action) => {
+        [thunks.tools.fetch.rejected]: (state, action) => {
             const {data: error} = action.payload;
             state.error = error;
             state.processing = false;
         },
-        [toolsThunks.parameterSet.fetch.pending]: (state) => {
+        [thunks.parameterSet.fetch.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [toolsThunks.parameterSet.fetch.fulfilled]: (state, action) => {
+        [thunks.parameterSet.fetch.fulfilled]: (state, action) => {
             const {data: parameterSet} = action.payload;
             state.processing = false;
             state.parameterSet = parameterSet;
         },
-        [toolsThunks.parameterSet.fetch.rejected]: (state, action) => {
+        [thunks.parameterSet.fetch.rejected]: (state, action) => {
             const {data: error} = action.payload;
             state.error = error;
             state.processing = false;
         },
-        [toolsThunks.parameterSet.post.pending]: (state) => {
+        [thunks.parameterSet.post.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [toolsThunks.parameterSet.post.fulfilled]: (state) => {
+        [thunks.parameterSet.post.fulfilled]: (state, action) => {
+            const {data: parameterSet} = action.payload;
+            state.processing = false;
+            state.parameterSet = parameterSet;
+        },
+        [thunks.parameterSet.post.rejected]: (state, action) => {
+            const {data: error} = action.payload;
+            state.error = error;
             state.processing = false;
         },
-        [toolsThunks.parameterSet.post.rejected]: (state, action) => {
+        [thunks.results.fetch.pending]: (state) => {
+            state.error = null;
+            state.processing = true;
+        },
+        [thunks.results.fetch.fulfilled]: (state, action) => {
+            const {data: {results, progress}} = action.payload;
+            state.processing = false;
+            state.results = results;
+            state.progress = progress;
+        },
+        [thunks.results.fetch.rejected]: (state, action) => {
             const {data: error} = action.payload;
             state.error = error;
             state.processing = false;
@@ -53,7 +70,9 @@ export const toolsSlice = createSlice({
             toolName: null,
             type: null
         },
-        processing: false
+        processing: false,
+        progress: null,
+        results: null
     },
     name: 'tools',
     reducers: {}

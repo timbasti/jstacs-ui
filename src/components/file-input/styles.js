@@ -10,8 +10,8 @@ export const useStyles = makeStyles({
         borderBottomLeftRadius: 0,
         borderLeft: 'none',
         borderTopLeftRadius: 0,
-        flex: 0,
-        height: '56px'
+        height: '56px',
+        width: '32px'
     },
     fileComment: {},
     fileDisplay: {
@@ -26,5 +26,6 @@ export const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'row'
     },
+    nameInput: {cursor: 'pointer'},
     root: {}
 });

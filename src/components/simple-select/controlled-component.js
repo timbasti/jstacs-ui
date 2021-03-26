@@ -1,11 +1,8 @@
 import {MenuItem, TextField, Tooltip, Typography} from '@material-ui/core';
 import {Info} from '@material-ui/icons';
 import React, {useCallback} from 'react';
-import {useFormContext} from 'react-hook-form';
 
-export const ControlledSimpleSelect = ({className, selected, helperText, label, name, options}) => {
-    const {register} = useFormContext();
-
+export const ControlledSimpleSelect = ({className, selected, helperText, label, name, options, onChange}) => {
     const renderOptions = useCallback(
         () => options.map(({key}) => <MenuItem
             key={key}
@@ -63,9 +60,9 @@ export const ControlledSimpleSelect = ({className, selected, helperText, label, 
                     </Tooltip>
                 </>
             }
-            inputRef={register}
             label={label}
             name={name}
+            onChange={onChange}
             select
             value={selected}
             variant="filled"
