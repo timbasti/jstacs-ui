@@ -10,15 +10,12 @@ export const NoMatchView = () => {
             <Box>
                 Die Ansicht
                 {' '}
-
                 <code>
                     {location.pathname}
                 </code>
-
                 {' '}
                 konnte nicht gefunden werden
             </Box>
-
             <Link
                 component={RouterLink}
                 to="/"

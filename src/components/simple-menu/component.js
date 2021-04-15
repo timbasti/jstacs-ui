@@ -40,7 +40,6 @@ const SimpleMenu = ({className, options, onClick}) => {
             >
                 <ArrowDropDownIcon />
             </Button>
-
             <Menu
                 anchorEl={anchorRef.current}
                 keepMounted

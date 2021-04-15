@@ -176,15 +176,14 @@ export const ToolsView = () => {
                         value={selectedTool}
                         variant="filled"
                     >
-                        {availableTools.map(({type, toolName}, toolIndex) => <MenuItem
+                        {availableTools.map(({type, name}, toolIndex) => <MenuItem
                             key={type}
                             value={toolIndex}
                         >
-                            {toolName}
+                            {name}
                         </MenuItem>)}
                     </TextField>}
             </Grid>
-
             <Grid item>
                 <Card>
                     <CardContent>
@@ -194,20 +193,16 @@ export const ToolsView = () => {
                         >
                             {availableTools && availableTools[selectedTool].type}
                         </Typography>
-
                         <Typography
                             component="h2"
                             variant="h5"
                         >
-                            {availableTools && availableTools[selectedTool].toolName}
+                            {availableTools && availableTools[selectedTool].name}
                         </Typography>
-
                         <Typography color="textSecondary">
                             {'Version: '}
-
-                            {availableTools && availableTools[selectedTool].toolVersion}
+                            {availableTools && availableTools[selectedTool].version}
                         </Typography>
-
                         <Typography
                             component="p"
                             variant="body2"
@@ -215,7 +210,6 @@ export const ToolsView = () => {
                             {availableTools && availableTools[selectedTool].description}
                         </Typography>
                     </CardContent>
-
                     <CardActions className={cardActionClasses.root}>
                         <Button
                             onClick={handleLoadToolClick}
@@ -223,7 +217,6 @@ export const ToolsView = () => {
                         >
                             Load Tool
                         </Button>
-
                         {availableTools && availableTools[selectedTool].helpText &&
                             <Button
                                 onClick={handleToggleHelpText}
@@ -231,7 +224,6 @@ export const ToolsView = () => {
                             >
                                 Show Help Text
                             </Button>}
-
                         {availableTools && availableTools[selectedTool].references &&
                             <Button
                                 onClick={handleToggleCitation}
@@ -242,7 +234,6 @@ export const ToolsView = () => {
                     </CardActions>
                 </Card>
             </Grid>
-
             <Grid item>
                 <Paper>
                     <Paper
@@ -254,11 +245,9 @@ export const ToolsView = () => {
                             value={selectedSection}
                         >
                             <Tab label="Parameters" />
-
                             <Tab label="Results" />
                         </Tabs>
                     </Paper>
-
                     <Box
                         hidden={selectedSection !== 0}
                         p={2}
@@ -279,7 +268,6 @@ export const ToolsView = () => {
                                         spacing={2}
                                     >
                                         {createParameterInputFields(parameters, classes.inputItem)}
-
                                         <Grid
                                             item
                                             xs={12}
@@ -297,7 +285,6 @@ export const ToolsView = () => {
                             </FileItemProvider>
                         </FormProvider>
                     </Box>
-
                     <Box
                         hidden={selectedSection !== 1}
                         p={2}
@@ -315,7 +302,6 @@ export const ToolsView = () => {
                     </Box>
                 </Paper>
             </Grid>
-
             <Dialog
                 fullWidth
                 maxWidth="md"
@@ -325,13 +311,11 @@ export const ToolsView = () => {
                 <DialogTitle>
                     Help Text
                 </DialogTitle>
-
                 <DialogContent>
                     <ReactMarkdown plugins={[gfm]}>
                         {availableTools && availableTools[selectedTool].helpText}
                     </ReactMarkdown>
                 </DialogContent>
-
                 <DialogActions>
                     <Button
                         onClick={handleToggleHelpText}
@@ -341,7 +325,6 @@ export const ToolsView = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog
                 fullWidth
                 maxWidth="md"
@@ -351,7 +334,6 @@ export const ToolsView = () => {
                 <DialogTitle>
                     Citation
                 </DialogTitle>
-
                 <DialogContent>
                     {availableTools &&
                         availableTools[selectedTool].references &&
@@ -361,7 +343,6 @@ export const ToolsView = () => {
                             </code>
                         </pre>)}
                 </DialogContent>
-
                 <DialogActions>
                     <Button
                         onClick={handleToggleCitation}

@@ -1,9 +1,9 @@
 import {MenuItem, TextField, Tooltip, Typography} from '@material-ui/core';
 import {Info} from '@material-ui/icons';
-import React, {useCallback} from 'react';
+import React, {useEffect} from 'react';
 
 export const ControlledSimpleSelect = ({className, selected, helperText, label, name, options, onChange}) => {
-    const renderOptions = useCallback(
+    const renderedOptions = useEffect(
         () => options.map(({key}) => <MenuItem
             key={key}
             value={key}
@@ -13,7 +13,7 @@ export const ControlledSimpleSelect = ({className, selected, helperText, label, 
         [options]
     );
 
-    const renderOptionsDescription = useCallback(
+    const renderedOptionsDescription = useEffect(
         () => options.map(({key, value}) => <Typography
             component="div"
             key={key}
@@ -38,7 +38,6 @@ export const ControlledSimpleSelect = ({className, selected, helperText, label, 
                     >
                         {helperText}
                     </Typography>
-
                     <Tooltip
                         enterTouchDelay={0}
                         title={
@@ -46,8 +45,7 @@ export const ControlledSimpleSelect = ({className, selected, helperText, label, 
                                 <Typography>
                                     The following options are available:
                                 </Typography>
-
-                                {renderOptionsDescription()}
+                                {renderedOptionsDescription}
                             </>
                         }
                     >
@@ -67,7 +65,7 @@ export const ControlledSimpleSelect = ({className, selected, helperText, label, 
             value={selected}
             variant="filled"
         >
-            {renderOptions()}
+            {renderedOptions}
         </TextField>
     );
 };

@@ -2,19 +2,15 @@ import {makeStyles, Toolbar} from '@material-ui/core';
 import React from 'react';
 import {Route, Switch} from 'react-router-dom';
 
+import {AdminView} from '../../views/admin/component';
 import {HomeView} from '../../views/home/component';
 import {NoMatchView} from '../../views/no-match/component';
 import {TestEnvironmentView} from '../../views/test-environment/component';
+import {ToolView} from '../../views/tool/component';
 import {ToolsView} from '../../views/tools/component';
 
-const useStyles = makeStyles((theme) => {
-    const contentSpacing = 3;
-    return {
-        content: {
-            flexGrow: 1,
-            padding: theme.spacing(contentSpacing)
-        }
-    };
+const useStyles = makeStyles(() => {
+    return {content: {flexGrow: 1}};
 });
 
 export const JstacsMainContent = () => {
@@ -26,7 +22,6 @@ export const JstacsMainContent = () => {
             id="content"
         >
             <Toolbar />
-
             <Switch>
                 <Route
                     exact
@@ -34,21 +29,18 @@ export const JstacsMainContent = () => {
                 >
                     <HomeView />
                 </Route>
-
                 <Route
                     exact
-                    path="/test"
+                    path="/admin"
                 >
-                    <TestEnvironmentView />
+                    <AdminView />
                 </Route>
-
                 <Route
                     exact
-                    path="/tools"
+                    path="/tool/:toolId"
                 >
-                    <ToolsView />
+                    <ToolView />
                 </Route>
-
                 <Route path="*">
                     <NoMatchView />
                 </Route>

@@ -53,7 +53,6 @@ const SplitButton = ({defaultSelected, className, options, onClick, onChange}) =
                 <Button onClick={handleClick}>
                     {options[selectedIndex]}
                 </Button>
-
                 <Button
                     onClick={handleToggle}
                     size="small"
@@ -61,7 +60,6 @@ const SplitButton = ({defaultSelected, className, options, onClick, onChange}) =
                     <ArrowDropDownIcon />
                 </Button>
             </ButtonGroup>
-
             <Popper
                 anchorEl={anchorRef.current}
                 className={classes.popper}

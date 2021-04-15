@@ -57,8 +57,8 @@ const CreateNumberField = ({parameter, inputItemClasses, parentName}) => {
         valueAsNumber: true
     };
 
-    const createNumberFormatTextField = useCallback(
-        () => ({onChange, value}) => {
+    const renderNumberFormatTextField = useCallback(
+        ({onChange, value}) => {
             const createChangeHanlder = (handleChange) => (values) => handleChange(values.floatValue);
             return (
                 <NumberFormat
@@ -86,12 +86,11 @@ const CreateNumberField = ({parameter, inputItemClasses, parentName}) => {
                 name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
                 style={{color: '#f44336'}}
             />
-
             <Controller
                 control={control}
                 defaultValue={parameter.value}
                 name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-                render={createNumberFormatTextField()}
+                render={renderNumberFormatTextField}
                 rules={registerOptions}
             />
         </>
@@ -123,7 +122,6 @@ const CreateTextField = ({parameter, inputItemClasses, parentName}) => {
                 name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
                 style={{color: '#f44336'}}
             />
-
             <TextField
                 className={inputItemClasses}
                 defaultValue={parameter.value}

@@ -76,12 +76,10 @@ export const TestEnvironmentView = () => {
             <Box component="p">
                 Dies ist eine Ansicht für Testzwecke
             </Box>
-
             <Box component="p">
                 Es wurden Daten für folgendes Tool geladen:
                 {toolName}
             </Box>
-
             <FormProvider
                 {...formProperties}
                 handleSubmit={handleSubmit}
@@ -98,7 +96,6 @@ export const TestEnvironmentView = () => {
                             spacing={5}
                         >
                             {createParameterInputFields(parameters, classes.inputItem)}
-
                             <Grid
                                 item
                                 xs={12}

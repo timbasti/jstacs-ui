@@ -90,7 +90,6 @@ const FileInput = ({name, label, defaultFile, helperText, onChange, className, r
             >
                 {label}
             </InputLabel>
-
             <Box className={classes.input}>
                 <OutlinedInput
                     className={classes.fileDisplay}
@@ -102,25 +101,21 @@ const FileInput = ({name, label, defaultFile, helperText, onChange, className, r
                     type="text"
                     value={file && file.name || ''}
                 />
-
                 <SimpleMenu
                     className={classes.fileAction}
                     onClick={handleOptionClick}
                     options={options}
                 />
             </Box>
-
             <FormHelperText className={classes.fileComment}>
                 {helperText}
             </FormHelperText>
-
             <input
                 hidden
                 onChange={handleFileInputChanged}
                 ref={inputRef}
                 type="file"
             />
-
             <FilePreviewDialog
                 file={file}
                 onClose={handleCloseFilePreview}

@@ -74,9 +74,7 @@
         ],
         "array-element-newline": [
             "error",
-            {
-                "multiline": true
-            }
+            "consistent"
         ],
         "no-mixed-operators": "off",
         "react/jsx-closing-tag-location": "off",
@@ -127,6 +125,23 @@
         "prefer-destructuring": "off",
         "no-empty-function": "off",
         "max-statements": "off",
-        "no-await-in-loop": "off"
+        "no-await-in-loop": "off",
+        "max-params": [
+            "error",
+            {
+                "max": 5
+            }
+        ],
+        "array-bracket-newline": [
+            "error",
+            "consistent"
+        ],
+        "react/jsx-newline": [
+            "error",
+            {
+                "prevent": true
+            }
+        ],
+        "arrow-body-style": "off"
     }
 }

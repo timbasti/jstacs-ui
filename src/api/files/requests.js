@@ -27,9 +27,12 @@ const loadFile = (file, onLoad, onDownloadProgress) => {
     });
 };
 
-const postFile = async (file, onUploadProgress) => {
+const postFile = async (file, userId, onUploadProgress) => {
     const config = {
-        headers: {'Content-Type': 'multipart/form-data'},
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'user-id': userId
+        },
         onUploadProgress: (progressEvent) => {
             const maxInPercent = 100;
             const percentCompleted = Math.round(progressEvent.loaded * maxInPercent / progressEvent.total);

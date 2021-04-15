@@ -1,8 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-import {thunks} from './thunks';
+import {loadToolValues, thunks} from './thunks';
 
-export const toolsSlice = createSlice({
+const slice = createSlice({
     extraReducers: {
         [thunks.tools.fetch.pending]: (state) => {
             state.error = null;
@@ -72,10 +72,13 @@ export const toolsSlice = createSlice({
         },
         processing: false,
         progress: null,
-        results: null
+        results: null,
+        tools: {
+            
+        }
     },
     name: 'tools',
     reducers: {}
 });
 
-export const toolsReducer = toolsSlice.reducer;
+export const toolsReducer = slice.reducer;

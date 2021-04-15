@@ -7,12 +7,20 @@ import {useDispatch, useSelector} from 'react-redux';
 import {open as openDrawer} from '../../api/drawer/actions';
 import {changeApplicationTheme} from '../../api/theme/actions';
 import {selectPaletteType} from '../../api/theme/selectors';
-import logo from '../../assets/logo.png';
+// import logo from '../../assets/logo.png';
+
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => {
     const titleSpacing = 2;
     return {
-        appBar: {zIndex: theme.zIndex.drawer + 1},
+        appBar: {
+            [theme.breakpoints.up('md')]: {
+                marginLeft: drawerWidth,
+                width: `calc(100% - ${drawerWidth}px)`
+            },
+            zIndex: theme.zIndex.drawer + 1
+        },
         logo: {
             height: 48,
             marginLeft: -12,
@@ -44,6 +52,7 @@ export const JstacsHeader = () => {
     return (
         <AppBar
             className={classes.appBar}
+            elevation={0}
             position="fixed"
         >
             <Toolbar>
@@ -57,22 +66,19 @@ export const JstacsHeader = () => {
                         <MenuIcon />
                     </IconButton>
                 </Hidden>
-
                 <Hidden smDown>
                     <img
                         alt="Jstacs logo"
                         className={classes.logo}
-                        src={logo}
+                        src="/assets/manifest-icon-192.png"
                     />
                 </Hidden>
-
                 <Typography
                     className={classes.title}
                     variant="h6"
                 >
                     Jstacs Online
                 </Typography>
-
                 <IconButton
                     color="inherit"
                     edge="end"
