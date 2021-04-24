@@ -1,20 +1,9 @@
-import {
-    Collapse,
-    Divider,
-    Drawer,
-    Hidden,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    makeStyles,
-    Toolbar
-} from '@material-ui/core';
+import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles} from '@material-ui/core';
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
 import EditIcon from '@material-ui/icons/Edit';
 import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Link as RouterLink} from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 
 import {selectAvailableApplications} from '../../api/applications/selectors';
 import {close as closeDrawer} from '../../api/drawer/actions';
@@ -49,7 +38,7 @@ const ToolItemList = ({toolItems = []}) => {
                     <ListItem
                         button
                         className={classes.item}
-                        component={RouterLink}
+                        component={NavLink}
                         key={id}
                         to={target}
                     >
@@ -106,19 +95,33 @@ const ApplicationItemList = () => {
 
 const NavigationDrawer = ({DrawerProps}) => {
     const classes = useNavigationDrawerStyles();
+    const location = useLocation();
 
     return (
         <Drawer
             {...DrawerProps}
             PaperProps={{className: classes.root}}
         >
-            <Toolbar />
-            <Toolbar />
+            <Box
+                boxSizing="content-box"
+                height={128}
+                m="0 auto"
+                p={2}
+                width={128}
+            >
+                <img
+                    alt="Jstacs logo"
+                    height={128}
+                    src="/assets/favicon-196.png"
+                    width={128}
+                />
+            </Box>
             <Divider />
             <List>
                 <ListItem
                     button
-                    component={RouterLink}
+                    component={NavLink}
+                    selected={location.pathname === '/admin'}
                     to="/admin"
                 >
                     <ListItemIcon>

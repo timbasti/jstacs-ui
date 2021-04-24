@@ -73,9 +73,7 @@ const slice = createSlice({
         processing: false,
         progress: null,
         results: null,
-        tools: {
-            
-        }
+        tools: {}
     },
     name: 'tools',
     reducers: {}

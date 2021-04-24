@@ -65,9 +65,10 @@ export const StartToolSection = ({toolId}) => {
     const parameters = useSelector(selectParameters);
     const {handleSubmit, ...formProperties} = useForm();
     const [fileItems, setFileItems] = useState({});
+    const selectedTool = 0;
 
     useEffect(() => {
-        
+        console.log(toolId);
     }, [toolId]);
 
     useEffect(() => {

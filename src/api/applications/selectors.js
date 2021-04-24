@@ -17,7 +17,7 @@ export const selectAvailableApplications = (state) => {
     return applicationsState.available || [];
 };
 
-export const selectNumberOfParameters = createSelector(
+export const selectNumberOfAvailableApplications = createSelector(
     selectAvailableApplications,
     (availableApplications) => {
         const numberOfAvailableApplications = availableApplications?.length || 0;

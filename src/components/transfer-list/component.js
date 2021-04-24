@@ -100,10 +100,13 @@ const CustomList = ({title, items, checked, onSelectionChange}) => {
 };
 
 CustomList.propTypes = {
-    checked: PropTypes.bool,
+    checked: PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
+    })),
     items: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired
+        key: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
     })).isRequired,
     onSelectionChange: PropTypes.func,
     title: PropTypes.string.isRequired
@@ -172,7 +175,8 @@ export const TransferList = ({defaultChoices, defaultChosen, titleChoices, title
             </Grid>
             <Grid
                 item
-                xs={1}
+                lg={1}
+                xs={2}
             >
                 <Grid
                     alignItems="center"
@@ -238,12 +242,12 @@ export const TransferList = ({defaultChoices, defaultChosen, titleChoices, title
 
 TransferList.propTypes = {
     defaultChoices: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired
+        key: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
     })).isRequired,
     defaultChosen: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired
+        key: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
     })).isRequired,
     onSelectionChange: PropTypes.func,
     titleChoices: PropTypes.string,

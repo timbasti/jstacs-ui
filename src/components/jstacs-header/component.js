@@ -66,18 +66,11 @@ export const JstacsHeader = () => {
                         <MenuIcon />
                     </IconButton>
                 </Hidden>
-                <Hidden smDown>
-                    <img
-                        alt="Jstacs logo"
-                        className={classes.logo}
-                        src="/assets/manifest-icon-192.png"
-                    />
-                </Hidden>
                 <Typography
                     className={classes.title}
                     variant="h6"
                 >
-                    Jstacs Online
+                    TODO: Add current pathname
                 </Typography>
                 <IconButton
                     color="inherit"

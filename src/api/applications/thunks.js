@@ -2,13 +2,13 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import * as requests from './requests';
 
-export const listAvailableApplications = createAsyncThunk('applications/list', async () => {
-    const {data} = await requests.listAvailableApplications();
+export const listApplications = createAsyncThunk('applications/list', async () => {
+    const {data} = await requests.listApplications();
     return data;
 });
 
-export const createNewApplication = createAsyncThunk('applications/create', async ({name, toolTypes = []}) => {
-    const {data} = await requests.createNewApplication(name, toolTypes);
+export const createApplication = createAsyncThunk('applications/create', async ({name, toolTypes = []}) => {
+    const {data} = await requests.createApplication(name, toolTypes);
     return data;
 });
 

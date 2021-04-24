@@ -4,27 +4,27 @@ import * as thunks from './thunks';
 
 export const slice = createSlice({
     extraReducers: {
-        [thunks.listAvailableApplications.pending]: (state) => {
+        [thunks.listApplications.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [thunks.listAvailableApplications.fulfilled]: (state, action) => {
+        [thunks.listApplications.fulfilled]: (state, action) => {
             state.available = action.payload;
             state.processing = false;
         },
-        [thunks.listAvailableApplications.rejected]: (state, action) => {
+        [thunks.listApplications.rejected]: (state, action) => {
             state.error = action.payload;
             state.processing = false;
         },
-        [thunks.createNewApplication.pending]: (state) => {
+        [thunks.createApplication.pending]: (state) => {
             state.error = null;
             state.processing = true;
         },
-        [thunks.createNewApplication.fulfilled]: (state, action) => {
+        [thunks.createApplication.fulfilled]: (state, action) => {
             state.available = action.payload;
             state.processing = false;
         },
-        [thunks.createNewApplication.rejected]: (state, action) => {
+        [thunks.createApplication.rejected]: (state, action) => {
             state.error = action.payload;
             state.processing = false;
         },

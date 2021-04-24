@@ -1,84 +1,136 @@
 /* eslint-disable no-magic-numbers */
 
-import {Box, Button, Card, CardContent, CardHeader, Grid, Radio, TextField, Typography} from '@material-ui/core';
-import React from 'react';
+import {Box, Button, Card, CardActions, CardContent, CardHeader, Grid} from '@material-ui/core';
+import React, {useCallback, useMemo} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
+import {useSelector} from 'react-redux';
 
-import {ControlledAccordions} from '../../../../components/controlled-accordion/component';
+import {selectAvailableApplications} from '../../../../api/applications/selectors';
+import {EnrichedTextField} from '../../../../components/enriched-text-field/component';
+import {UncontrolledSimpleSelect} from '../../../../components/simple-select/uncontrolled-component';
 import {TransferList} from '../../../../components/transfer-list/component';
 
 export const ApplicationsSection = () => {
     const {handleSubmit, ...formProperties} = useForm();
+    const availableApplications = useSelector(selectAvailableApplications);
+    const selectableOptions = useMemo(() => {
+        const defaultOption = {
+            label: 'New Application',
+            value: -1
+        };
+        const options = availableApplications.map(({id, type}) => ({
+            label: type,
+            value: id
+        }));
+        return [defaultOption, ...options];
+    }, [availableApplications]);
+
+    const onSubmit = useCallback((values) => console.log(values), []);
+    const onError = useCallback((errors) => console.log(errors), []);
+
+    const handleFormSubmit = useMemo(() => {
+        return handleSubmit(onSubmit, onError);
+    }, [handleSubmit, onSubmit, onError]);
 
     return (
-        <Box>
+        <Box p={3}>
             <FormProvider
                 handleSubmit={handleSubmit}
                 {...formProperties}
             >
-                <Grid
-                    container
-                    spacing={3}
-                >
+                <form onSubmit={handleFormSubmit}>
                     <Grid
-                        item
-                        xs={12}
+                        container
+                        spacing={3}
                     >
-                        <ControlledAccordions />
-                    </Grid>
-                    <Grid
-                        item
-                        xs={6}
-                    >
-                        <Card>
-                            <CardHeader
-                                action={<Radio />}
-                                subheader="Use this to change an application name or to add/remove tools."
-                                title="Select existing Application"
-                            />
-                            <CardContent>
-                                <TextField />
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={6}
-                    >
-                        <Card>
-                            <CardHeader
-                                action={<Radio />}
-                                subheader="Use this to create a new application with a selected set of tools."
-                                title="Create new Application"
-                            />
-                            <CardContent>
-                                <TextField />
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                    >
-                        <TransferList
-                            defaultChoices={[1, 2, 3, 4]}
-                            defaultChosen={[5, 6, 7, 8]}
-                            titleChoices="Available Tools"
-                            titleChosen="Selected Tools"
-                        />
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                    >
-                        <Button
-                            color="primary"
-                            variant="contained"
+                        <Grid
+                            item
+                            xs={12}
                         >
-                            Create
-                        </Button>
+                            <Card>
+                                <CardHeader title="Create or change an application" />
+                                <CardContent>
+                                    <Grid
+                                        container
+                                        spacing={6}
+                                    >
+                                        <Grid
+                                            item
+                                            xs={6}
+                                        >
+                                            <UncontrolledSimpleSelect
+                                                defaultSelected={-1}
+                                                helperText={`
+                                                Select an application type to change its name and/or assigned tools below.
+                                                You can also delete a selected application type.
+                                                But you have to confirm this operation with a second click.
+                                            `}
+                                                label="Application type"
+                                                name="application-type"
+                                                options={selectableOptions}
+                                                placeholder="Select an application"
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid
+                                            item
+                                            xs={6}
+                                        >
+                                            <EnrichedTextField
+                                                helperText="Enter a new name or change the one provided"
+                                                label="Application name"
+                                                name="application-name"
+                                                placeholder="Enter application name"
+                                                required
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                                <CardActions>
+                                    <Button
+                                        color="secondary"
+                                        disabled
+                                    >
+                                        Delete
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                        >
+                            <TransferList
+                                defaultChoices={[
+                                    {
+                                        key: 1,
+                                        value: 1
+                                    }
+                                ]}
+                                defaultChosen={[
+                                    {
+                                        key: 2,
+                                        value: 2
+                                    }
+                                ]}
+                                titleChoices="Available Tools"
+                                titleChosen="Assigned Tools"
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                        >
+                            <Button
+                                color="secondary"
+                                type="submit"
+                                variant="contained"
+                            >
+                                Create
+                            </Button>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </form>
             </FormProvider>
         </Box>
     );
