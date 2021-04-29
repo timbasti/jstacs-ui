@@ -113,12 +113,7 @@
         "no-console": "off",
         "capitalized-comments": "off",
         "multiline-comment-style": "off",
-        "react/jsx-props-no-spreading": [
-            "error",
-            {
-                "custom": "ignore"
-            }
-        ],
+        "react/jsx-props-no-spreading": "off",
         "prefer-destructuring": "off",
         "no-empty-function": "off",
         "max-statements": "off",

@@ -7,13 +7,13 @@ export const listApplications = createAsyncThunk('applications/list', async () =
     return data;
 });
 
-export const createApplication = createAsyncThunk('applications/create', async ({name, toolTypes = []}) => {
-    const {data} = await requests.createApplication(name, toolTypes);
+export const createApplication = createAsyncThunk('applications/create', async ({name, toolIds = []}) => {
+    const {data} = await requests.createApplication(name, toolIds);
     return data;
 });
 
-export const updateApplication = createAsyncThunk('applications/update', async ({id, toolTypes = []}) => {
-    const {data} = await requests.updateApplication(id, toolTypes);
+export const updateApplication = createAsyncThunk('applications/update', async ({id, toolIds = []}) => {
+    const {data} = await requests.updateApplication(id, toolIds);
     return data;
 });
 

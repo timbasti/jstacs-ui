@@ -14,46 +14,42 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useFormContext} from 'react-hook-form';
 
+import {intersection, not, union} from '../../helpers/data-helpers';
 import {useCustomListStyles, useTransferListStyles} from './styles';
 
-const not = (listA, listB) => listA.filter((value) => listB.indexOf(value) === -1);
-
-const intersection = (listA, listB) => listA.filter((value) => listB.indexOf(value) !== -1);
-
-const union = (listA, listB) => [...listA, ...not(listB, listA)];
-
-const CustomList = ({title, items, checked, onSelectionChange}) => {
+const CustomList = ({title, items, checked, onChange}) => {
     const classes = useCustomListStyles();
 
     const numberOfChecked = useCallback(() => intersection(checked, items).length, [checked, items]);
 
     const createToggleHandler = useCallback(
-        (value) => () => {
-            const currentIndex = checked.indexOf(value);
+        (selectedItem) => () => {
+            const currentIndex = checked.indexOf(selectedItem);
             const newChecked = [...checked];
 
             if (currentIndex === -1) {
-                newChecked.push(value);
+                newChecked.push(selectedItem);
             } else {
                 newChecked.splice(currentIndex, 1);
             }
 
-            onSelectionChange(newChecked);
+            onChange(newChecked);
         },
-        [checked, onSelectionChange]
+        [checked, onChange]
     );
 
     const handleToggleAll = useCallback(() => {
         if (numberOfChecked(items) === items.length) {
-            onSelectionChange(not(checked, items));
+            onChange(not(checked, items));
         } else {
-            onSelectionChange(union(checked, items));
+            onChange(union(checked, items));
         }
-    }, [checked, items, numberOfChecked, onSelectionChange]);
+    }, [checked, items, numberOfChecked, onChange]);
 
     return (
-        <Card>
+        <Card className={classes.root}>
             <CardHeader
                 avatar={
                     <Checkbox
@@ -77,7 +73,7 @@ const CustomList = ({title, items, checked, onSelectionChange}) => {
             >
                 {items.map((item) => <ListItem
                     button
-                    key={item.key}
+                    key={item.value}
                     onClick={createToggleHandler(item)}
                     role="listitem"
                 >
@@ -89,8 +85,8 @@ const CustomList = ({title, items, checked, onSelectionChange}) => {
                         />
                     </ListItemIcon>
                     <ListItemText
-                        primary={item.value}
-                        secondary={item.key}
+                        primary={item.title}
+                        secondary={item.hint}
                     />
                 </ListItem>)}
                 <ListItem />
@@ -101,31 +97,49 @@ const CustomList = ({title, items, checked, onSelectionChange}) => {
 
 CustomList.propTypes = {
     checked: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
+        hint: PropTypes.any,
+        title: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
     })),
     items: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
+        hint: PropTypes.any,
+        title: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
-    })).isRequired,
-    onSelectionChange: PropTypes.func,
+    })),
+    onChange: PropTypes.func,
     title: PropTypes.string.isRequired
 };
 
 CustomList.defaultProps = {
     checked: [],
-    onSelectionChange: () => {}
+    items: [],
+    onChange: () => {}
 };
 
-export const TransferList = ({defaultChoices, defaultChosen, titleChoices, titleChosen, onSelectionChange}) => {
+export const TransferList = ({options, defaultValue, name, titleOptions, titleSelections, required, onChange}) => {
     const classes = useTransferListStyles();
     const [checked, setChecked] = useState([]);
-    const [left, setLeft] = useState(defaultChoices);
-    const [right, setRight] = useState(defaultChosen);
+    const [left, setLeft] = useState([]);
+    const [right, setRight] = useState([]);
+
+    const {register, setValue} = useFormContext();
+
+    const {...registrationProps} = useMemo(() => {
+        return register(name, {required});
+    }, [name, register, required]);
 
     useEffect(() => {
-        onSelectionChange(right);
-    }, [onSelectionChange, right]);
+        const selectedOptions = defaultValue.map((dValue) => options.find(({value}) => value === dValue));
+        const availableOptions = not(options, selectedOptions);
+        setLeft(availableOptions);
+        setRight(selectedOptions);
+    }, [defaultValue, options]);
+
+    useEffect(() => {
+        const selectedValues = right.map(({value}) => value);
+        onChange(selectedValues);
+        setValue(name, selectedValues);
+    }, [name, onChange, right, setValue]);
 
     const leftChecked = useMemo(() => intersection(checked, left), [checked, left]);
     const rightChecked = useMemo(() => intersection(checked, right), [checked, right]);
@@ -163,14 +177,15 @@ export const TransferList = ({defaultChoices, defaultChosen, titleChoices, title
             container
         >
             <Grid
+                className={classes.list}
                 item
                 xs
             >
                 <CustomList
                     checked={checked}
                     items={left}
-                    onSelectionChange={setChecked}
-                    title={titleChoices}
+                    onChange={setChecked}
+                    title={titleOptions}
                 />
             </Grid>
             <Grid
@@ -223,17 +238,22 @@ export const TransferList = ({defaultChoices, defaultChosen, titleChoices, title
                     >
                         <KeyboardArrowDownIcon />
                     </Button>
+                    <input
+                        type="hidden"
+                        {...registrationProps}
+                    />
                 </Grid>
             </Grid>
             <Grid
+                className={classes.list}
                 item
                 xs
             >
                 <CustomList
                     checked={checked}
                     items={right}
-                    onSelectionChange={setChecked}
-                    title={titleChosen}
+                    onChange={setChecked}
+                    title={titleSelections}
                 />
             </Grid>
         </Grid>
@@ -241,21 +261,36 @@ export const TransferList = ({defaultChoices, defaultChosen, titleChoices, title
 };
 
 TransferList.propTypes = {
-    defaultChoices: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
-        value: PropTypes.any.isRequired
-    })).isRequired,
-    defaultChosen: PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
-        value: PropTypes.any.isRequired
-    })).isRequired,
-    onSelectionChange: PropTypes.func,
-    titleChoices: PropTypes.string,
-    titleChosen: PropTypes.string
+    defaultValue: PropTypes.arrayOf(PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ])),
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func,
+    options: PropTypes.arrayOf(PropTypes.shape({
+        hint: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
+        ]),
+        title: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
+        ]).isRequired,
+        value: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
+        ]).isRequired
+    })),
+    required: PropTypes.bool,
+    titleOptions: PropTypes.string,
+    titleSelections: PropTypes.string
 };
 
 TransferList.defaultProps = {
-    onSelectionChange: () => {},
-    titleChoices: 'Choices',
-    titleChosen: 'Chosen'
+    defaultValue: [],
+    onChange: () => {},
+    options: [],
+    required: false,
+    titleOptions: 'Choices',
+    titleSelections: 'Chosen'
 };

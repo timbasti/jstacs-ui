@@ -11,17 +11,15 @@ export const listApplications = async () => {
 
 export const createApplication = async (applicationName, toolIds = []) => {
     const response = await axios.post(applicationsEndpoint, {
-        data: {
-            name: applicationName,
-            toolIds: [...toolIds]
-        }
+        name: applicationName,
+        toolIds: [...toolIds]
     });
     return response;
 };
 
 export const updateApplication = async (applicationId, toolIds = []) => {
     const applicationEndpoint = createSpecificEndpointForApplication(applicationId);
-    const response = await axios.put(applicationEndpoint, {data: {toolIds: [...toolIds]}});
+    const response = await axios.put(applicationEndpoint, {toolIds: [...toolIds]});
     return response;
 };
 

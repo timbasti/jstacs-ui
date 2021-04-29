@@ -1,29 +1,51 @@
-import {TextField} from '@material-ui/core';
+import {Box, TextField} from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
-import {useFormContext} from 'react-hook-form';
+import React, {useRef} from 'react';
+import {useController, useFormContext} from 'react-hook-form';
 
-const EnrichedTextField = ({helperText, label, name, placeholder, required}) => {
-    const {register} = useFormContext();
+import {requiredValueErrorMessage} from '../../utils/error-messages';
+import {ErrorNotification} from '../notifications';
 
-    const inputRegistration = useMemo(() => {
-        return register(name, {required});
-    }, [name, register, required]);
+const EnrichedTextField = ({helperText, label, name, placeholder, required, defaultValue}) => {
+    const {control} = useFormContext();
+
+    const textFieldRef = useRef();
+
+    const {
+        field: {ref, ...fieldProps},
+        fieldState: {invalid}
+    } = useController({
+        control,
+        defaultValue,
+        name,
+        rules: {required: required ? requiredValueErrorMessage() : false}
+    });
 
     return (
-        <TextField
-            fullWidth
-            helperText={helperText}
-            inputRef={inputRegistration}
-            label={label}
-            placeholder={placeholder}
-            required
-            variant="filled"
-        />
+        <Box>
+            <ErrorNotification
+                anchorEl={textFieldRef.current}
+                name={name}
+            />
+            <TextField
+                error={invalid}
+                fullWidth
+                helperText={helperText}
+                inputRef={ref}
+                label={label}
+                placeholder={placeholder}
+                ref={textFieldRef}
+                required={required}
+                type="text"
+                variant="filled"
+                {...fieldProps}
+            />
+        </Box>
     );
 };
 
 EnrichedTextField.propTypes = {
+    defaultValue: PropTypes.string,
     helperText: PropTypes.string,
     label: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -32,6 +54,7 @@ EnrichedTextField.propTypes = {
 };
 
 EnrichedTextField.defaultProps = {
+    defaultValue: '',
     helperText: '',
     placeholder: '',
     required: false

@@ -46,8 +46,6 @@ export const TestEnvironmentView = () => {
 
     const onSubmit = useCallback(
         (formData) => {
-            console.log(formData, fileItems);
-
             if (Object.keys(formData).length > 0) {
                 dispatch(testThunks.parameterSet.update({
                     files: Object.values(fileItems),

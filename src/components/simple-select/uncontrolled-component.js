@@ -12,24 +12,24 @@ const UncontrolledSimpleSelect = ({
     name,
     options,
     showValuesInHelperText,
-    required
+    required,
+    onChange
 }) => {
     const {register} = useFormContext();
 
     const renderedOptions = useMemo(
-        () => options &&
-            options.map((option) => {
-                const optionValue = option.value;
-                const optionLabel = option.label;
-                return (
-                    <MenuItem
-                        key={optionValue}
-                        value={optionValue}
-                    >
-                        {optionLabel}
-                    </MenuItem>
-                );
-            }),
+        () => options?.map((option) => {
+            const optionValue = option.value;
+            const optionLabel = option.label;
+            return (
+                <MenuItem
+                    key={optionValue}
+                    value={optionValue}
+                >
+                    {optionLabel}
+                </MenuItem>
+            );
+        }),
         [options]
     );
 
@@ -98,7 +98,7 @@ const UncontrolledSimpleSelect = ({
         return showValuesInHelperText ? renderedEnrichedHelperText : helperText;
     }, [helperText, showValuesInHelperText, renderedEnrichedHelperText]);
 
-    const formRegistration = useMemo(() => {
+    const {ref, ...registrationProps} = useMemo(() => {
         return register(name, {required});
     }, [name, register, required]);
 
@@ -108,12 +108,14 @@ const UncontrolledSimpleSelect = ({
             defaultValue={defaultSelected}
             fullWidth
             helperText={renderedHelperText}
-            inputRef={formRegistration}
+            inputRef={ref}
             label={label}
             name={name}
             required={required}
             select
             variant="filled"
+            {...registrationProps}
+            onChange={onChange}
         >
             {renderedOptions}
         </TextField>
@@ -122,10 +124,11 @@ const UncontrolledSimpleSelect = ({
 
 UncontrolledSimpleSelect.propTypes = {
     className: PropTypes.string,
-    defaultSelected: PropTypes.any.isRequired,
+    defaultSelected: PropTypes.any,
     helperText: PropTypes.string,
     label: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    onChange: PropTypes.func,
     options: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
@@ -136,7 +139,9 @@ UncontrolledSimpleSelect.propTypes = {
 
 UncontrolledSimpleSelect.defaultProps = {
     className: '',
+    defaultSelected: undefined,
     helperText: '',
+    onChange: () => {},
     required: false,
     showValuesInHelperText: false
 };

@@ -1,137 +1,246 @@
-/* eslint-disable no-magic-numbers */
-
 import {Box, Button, Card, CardActions, CardContent, CardHeader, Grid} from '@material-ui/core';
-import React, {useCallback, useMemo} from 'react';
-import {FormProvider, useForm} from 'react-hook-form';
-import {useSelector} from 'react-redux';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {FormProvider, useForm, useFormContext, useWatch} from 'react-hook-form';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {selectAvailableApplications} from '../../../../api/applications/selectors';
+import {createApplication, deleteApplication, listApplications, updateApplication} from '../../../../api/applications/thunks';
+import {selectAvailableTools} from '../../../../api/tools/selectors';
+import {listTools} from '../../../../api/tools/thunks';
+import {EnrichedSelectField} from '../../../../components/enriched-select-field/component';
 import {EnrichedTextField} from '../../../../components/enriched-text-field/component';
-import {UncontrolledSimpleSelect} from '../../../../components/simple-select/uncontrolled-component';
 import {TransferList} from '../../../../components/transfer-list/component';
+import {useApplicationsSectionStyles} from './styles';
 
-export const ApplicationsSection = () => {
-    const {handleSubmit, ...formProperties} = useForm();
+const newApplicationName = 'New Application';
+const newApplicationId = -1;
+
+const ApplicationSelectionFieldSet = ({onChange}) => {
+    const {setValue, control} = useFormContext();
+    const selectedApplicationId = useWatch({
+        control,
+        defaultValue: newApplicationId,
+        name: 'applicationId'
+    });
+
+    const dispatch = useDispatch();
     const availableApplications = useSelector(selectAvailableApplications);
+
+    useEffect(() => {
+        if (selectedApplicationId === undefined) {
+            return;
+        }
+
+        if (selectedApplicationId === -1) {
+            setValue('applicationName', '', {shouldValidate: false});
+        } else {
+            const selectedApplication = availableApplications?.find(({id}) => id === selectedApplicationId);
+            const newSelectedApplicationName = selectedApplication?.name || newApplicationName;
+            setValue('applicationName', newSelectedApplicationName, {shouldValidate: true});
+        }
+
+        onChange(selectedApplicationId);
+    }, [availableApplications, onChange, setValue, selectedApplicationId]);
+
+    const handleDeleteClick = useCallback(() => {
+        if (selectedApplicationId === undefined) {
+            return;
+        }
+
+        dispatch(deleteApplication({id: selectedApplicationId}));
+        setValue('applicationId', newApplicationId, {shouldValidate: false});
+        setValue('applicationName', newApplicationName, {shouldValidate: false});
+    }, [dispatch, selectedApplicationId, setValue]);
+
     const selectableOptions = useMemo(() => {
         const defaultOption = {
-            label: 'New Application',
-            value: -1
+            label: newApplicationName,
+            value: newApplicationId
         };
-        const options = availableApplications.map(({id, type}) => ({
-            label: type,
-            value: id
-        }));
+        const options =
+            availableApplications?.map(({id, name}) => ({
+                label: name,
+                value: id
+            })) || [];
         return [defaultOption, ...options];
     }, [availableApplications]);
 
-    const onSubmit = useCallback((values) => console.log(values), []);
-    const onError = useCallback((errors) => console.log(errors), []);
+    return (
+        <Card>
+            <CardHeader title="Create or change an application" />
+            <CardContent>
+                <Grid
+                    container
+                    spacing={6}
+                >
+                    <Grid
+                        item
+                        xs={6}
+                    >
+                        <EnrichedSelectField
+                            defaultValue={newApplicationId}
+                            helperText={`
+                                            Select an application to change its name and/or assigned tools below.
+                                            You can also delete a selected application type.
+                                        `}
+                            label="Existing Application"
+                            name="applicationId"
+                            options={selectableOptions}
+                            placeholder="Select an application"
+                            required
+                        />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={6}
+                    >
+                        <EnrichedTextField
+                            helperText="Enter a new name or change the one provided"
+                            label="Application name"
+                            name="applicationName"
+                            placeholder="Enter application name"
+                            required
+                        />
+                    </Grid>
+                </Grid>
+            </CardContent>
+            <CardActions>
+                <Button
+                    color="secondary"
+                    disabled={selectedApplicationId === newApplicationId}
+                    onClick={handleDeleteClick}
+                >
+                    Delete
+                </Button>
+            </CardActions>
+        </Card>
+    );
+};
 
-    const handleFormSubmit = useMemo(() => {
-        return handleSubmit(onSubmit, onError);
-    }, [handleSubmit, onSubmit, onError]);
+const ToolSelectionFieldSet = ({selectedApplicationId, onChange}) => {
+    const [toolOptions, setToolOptions] = useState([]);
+    const [selectedTools, setSelectedTools] = useState([]);
+
+    const dispatch = useDispatch();
+    const availableApplications = useSelector(selectAvailableApplications);
+    const allAvailableTools = useSelector(selectAvailableTools);
+
+    useEffect(() => {
+        if (!allAvailableTools || allAvailableTools.length === 0) {
+            dispatch(listTools());
+        } else {
+            const newAvailableTools = allAvailableTools.map(({id, type, name}) => {
+                return {
+                    hint: type,
+                    title: name,
+                    value: id
+                };
+            });
+            setToolOptions(newAvailableTools);
+        }
+    }, [dispatch, allAvailableTools]);
+
+    useEffect(() => {
+        if (!availableApplications || availableApplications.length === 0) {
+            dispatch(listApplications());
+        } else {
+            const selectedApplication = availableApplications.find(({id}) => id === selectedApplicationId);
+            const alreadySelectedTools =
+                selectedApplication?.tools.map(({id}) => id) || [];
+            setSelectedTools(alreadySelectedTools);
+        }
+    }, [dispatch, availableApplications, selectedApplicationId]);
 
     return (
-        <Box p={3}>
-            <FormProvider
-                handleSubmit={handleSubmit}
-                {...formProperties}
+        <TransferList
+            defaultValue={selectedTools}
+            name="assignedTools"
+            onChange={onChange}
+            options={toolOptions}
+            titleOptions="Available Tools"
+            titleSelections="Assigned Tools"
+        />
+    );
+};
+
+export const ApplicationsSection = () => {
+    const {handleSubmit, ...formProperties} = useForm();
+    const [selectedApplicationId, setSelectedApplicationId] = useState();
+
+    const dispatch = useDispatch();
+
+    const classes = useApplicationsSectionStyles();
+
+    const doSubmit = useCallback(
+        ({applicationId, applicationName, assignedTools}) => {
+            if (applicationId === newApplicationId) {
+                dispatch(createApplication({
+                    name: applicationName,
+                    toolIds: assignedTools
+                }));
+            } else {
+                dispatch(updateApplication({
+                    id: applicationId,
+                    name: applicationName,
+                    toolIds: assignedTools
+                }));
+            }
+        },
+        [dispatch]
+    );
+
+    const handleFormSubmit = useMemo(() => {
+        return handleSubmit(doSubmit);
+    }, [handleSubmit, doSubmit]);
+
+    return (
+        <FormProvider
+            handleSubmit={handleSubmit}
+            {...formProperties}
+        >
+            <Box
+                className={classes.root}
+                component="form"
+                noValidate
+                onSubmit={handleFormSubmit}
+                paddingLeft={3}
+                paddingRight={3}
+                paddingTop={3}
             >
-                <form onSubmit={handleFormSubmit}>
+                <Grid
+                    className={classes.gridContainer}
+                    container
+                    direction="column"
+                    spacing={2}
+                    wrap="nowrap"
+                >
                     <Grid
-                        container
-                        spacing={3}
+                        className={classes.gridItem}
+                        item
                     >
-                        <Grid
-                            item
-                            xs={12}
-                        >
-                            <Card>
-                                <CardHeader title="Create or change an application" />
-                                <CardContent>
-                                    <Grid
-                                        container
-                                        spacing={6}
-                                    >
-                                        <Grid
-                                            item
-                                            xs={6}
-                                        >
-                                            <UncontrolledSimpleSelect
-                                                defaultSelected={-1}
-                                                helperText={`
-                                                Select an application type to change its name and/or assigned tools below.
-                                                You can also delete a selected application type.
-                                                But you have to confirm this operation with a second click.
-                                            `}
-                                                label="Application type"
-                                                name="application-type"
-                                                options={selectableOptions}
-                                                placeholder="Select an application"
-                                                required
-                                            />
-                                        </Grid>
-                                        <Grid
-                                            item
-                                            xs={6}
-                                        >
-                                            <EnrichedTextField
-                                                helperText="Enter a new name or change the one provided"
-                                                label="Application name"
-                                                name="application-name"
-                                                placeholder="Enter application name"
-                                                required
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </CardContent>
-                                <CardActions>
-                                    <Button
-                                        color="secondary"
-                                        disabled
-                                    >
-                                        Delete
-                                    </Button>
-                                </CardActions>
-                            </Card>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                        >
-                            <TransferList
-                                defaultChoices={[
-                                    {
-                                        key: 1,
-                                        value: 1
-                                    }
-                                ]}
-                                defaultChosen={[
-                                    {
-                                        key: 2,
-                                        value: 2
-                                    }
-                                ]}
-                                titleChoices="Available Tools"
-                                titleChosen="Assigned Tools"
-                            />
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                        >
-                            <Button
-                                color="secondary"
-                                type="submit"
-                                variant="contained"
-                            >
-                                Create
-                            </Button>
-                        </Grid>
+                        <ApplicationSelectionFieldSet onChange={setSelectedApplicationId} />
                     </Grid>
-                </form>
-            </FormProvider>
-        </Box>
+                    <Grid
+                        className={classes.gridItem}
+                        item
+                        xs
+                    >
+                        <ToolSelectionFieldSet selectedApplicationId={selectedApplicationId} />
+                    </Grid>
+                    <Grid
+                        className={classes.gridItem}
+                        item
+                    >
+                        <Button
+                            color="primary"
+                            type="submit"
+                            variant="contained"
+                        >
+                            {selectedApplicationId === newApplicationId ? 'Create' : 'Update'}
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Box>
+        </FormProvider>
     );
 };
