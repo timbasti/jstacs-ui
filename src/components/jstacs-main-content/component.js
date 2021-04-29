@@ -1,10 +1,11 @@
+import loadable from '@loadable/component';
 import {makeStyles, Toolbar} from '@material-ui/core';
 import React from 'react';
 import {Route, Switch} from 'react-router-dom';
 
-import {AdminView} from '../../views/admin/component';
-import {HomeView} from '../../views/home/component';
-import {NoMatchView} from '../../views/no-match/component';
+const AdminView = loadable(() => import('../../views/admin/component'));
+const HomeView = loadable(() => import('../../views/home/component'));
+const NoMatchView = loadable(() => import('../../views/no-match/component'));
 
 const useStyles = makeStyles(() => {
     return {content: {flexGrow: 1}};
@@ -21,26 +22,24 @@ export const JstacsMainContent = () => {
             <Toolbar />
             <Switch>
                 <Route
+                    component={HomeView}
                     exact
                     path="/"
-                >
-                    <HomeView />
-                </Route>
+                />
                 <Route
+                    component={AdminView}
                     exact
                     path="/admin"
-                >
-                    <AdminView />
-                </Route>
+                />
                 <Route
+                    component={NoMatchView}
                     exact
                     path="/tool/:toolId"
-                >
-                    <NoMatchView />
-                </Route>
-                <Route path="*">
-                    <NoMatchView />
-                </Route>
+                />
+                <Route
+                    component={NoMatchView}
+                    path="*"
+                />
             </Switch>
         </main>
     );
