@@ -2,7 +2,7 @@ import {Box, Link, Typography} from '@material-ui/core';
 import React from 'react';
 import {Link as RouterLink, useLocation} from 'react-router-dom';
 
-export const NoMatchView = () => {
+const NoMatchView = () => {
     const location = useLocation();
 
     return (
@@ -25,3 +25,5 @@ export const NoMatchView = () => {
         </Typography>
     );
 };
+
+export default NoMatchView;
