@@ -103,7 +103,6 @@ const RadioControlledAccordion = ({radioLabel, radioValue, children}) => {
                     value={radioValue}
                 />
             </AccordionSummary>
-
             <AccordionDetails>
                 {children}
             </AccordionDetails>
@@ -181,21 +180,18 @@ const InputSetSelection = ({defaultSelected, className, inputSets, label, helper
                 name={name}
                 style={{color: '#f44336'}}
             />
-
             <FormLabel
                 className={`${classes.SetSelectionHint} ${classes.SetSelectionLabel}`}
                 required
             >
                 {label}
             </FormLabel>
-
             <UncontrolledRadioGroup
                 defaultSelected={defaultSelected}
                 name={name}
             >
                 {createFieldsetSelectionList(inputSets)}
             </UncontrolledRadioGroup>
-
             <FormHelperText className={classes.SetSelectionHint}>
                 {helperText}
             </FormHelperText>
@@ -305,7 +301,7 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
     );
 
     const renderSelect = useCallback(
-        () => ({onChange, value}) => {
+        ({onChange, value}) => {
             const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
             return (
                 <TextField
@@ -321,7 +317,6 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
                             >
                                 {helperText}
                             </Typography>
-
                             <Tooltip
                                 enterTouchDelay={0}
                                 title={
@@ -329,7 +324,6 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
                                         <Typography>
                                             The following options are available.
                                         </Typography>
-
                                         {renderOptionsDescription()}
                                     </>
                                 }
@@ -360,7 +354,7 @@ const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label
         control={control}
         defaultValue={defaultSelected}
         name={name}
-        render={renderSelect()}
+        render={renderSelect}
     />;
 };
 

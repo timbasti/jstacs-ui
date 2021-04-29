@@ -1,7 +1,6 @@
 import React, {createContext, useContext, useEffect, useMemo, useReducer} from 'react';
 
 const fileItemReducer = (state, fileItem) => {
-    console.log(state, fileItem);
     return {
         ...state,
         [fileItem.ref]: fileItem.file

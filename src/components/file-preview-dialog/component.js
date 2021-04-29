@@ -38,7 +38,6 @@ export const FilePreviewDialog = ({file, onClose, open}) => {
             <DialogTitle>
                 {file && file.name}
             </DialogTitle>
-
             <DialogContent>
                 <Editor
                     height="100%"
@@ -49,7 +48,6 @@ export const FilePreviewDialog = ({file, onClose, open}) => {
                     width="100%"
                 />
             </DialogContent>
-
             <DialogActions>
                 <Button
                     onClick={handleClose}

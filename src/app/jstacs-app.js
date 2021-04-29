@@ -32,12 +32,9 @@ export const JstacsApp = () => {
                 onClose={handleUploadDialogClose}
                 open={openUploadDialog}
             />
-
             <JstacsHeader />
-
             <Router>
                 <JstacsNavigation />
-
                 <JstacsMainContent />
             </Router>
         </div>

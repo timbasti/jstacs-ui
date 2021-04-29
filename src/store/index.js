@@ -1,10 +1,10 @@
 import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 import {load, save} from 'redux-localstorage-simple';
 
-import {rootReducer} from './rootReducer';
+import {reducer as rootReducer} from './root-reducer';
 
 export const store = configureStore({
-    middleware: [...getDefaultMiddleware(), save({states: ['theme']})],
-    preloadedState: load({states: ['theme']}),
+    middleware: [...getDefaultMiddleware(), save({states: ['theme', 'user']})],
+    preloadedState: load({states: ['theme', 'user']}),
     reducer: rootReducer
 });

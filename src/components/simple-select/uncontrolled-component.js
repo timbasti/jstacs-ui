@@ -1,88 +1,149 @@
 import {MenuItem, TextField, Tooltip, Typography} from '@material-ui/core';
 import {Info} from '@material-ui/icons';
-import React, {useCallback} from 'react';
-import {Controller, useFormContext} from 'react-hook-form';
+import PropTypes from 'prop-types';
+import React, {useMemo} from 'react';
+import {useFormContext} from 'react-hook-form';
 
-export const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label, name, options}) => {
-    const {control} = useFormContext();
+const UncontrolledSimpleSelect = ({
+    className,
+    defaultSelected,
+    helperText,
+    label,
+    name,
+    options,
+    showValuesInHelperText,
+    required,
+    onChange
+}) => {
+    const {register} = useFormContext();
 
-    const renderOptions = useCallback(
-        () => options.map(({key}) => <MenuItem
-            key={key}
-            value={key}
-        >
-            {key}
-        </MenuItem>),
-        [options]
-    );
-
-    const renderOptionsDescription = useCallback(
-        () => options.map(({key, value}) => <Typography
-            component="div"
-            key={key}
-            variant="caption"
-        >
-            {key === value ? key : `${key}: ${value}`}
-        </Typography>),
-        [options]
-    );
-
-    const renderSelect = useCallback(
-        () => ({onChange, value}) => {
-            const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
+    const renderedOptions = useMemo(
+        () => options?.map((option) => {
+            const optionValue = option.value;
+            const optionLabel = option.label;
             return (
-                <TextField
-                    className={className}
-                    helperText={
+                <MenuItem
+                    key={optionValue}
+                    value={optionValue}
+                >
+                    {optionLabel}
+                </MenuItem>
+            );
+        }),
+        [options]
+    );
+
+    const renderedOptionsDescription = useMemo(() => {
+        if (!showValuesInHelperText) {
+            return undefined;
+        }
+
+        return (
+            options &&
+            options.map((option) => {
+                const optionValue = option.value;
+                const optionLabel = option.label;
+                return (
+                    <Typography
+                        component="div"
+                        key={optionValue}
+                        variant="caption"
+                    >
+                        {`${optionLabel}: ${optionValue}`}
+                    </Typography>
+                );
+            })
+        );
+    }, [options, showValuesInHelperText]);
+
+    const renderedEnrichedHelperText = useMemo(() => {
+        if (!showValuesInHelperText) {
+            return undefined;
+        }
+
+        return (
+            <>
+                <Typography
+                    style={{
+                        marginRight: 5,
+                        verticalAlign: 'middle'
+                    }}
+                    variant="caption"
+                >
+                    {helperText}
+                </Typography>
+                <Tooltip
+                    enterTouchDelay={0}
+                    title={
                         <>
-                            <Typography
-                                style={{
-                                    marginRight: 5,
-                                    verticalAlign: 'middle'
-                                }}
-                                variant="caption"
-                            >
-                                {helperText}
+                            <Typography>
+                                The following options are available:
                             </Typography>
-
-                            <Tooltip
-                                enterTouchDelay={0}
-                                title={
-                                    <>
-                                        <Typography>
-                                            The following options are available:
-                                        </Typography>
-
-                                        {renderOptionsDescription()}
-                                    </>
-                                }
-                            >
-                                <Info
-                                    style={{
-                                        fontSize: 15,
-                                        verticalAlign: 'middle'
-                                    }}
-                                />
-                            </Tooltip>
+                            {renderedOptionsDescription}
                         </>
                     }
-                    label={label}
-                    onChange={createChangeHanlder(onChange)}
-                    select
-                    value={value}
-                    variant="filled"
                 >
-                    {renderOptions()}
-                </TextField>
-            );
-        },
-        [className, helperText, label, renderOptions, renderOptionsDescription]
-    );
+                    <Info
+                        style={{
+                            fontSize: 15,
+                            verticalAlign: 'middle'
+                        }}
+                    />
+                </Tooltip>
+            </>
+        );
+    }, [helperText, showValuesInHelperText, renderedOptionsDescription]);
 
-    return <Controller
-        control={control}
-        defaultValue={defaultSelected}
-        name={name}
-        render={renderSelect()}
-    />;
+    const renderedHelperText = useMemo(() => {
+        return showValuesInHelperText ? renderedEnrichedHelperText : helperText;
+    }, [helperText, showValuesInHelperText, renderedEnrichedHelperText]);
+
+    const {ref, ...registrationProps} = useMemo(() => {
+        return register(name, {required});
+    }, [name, register, required]);
+
+    return (
+        <TextField
+            className={className}
+            defaultValue={defaultSelected}
+            fullWidth
+            helperText={renderedHelperText}
+            inputRef={ref}
+            label={label}
+            name={name}
+            required={required}
+            select
+            variant="filled"
+            {...registrationProps}
+            onChange={onChange}
+        >
+            {renderedOptions}
+        </TextField>
+    );
 };
+
+UncontrolledSimpleSelect.propTypes = {
+    className: PropTypes.string,
+    defaultSelected: PropTypes.any,
+    helperText: PropTypes.string,
+    label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func,
+    options: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
+    })).isRequired,
+    required: PropTypes.bool,
+    showValuesInHelperText: PropTypes.bool
+};
+
+UncontrolledSimpleSelect.defaultProps = {
+    className: '',
+    defaultSelected: undefined,
+    helperText: '',
+    onChange: () => {},
+    required: false,
+    showValuesInHelperText: false
+};
+
+export {UncontrolledSimpleSelect};

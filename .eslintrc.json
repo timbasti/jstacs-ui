@@ -72,12 +72,7 @@
                 "multiline": true
             }
         ],
-        "array-element-newline": [
-            "error",
-            {
-                "multiline": true
-            }
-        ],
+        "array-element-newline": ["error", "consistent"],
         "no-mixed-operators": "off",
         "react/jsx-closing-tag-location": "off",
         "simple-import-sort/imports": "error",
@@ -118,15 +113,25 @@
         "no-console": "off",
         "capitalized-comments": "off",
         "multiline-comment-style": "off",
-        "react/jsx-props-no-spreading": [
-            "error",
-            {
-                "custom": "ignore"
-            }
-        ],
+        "react/jsx-props-no-spreading": "off",
         "prefer-destructuring": "off",
         "no-empty-function": "off",
         "max-statements": "off",
-        "no-await-in-loop": "off"
+        "no-await-in-loop": "off",
+        "max-params": [
+            "error",
+            {
+                "max": 5
+            }
+        ],
+        "array-bracket-newline": ["error", "consistent"],
+        "react/jsx-newline": [
+            "error",
+            {
+                "prevent": true
+            }
+        ],
+        "arrow-body-style": "off",
+        "react/forbid-prop-types": ["error", {"forbid": ["array", "object"]}]
     }
 }

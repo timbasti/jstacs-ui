@@ -13,12 +13,10 @@ const UploadItem = ({name, progress}) => {
             <Typography>
                 {name}
             </Typography>
-
             <LinearProgress
                 value={progress}
                 variant="determinate"
             />
-
             <Typography>
                 Uploaded:
                 {progress}
@@ -57,9 +55,7 @@ const UploadDialog = ({open, onClose}) => {
             <DialogTitle>
                 Upload Progress
             </DialogTitle>
-
             <UploadList />
-
             <DialogActions>
                 <Button
                     onClick={handleClose}
