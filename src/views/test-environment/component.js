@@ -1,115 +1,155 @@
 import {Box, Button, Grid} from '@material-ui/core';
-import React, {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
+import React, {useCallback} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
-import {useDispatch, useSelector} from 'react-redux';
 
-import {selectParameters, selectToolName} from '../../api/test/selectors';
-import {thunks as testThunks} from '../../api/test/thunks';
-import {FileItemProvider, useFileItemContext} from '../../utils/file-context';
-import {createParameterInput} from '../../utils/parameter-factory';
-import {useStyles} from './styles';
+import {
+    DataColumnField,
+    EnrichedCheckbox,
+    EnrichedFileInput,
+    EnrichedNumberField,
+    EnrichedSelectField,
+    EnrichedTextField
+} from '../../components/input-fields';
+import {EnrichedRadioButton} from '../../components/input-fields/enriched-radio-button/component';
+import {requiredValueErrorMessage} from '../../utils/error-messages';
 
-const createParameterInputFields = (parameters, inputItemClasses) => parameters &&
-    parameters.map((parameter) => {
-        const gritItemProps =
-            parameter.dataType === 'PARAMETERSET'
-                ? {
-                    lg: 9,
-                    sm: 12,
-                    xs: 12
-                }
-                : {
-                    lg: 3,
-                    sm: 4,
-                    xs: 12
-                };
-        return (
-            <Grid
-                item
-                key={parameter.name}
-                lg={gritItemProps.lg}
-                sm={gritItemProps.sm}
-                xs={gritItemProps.xs}
-            >
-                {createParameterInput(parameter, inputItemClasses)}
-            </Grid>
-        );
-    });
-
-export const TestEnvironmentView = () => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
-    const toolName = useSelector(selectToolName);
-    const parameters = useSelector(selectParameters);
+const TestEnvironmentView = () => {
     const {handleSubmit, ...formProperties} = useForm();
-    const [fileItems, setFileItems] = useState({});
 
-    const onSubmit = useCallback(
-        (formData) => {
-            if (Object.keys(formData).length > 0) {
-                dispatch(testThunks.parameterSet.update({
-                    files: Object.values(fileItems),
-                    formData
-                }));
-            }
-        },
-        [dispatch, fileItems]
-    );
-
-    const handleFileItemsChange = useCallback(
-        (updatedFileItems) => {
-            setFileItems(updatedFileItems);
-        },
-        [setFileItems]
-    );
-
-    useEffect(() => {
-        if (!toolName) {
-            dispatch(testThunks.parameterSet.fetch());
-        }
-    }, [toolName, dispatch]);
+    const onSubmit = useCallback((formData) => {
+        console.log(formData);
+    }, []);
 
     return (
-        <Box>
-            <Box component="p">
-                Dies ist eine Ansicht für Testzwecke
-            </Box>
-            <Box component="p">
-                Es wurden Daten für folgendes Tool geladen:
-                {toolName}
-            </Box>
+        <Box p={10}>
             <FormProvider
                 {...formProperties}
                 handleSubmit={handleSubmit}
             >
-                <FileItemProvider onChange={handleFileItemsChange}>
-                    <form
-                        className={classes.form}
-                        onSubmit={handleSubmit(onSubmit)}
+                <form
+                    noValidate
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <Grid
+                        alignContent="flex-start"
+                        container
+                        justify="center"
+                        spacing={5}
                     >
                         <Grid
-                            alignContent="flex-start"
-                            container
-                            justify="center"
-                            spacing={5}
+                            item
+                            xs={6}
                         >
-                            {createParameterInputFields(parameters, classes.inputItem)}
-                            <Grid
-                                item
-                                xs={12}
-                            >
-                                <Button
-                                    color="primary"
-                                    type="submit"
-                                    variant="contained"
-                                >
-                                    Submit
-                                </Button>
-                            </Grid>
+                            <EnrichedCheckbox
+                                defaultChecked
+                                helperText="Some helper text"
+                                label="Checkbox"
+                                name="checkbox"
+                            />
                         </Grid>
-                    </form>
-                </FileItemProvider>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <EnrichedNumberField
+                                defaultValue={5}
+                                helperText="Some helper text"
+                                label="Number Field"
+                                name="numberfield"
+                                placeholder="Enter a number"
+                                required={requiredValueErrorMessage}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <EnrichedSelectField
+                                defaultValue={1}
+                                helperText="Some helper text"
+                                label="Select Field"
+                                name="selectfield"
+                                options={[
+                                    {
+                                        label: 'Hello World',
+                                        value: 0
+                                    },
+                                    {
+                                        label: 'Foo bar',
+                                        value: 1
+                                    }
+                                ]}
+                                placeholder="Select a value"
+                                required={requiredValueErrorMessage}
+                                showEnrichedHelperText
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <EnrichedTextField
+                                defaultValue="Hello World"
+                                helperText="Some helper text"
+                                label="Text Field"
+                                name="textfield"
+                                placeholder="Enter a text"
+                                required={requiredValueErrorMessage}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <EnrichedFileInput
+                                accept=".tsv,.tabular/*  */"
+                                helperText="Some helper text"
+                                label="File Field"
+                                name="filefield"
+                                required={requiredValueErrorMessage}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <DataColumnField
+                                defaultValue={3}
+                                fileFieldName="filefield"
+                                helperText="Some helper text"
+                                label="Data Column Field"
+                                name="columnfield"
+                                placeholder="Select a value"
+                                required={requiredValueErrorMessage}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <EnrichedRadioButton
+                                defaultChecked
+                                label="Radio Button Field"
+                                name="radiofield"
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                        >
+                            <Button
+                                color="primary"
+                                type="submit"
+                                variant="contained"
+                            >
+                                Submit
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </form>
             </FormProvider>
         </Box>
     );
 };
+
+export default TestEnvironmentView;

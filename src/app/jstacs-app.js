@@ -1,7 +1,6 @@
 import {makeStyles} from '@material-ui/core';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {BrowserRouter as Router} from 'react-router-dom';
 
 import {selectProcessing as selectFilesProcessing} from '../api/files/selectors';
 import {JstacsHeader} from '../components/jstacs-header/component';
@@ -33,10 +32,8 @@ export const JstacsApp = () => {
                 open={openUploadDialog}
             />
             <JstacsHeader />
-            <Router>
-                <JstacsNavigation />
-                <JstacsMainContent />
-            </Router>
+            <JstacsNavigation />
+            <JstacsMainContent />
         </div>
     );
 };

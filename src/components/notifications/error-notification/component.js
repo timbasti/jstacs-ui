@@ -6,14 +6,14 @@ import {NotificationPopper} from '../notification-popper/component';
 
 const ErrorNotification = ({name, anchorEl}) => {
     const handleRender = useCallback(
-        ({message}) => {
+        (error) => {
             return (
                 <NotificationPopper
                     anchorEl={anchorEl}
                     placement="top-start"
                     type="error"
                 >
-                    {message}
+                    {error.message}
                 </NotificationPopper>
             );
         },

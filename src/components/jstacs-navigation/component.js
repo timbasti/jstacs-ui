@@ -129,6 +129,14 @@ const NavigationDrawer = ({DrawerProps}) => {
                     </ListItemIcon>
                     <ListItemText primary="Admin" />
                 </ListItem>
+                <ListItem
+                    button
+                    component={NavLink}
+                    selected={location.pathname === '/test-environment'}
+                    to="/test-environment"
+                >
+                    <ListItemText primary="Test Environment" />
+                </ListItem>
             </List>
             <Divider />
             <ApplicationItemList />
