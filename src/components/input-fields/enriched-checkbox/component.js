@@ -1,23 +1,26 @@
 import {Checkbox, FormControl, FormControlLabel, FormHelperText} from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
-import {useController, useFormContext} from 'react-hook-form';
+import React, {useCallback, useMemo} from 'react';
+import {Controller, useFormContext} from 'react-hook-form';
 
 import {useCheckboxStyles} from './styles';
 
 const UncontrolledCheckbox = ({name, defaultChecked}) => {
     const {control} = useFormContext();
 
-    const {field: {ref, ...fieldProps}} = useController({
-        control,
-        defaultValue: defaultChecked,
-        name
-    });
+    const renderCheckbox = useCallback(({field: {ref, value, ...fieldProps}}) => {
+        return <Checkbox
+            checked={value}
+            inputRef={ref}
+            {...fieldProps}
+        />;
+    }, []);
 
-    return <Checkbox
-        inputRef={ref}
-        {...fieldProps}
-        checked={defaultChecked}
+    return <Controller
+        control={control}
+        defaultValue={defaultChecked}
+        name={name}
+        render={renderCheckbox}
     />;
 };
 

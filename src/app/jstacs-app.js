@@ -3,10 +3,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {selectProcessing as selectFilesProcessing} from '../api/files/selectors';
-import {JstacsHeader} from '../components/jstacs-header/component';
-import {JstacsMainContent} from '../components/jstacs-main-content/component';
-import {JstacsNavigation} from '../components/jstacs-navigation/component';
 import {UploadDialog} from '../components/upload-dialog/component';
+import {JstacsHeader} from './jstacs-header';
+import {JstacsMainContent} from './jstacs-main-content';
+import {JstacsNavigation} from './jstacs-navigation';
 
 const useStyles = makeStyles((theme) => ({root: {display: 'flex'}}));
 

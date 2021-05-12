@@ -15,12 +15,12 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import InfoIcon from '@material-ui/icons/Info';
 import PropTypes from 'prop-types';
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {Controller, useFormContext} from 'react-hook-form';
 
 import {createParameterInput} from './parameter-factory';
 
-const RadioGroupContext = React.createContext();
+const RadioGroupContext = createContext();
 
 const queryObject = (object, path) => path
     .split('.')

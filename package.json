@@ -19,7 +19,7 @@
         "prop-types": "^15.7.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-hook-form": "^7.4.2",
+        "react-hook-form": "^7.5.2",
         "react-markdown": "^6.0.2",
         "react-number-format": "^4.5.5",
         "react-redux": "^7.2.4",
@@ -42,7 +42,6 @@
         "clear:index": "html-remove-empty-lines ./public/index.html && prettier --write \"./public/index.html\"",
         "make:pwa": "pwa-asset-generator src/logo.svg -f -i ./public/index.html -m ./public/manifest.json --opaque false --padding \"0\" -a %PUBLIC_URL% ./public/assets && yarn clear:index",
         "test": "react-scripts test",
-        "eeject": "react-scripts eeject",
         "format": "prettier --write \"src/**/*\""
     },
     "browserslist": {
@@ -59,7 +58,7 @@
     },
     "devDependencies": {
         "@ryanburnette/html-remove-empty-lines": "^1.1.6",
-        "@testing-library/dom": "^7.30.4",
+        "@testing-library/dom": "^7.31.0",
         "@testing-library/jest-dom": "^5.12.0",
         "@testing-library/react": "^11.2.6",
         "@testing-library/user-event": "^13.1.8",
@@ -75,7 +74,7 @@
         "eslint-plugin-sort-keys-fix": "^1.1.1",
         "husky": "^6.0.0",
         "lint-staged": "^11.0.0",
-        "prettier": "^2.2.1",
+        "prettier": "^2.3.0",
         "prettier-eslint": "^12.0.0",
         "pwa-asset-generator": "^4.1.1",
         "react-refresh": "^0.10.0",

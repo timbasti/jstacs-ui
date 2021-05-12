@@ -174,6 +174,7 @@ export const createSimpleParameterInput = (parameter, inputItemClasses, parentNa
     case 'BOOLEAN':
         return createCheckbox(parameter, inputItemClasses, parentName);
     default:
+        console.error('Not supported data type');
         return undefined;
     }
 };

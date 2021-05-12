@@ -4,13 +4,13 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import PropTypes from 'prop-types';
-import React, {useCallback} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 import {useStyles} from './styles';
 
 const SimpleMenu = ({className, options, onClick}) => {
-    const [open, setOpen] = React.useState(false);
-    const anchorRef = React.useRef(null);
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
     const classes = useStyles();
 
     const createMenuItemClickHandler = useCallback(

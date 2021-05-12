@@ -164,11 +164,9 @@ const ToolSelectionFieldSet = ({selectedApplicationId, onChange}) => {
 };
 
 export const ApplicationsSection = () => {
-    const {handleSubmit, ...formProperties} = useForm();
     const [selectedApplicationId, setSelectedApplicationId] = useState();
-
     const dispatch = useDispatch();
-
+    const {handleSubmit, ...formProperties} = useForm();
     const classes = useApplicationsSectionStyles();
 
     const doSubmit = useCallback(

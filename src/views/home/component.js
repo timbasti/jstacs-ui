@@ -1,8 +1,19 @@
 import {Typography} from '@material-ui/core';
-import React from 'react';
+import React, {useEffect} from 'react';
+import {useDispatch} from 'react-redux';
 
-const HomeView = () => <Typography variant="body1">
-    Willkommen bei Jstacs Online
-</Typography>;
+import {setRouteData} from '../../api/route/slice';
+
+const HomeView = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(setRouteData({view: 'Home'}));
+    }, [dispatch]);
+
+    return <Typography variant="body1">
+        Willkommen bei Jstacs Online
+    </Typography>;
+};
 
 export default HomeView;

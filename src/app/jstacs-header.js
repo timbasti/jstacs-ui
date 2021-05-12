@@ -1,12 +1,14 @@
-import {AppBar, Hidden, IconButton, makeStyles, Toolbar, Typography} from '@material-ui/core';
+import {AppBar, Breadcrumbs, Hidden, IconButton, makeStyles, Toolbar, Typography} from '@material-ui/core';
 import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 import MenuIcon from '@material-ui/icons/Menu';
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {useLocation} from 'react-router';
 
-import {open as openDrawer} from '../../api/drawer/actions';
-import {changeApplicationTheme} from '../../api/theme/actions';
-import {selectPaletteType} from '../../api/theme/selectors';
+import {open as openDrawer} from '../api/drawer/actions';
+import {selectSection, selectView} from '../api/route/selectors';
+import {changeApplicationTheme} from '../api/theme/actions';
+import {selectPaletteType} from '../api/theme/selectors';
 // import logo from '../../assets/logo.png';
 
 const drawerWidth = 240;
@@ -37,6 +39,13 @@ const useStyles = makeStyles((theme) => {
 export const JstacsHeader = () => {
     const themePaletteType = useSelector(selectPaletteType);
     const dispatch = useDispatch();
+    const currentView = useSelector(selectView);
+
+    const viewBreadcrumb = useMemo(() => {
+        return currentView && <Typography variant="h6">
+            {currentView}
+        </Typography>;
+    }, [currentView]);
 
     const handleDrawerOpen = useCallback(() => {
         dispatch(openDrawer());
@@ -66,12 +75,12 @@ export const JstacsHeader = () => {
                         <MenuIcon />
                     </IconButton>
                 </Hidden>
-                <Typography
+                <Breadcrumbs
                     className={classes.title}
-                    variant="h6"
+                    color="textPrimary"
                 >
-                    TODO: Add current pathname
-                </Typography>
+                    {viewBreadcrumb}
+                </Breadcrumbs>
                 <IconButton
                     color="inherit"
                     edge="end"

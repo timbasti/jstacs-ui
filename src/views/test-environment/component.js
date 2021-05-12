@@ -1,20 +1,28 @@
 import {Box, Button, Grid} from '@material-ui/core';
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
+import {useDispatch} from 'react-redux';
 
+import {setRouteData} from '../../api/route/slice';
 import {
     DataColumnField,
     EnrichedCheckbox,
     EnrichedFileInput,
     EnrichedNumberField,
     EnrichedSelectField,
-    EnrichedTextField
+    EnrichedTextField,
+    FieldsetSelectField,
+    SimpleEnrichedRadioGroup
 } from '../../components/input-fields';
-import {EnrichedRadioButton} from '../../components/input-fields/enriched-radio-button/component';
 import {requiredValueErrorMessage} from '../../utils/error-messages';
 
 const TestEnvironmentView = () => {
     const {handleSubmit, ...formProperties} = useForm();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(setRouteData({view: 'Test-Environment'}));
+    }, [dispatch]);
 
     const onSubmit = useCallback((formData) => {
         console.log(formData);
@@ -127,10 +135,44 @@ const TestEnvironmentView = () => {
                             item
                             xs={6}
                         >
-                            <EnrichedRadioButton
-                                defaultChecked
-                                label="Radio Button Field"
-                                name="radiofield"
+                            <SimpleEnrichedRadioGroup
+                                defaultValue="female"
+                                helperText="Some helper text"
+                                label="Radio Group Field"
+                                name="radiogroupfield"
+                                options={[
+                                    {
+                                        label: 'Male',
+                                        value: 'male'
+                                    },
+                                    {
+                                        label: 'Female',
+                                        value: 'female'
+                                    }
+                                ]}
+                                required={requiredValueErrorMessage}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={6}
+                        >
+                            <FieldsetSelectField
+                                helperText="Some helper text"
+                                label="Fieldset Select Field"
+                                name="fieldsetselectfield"
+                                options={[
+                                    {
+                                        content: 'Männertag ^^',
+                                        label: 'Male',
+                                        value: 'male'
+                                    },
+                                    {
+                                        label: 'Female',
+                                        value: 'female'
+                                    }
+                                ]}
+                                required={requiredValueErrorMessage}
                             />
                         </Grid>
                         <Grid

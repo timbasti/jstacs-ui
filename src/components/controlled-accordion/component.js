@@ -3,13 +3,13 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 
 import {useStyles} from './styles';
 
 export const ControlledAccordions = () => {
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     const createChangeHandler = useCallback((panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);

@@ -1780,10 +1780,10 @@
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
 
-"@testing-library/dom@^7.30.4":
-  version "7.30.4"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.30.4.tgz#c6a4a91557e92035fd565246bbbfb8107aa4634d"
-  integrity sha512-GObDVMaI4ARrZEXaRy4moolNAxWPKvEYNV/fa6Uc2eAzR/t4otS6A7EhrntPBIQLeehL9DbVhscvvv7gd6hWqA==
+"@testing-library/dom@^7.31.0":
+  version "7.31.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.31.0.tgz#938451abd3ca27e1b69bb395d4a40759fd7f5b3b"
+  integrity sha512-0X7ACg4YvTRDFMIuTOEj6B4NpN7i3F/4j5igOcTI5NC5J+N4TribNdErCHOZF1LBWhhcyfwxelVwvoYNMUXTOA==
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
@@ -10146,10 +10146,15 @@ prettier-eslint@^12.0.0:
     typescript "^3.9.3"
     vue-eslint-parser "~7.1.0"
 
-prettier@^2.0.0, prettier@^2.2.1:
+prettier@^2.0.0:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.2.1.tgz#795a1a78dd52f073da0cd42b21f9c91381923ff5"
   integrity sha512-PqyhM2yCjg/oKkFPtTGUojv7gnZAoG80ttl45O6x2Ug/rMJw4wcc9k6aaf2hibP7BGVCCM33gZoGjyvt9mm16Q==
+
+prettier@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.3.0.tgz#b6a5bf1284026ae640f17f7ff5658a7567fc0d18"
+  integrity sha512-kXtO4s0Lz/DW/IJ9QdWhAf7/NmPWQXkFr/r/WkR3vyI+0v8amTDxiaQSLzs8NBlytfLWX/7uQUMIW677yLKl4w==
 
 pretty-bytes@^5.3.0:
   version "5.6.0"
@@ -10497,10 +10502,10 @@ react-error-overlay@^6.0.9:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
   integrity sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==
 
-react-hook-form@^7.4.2:
-  version "7.4.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.4.2.tgz#7d68f7fbdb8477a8ed7efe880cd507a8b074f6c0"
-  integrity sha512-raKWXkD/gtOWWtnHMx53b7an3yBcJjD4DPo4c9GgsE0tL35ypHjwRHrC4DqnhI28JxcYVjqf7xcVBubrZ/ez1w==
+react-hook-form@^7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.5.2.tgz#4f8da6d22ae67aa18ce170a0980bd7e1e7bd6917"
+  integrity sha512-fRA6TieC+wsumcdAM7OTeWSa+s+qG2ZlWfTXB2gpOwVeWpJxDwUpZZRfZdU9Bj6TEn1v/ZPJg/1xbmUGVI+MWA==
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"

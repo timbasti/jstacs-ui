@@ -1,13 +1,14 @@
 import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles} from '@material-ui/core';
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
 import EditIcon from '@material-ui/icons/Edit';
-import React, {useCallback} from 'react';
+import PropTypes from 'prop-types';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {NavLink, useLocation} from 'react-router-dom';
+import {NavLink, useLocation, useParams} from 'react-router-dom';
 
-import {selectAvailableApplications} from '../../api/applications/selectors';
-import {close as closeDrawer} from '../../api/drawer/actions';
-import {selectDrawerOpenState} from '../../api/drawer/selectors';
+import {selectAvailableApplications} from '../api/applications/selectors';
+import {close as closeDrawer} from '../api/drawer/actions';
+import {selectDrawerOpenState} from '../api/drawer/selectors';
 
 const drawerWidth = 240;
 
@@ -27,20 +28,23 @@ const useToolItemListStyles = makeStyles((theme) => {
     return {item: {paddingLeft: theme.spacing(nestedListPadding)}};
 });
 
-const ToolItemList = ({toolItems = []}) => {
+const ToolItemList = ({applicationId, toolItems}) => {
+    const location = useLocation();
     const classes = useToolItemListStyles();
 
     return (
         <List disablePadding>
-            {toolItems.map(({id, name}) => {
-                const target = `/tool/${id}`;
+            {toolItems?.map(({id, name}) => {
+                const toolPathname = `/applications/${applicationId}/tools/${id}`;
+                const firstToolSection = `${toolPathname}/tool-overview`;
                 return (
                     <ListItem
                         button
                         className={classes.item}
                         component={NavLink}
                         key={id}
-                        to={target}
+                        selected={location.pathname.startsWith(toolPathname)}
+                        to={firstToolSection}
                     >
                         <ListItemText primary={name} />
                     </ListItem>
@@ -50,8 +54,22 @@ const ToolItemList = ({toolItems = []}) => {
     );
 };
 
-const ApplicationItem = ({name, tools}) => {
-    const [open, setOpen] = React.useState(false);
+ToolItemList.propTypes = {
+    applicationId: PropTypes.number.isRequired,
+    toolItems: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired
+    })).isRequired
+};
+
+const ApplicationItem = ({id, name, tools}) => {
+    const [open, setOpen] = useState(false);
+    const location = useLocation();
+
+    useEffect(() => {
+        const applicationPath = `/applications/${id}`;
+        setOpen(location.pathname.startsWith(applicationPath));
+    }, [id, location]);
 
     const handleClick = useCallback(() => {
         setOpen(!open);
@@ -71,7 +89,10 @@ const ApplicationItem = ({name, tools}) => {
                 timeout="auto"
                 unmountOnExit
             >
-                <ToolItemList toolItems={tools} />
+                <ToolItemList
+                    applicationId={id}
+                    toolItems={tools}
+                />
             </Collapse>
         </>
     );
@@ -82,8 +103,9 @@ const ApplicationItemList = () => {
 
     return (
         <List>
-            {availableApplications.map(({id, name, tools}) => {
+            {availableApplications?.map(({id, name, tools}) => {
                 return <ApplicationItem
+                    id={id}
                     key={id}
                     name={name}
                     tools={tools}
