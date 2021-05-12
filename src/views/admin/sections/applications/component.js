@@ -7,8 +7,8 @@ import {selectAvailableApplications} from '../../../../api/applications/selector
 import {createApplication, deleteApplication, listApplications, updateApplication} from '../../../../api/applications/thunks';
 import {selectAvailableTools} from '../../../../api/tools/selectors';
 import {listTools} from '../../../../api/tools/thunks';
-import {EnrichedSelectField} from '../../../../components/enriched-select-field/component';
-import {EnrichedTextField} from '../../../../components/enriched-text-field/component';
+import {EnrichedSelectField} from '../../../../components/input-fields/enriched-select-field/component';
+import {EnrichedTextField} from '../../../../components/input-fields/enriched-text-field/component';
 import {TransferList} from '../../../../components/transfer-list/component';
 import {useApplicationsSectionStyles} from './styles';
 
@@ -164,11 +164,9 @@ const ToolSelectionFieldSet = ({selectedApplicationId, onChange}) => {
 };
 
 export const ApplicationsSection = () => {
-    const {handleSubmit, ...formProperties} = useForm();
     const [selectedApplicationId, setSelectedApplicationId] = useState();
-
     const dispatch = useDispatch();
-
+    const {handleSubmit, ...formProperties} = useForm();
     const classes = useApplicationsSectionStyles();
 
     const doSubmit = useCallback(

@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import React, {useRef} from 'react';
 import {useController, useFormContext} from 'react-hook-form';
 
-import {requiredValueErrorMessage} from '../../utils/error-messages';
-import {ErrorNotification} from '../notifications';
+import {ErrorNotification} from '../../notifications';
 
-const EnrichedTextField = ({helperText, label, name, placeholder, required, defaultValue}) => {
+const EnrichedTextField = ({helperText, label, name, placeholder, required, defaultValue, minLength, maxLength}) => {
     const {control} = useFormContext();
 
     const textFieldRef = useRef();
@@ -18,7 +17,11 @@ const EnrichedTextField = ({helperText, label, name, placeholder, required, defa
         control,
         defaultValue,
         name,
-        rules: {required: required ? requiredValueErrorMessage() : false}
+        rules: {
+            maxLength,
+            minLength,
+            required
+        }
     });
 
     return (
@@ -35,8 +38,7 @@ const EnrichedTextField = ({helperText, label, name, placeholder, required, defa
                 label={label}
                 placeholder={placeholder}
                 ref={textFieldRef}
-                required={required}
-                type="text"
+                required={Boolean(required)}
                 variant="filled"
                 {...fieldProps}
             />
@@ -48,14 +50,18 @@ EnrichedTextField.propTypes = {
     defaultValue: PropTypes.string,
     helperText: PropTypes.string,
     label: PropTypes.string.isRequired,
+    maxLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    minLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
-    required: PropTypes.bool
+    required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 
 EnrichedTextField.defaultProps = {
     defaultValue: '',
     helperText: '',
+    maxLength: undefined,
+    minLength: undefined,
     placeholder: '',
     required: false
 };

@@ -1,11 +1,10 @@
 import {Box, MenuItem, TextField, Tooltip, Typography} from '@material-ui/core';
 import {Info} from '@material-ui/icons';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import {useController, useFormContext} from 'react-hook-form';
 
-import {requiredValueErrorMessage} from '../../utils/error-messages';
-import {ErrorNotification} from '../notifications';
+import {ErrorNotification} from '../../notifications';
 
 const getLabelValueEntry = (label, value) => {
     return `${label}: ${value}`;
@@ -37,7 +36,9 @@ const EnrichedHelperText = ({helperText, options}) => {
             }}
             variant="caption"
         >
-            {helperText}
+            <span style={{verticalAlign: 'middle'}}>
+                {helperText}
+            </span>
             <Tooltip
                 enterTouchDelay={0}
                 title={
@@ -52,6 +53,7 @@ const EnrichedHelperText = ({helperText, options}) => {
                 <Info
                     style={{
                         fontSize: 15,
+                        marginLeft: 5,
                         verticalAlign: 'middle'
                     }}
                 />
@@ -85,7 +87,7 @@ const EnrichedSelectField = ({defaultValue, helperText, label, name, options, sh
         control,
         defaultValue,
         name,
-        rules: {required: required ? requiredValueErrorMessage() : false}
+        rules: {required}
     });
 
     const renderedOptions = useMemo(() => {
@@ -127,7 +129,7 @@ const EnrichedSelectField = ({defaultValue, helperText, label, name, options, sh
                 label={label}
                 placeholder={placeholder}
                 ref={selectFieldRef}
-                required={required}
+                required={Boolean(required)}
                 select
                 variant="filled"
                 {...fieldProps}
@@ -148,7 +150,7 @@ EnrichedSelectField.propTypes = {
         value: PropTypes.any.isRequired
     })),
     placeholder: PropTypes.string,
-    required: PropTypes.bool,
+    required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     showEnrichedHelperText: PropTypes.bool
 };
 

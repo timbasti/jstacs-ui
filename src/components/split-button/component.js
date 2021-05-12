@@ -8,14 +8,14 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import PropTypes from 'prop-types';
-import React, {useCallback} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 import {useStyles} from './styles';
 
 const SplitButton = ({defaultSelected, className, options, onClick, onChange}) => {
-    const [open, setOpen] = React.useState(false);
-    const [selectedIndex, setSelectedIndex] = React.useState(defaultSelected === !undefined ? defaultSelected : 0);
-    const anchorRef = React.useRef(null);
+    const [open, setOpen] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(defaultSelected === !undefined ? defaultSelected : 0);
+    const anchorRef = useRef(null);
     const classes = useStyles();
 
     const handleClick = useCallback(() => {

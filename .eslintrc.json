@@ -132,6 +132,14 @@
             }
         ],
         "arrow-body-style": "off",
-        "react/forbid-prop-types": ["error", {"forbid": ["array", "object"]}]
+        "react/forbid-prop-types": ["error", {"forbid": ["array", "object"]}],
+        "template-curly-spacing": "off",
+        "indent": [
+            "error",
+            4,
+            {
+                "ignoredNodes": ["TemplateLiteral"]
+            }
+        ]
     }
 }
