@@ -2,6 +2,7 @@ import {withStyles} from '@material-ui/core';
 import MuiAccordion from '@material-ui/core/Accordion';
 import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
+import MuiCollapse from '@material-ui/core/Collapse';
 import {ExpandMore} from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import React, {useCallback, useMemo, useRef} from 'react';
@@ -13,11 +14,12 @@ import {EnrichedRadioGroup} from '../enriched-radio-group/component';
 const Accordion = withStyles({
     expanded: {},
     root: {
-        '&$expanded': {margin: 'auto 0'},
+        '&$expanded': {margin: 'auto'},
         '&:before': {display: 'none'},
         '&:not(:last-child)': {borderBottom: 0},
         border: '1px solid rgba(0, 0, 0, .125)',
-        boxShadow: 'none'
+        boxShadow: 'none',
+        width: '100%'
     }
 })(MuiAccordion);
 
@@ -33,7 +35,7 @@ const AccordionSummary = withStyles({
     }
 })(MuiAccordionSummary);
 
-const AccordionDetails = withStyles({root: {padding: 20}})(MuiAccordionDetails);
+const AccordionDetails = withStyles((theme) => ({root: {padding: theme.spacing(2)}}))(MuiAccordionDetails);
 
 const SelectableAccordion = ({defaultValue, name, label, value, children}) => {
     const inputRef = useRef();
@@ -41,14 +43,14 @@ const SelectableAccordion = ({defaultValue, name, label, value, children}) => {
     const selectedValue = useWatch({
         control,
         defaultValue,
-        name
+        name: `${name}.selected`
     });
 
     const handleSummaryClick = useCallback(
         (clickEvent) => {
             if (inputRef?.current !== clickEvent.target) {
                 clickEvent.preventDefault();
-                setValue(name, value, {shouldValidate: true});
+                setValue(`${name}.selected`, value, {shouldValidate: true});
             }
         },
         [name, setValue, value]
@@ -128,6 +130,7 @@ FieldsetSelectField.propTypes = {
     label: PropTypes.string,
     name: PropTypes.string.isRequired,
     options: PropTypes.arrayOf(PropTypes.shape({
+        content: PropTypes.any,
         label: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
     })),

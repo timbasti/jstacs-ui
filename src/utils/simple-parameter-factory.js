@@ -1,11 +1,13 @@
-import {ErrorMessage} from '@hookform/error-message';
-import {TextField} from '@material-ui/core';
-import React, {useCallback} from 'react';
-import {Controller, useFormContext} from 'react-hook-form';
-import NumberFormat from 'react-number-format';
+import React from 'react';
 
-import {UncontrolledCheckbox} from '../components/controlled-checkbox/component';
-import {minMaxErrorMessage, patternErrorMessage, requiredValueErrorMessage, singleCharErrorMessage} from './error-messages';
+import {EnrichedCheckbox, EnrichedNumberField, EnrichedTextField} from '../components/input-fields';
+import {
+    maxErrorMessage,
+    maxLengthErrorMessage,
+    minErrorMessage,
+    minLengthErrorMessage,
+    requiredValueErrorMessage
+} from './error-messages';
 
 const numberTypeMinMaxDefaultMap = {
     BYTE: {
@@ -34,130 +36,74 @@ const numberTypeMinMaxDefaultMap = {
     }
 };
 
-const queryObject = (object, path) => path
-    .split('.')
-    .reduce((currentObject, key) => (currentObject && currentObject[key] ? currentObject[key] : undefined), object);
+const textTypeMinMaxLengthDefaultMap = {
+    CHAR: {
+        maxLength: 1,
+        minLength: 0
+    },
+    STRING: {
+        maxLength: Number.MAX_SAFE_INTEGER,
+        minLength: 0
+    }
+};
 
-const CreateNumberField = ({parameter, inputItemClasses, parentName}) => {
-    const {errors, control} = useFormContext();
-
-    const {lowerBound, upperBound} = parameter.validator || {};
-    const minValue = typeof lowerBound === 'number' ? lowerBound : numberTypeMinMaxDefaultMap[parameter.dataType].minValue;
-    const maxValue = typeof upperBound === 'number' ? upperBound : numberTypeMinMaxDefaultMap[parameter.dataType].maxValue;
-    const registerOptions = {
-        max: {
-            message: minMaxErrorMessage(minValue, maxValue),
-            value: maxValue
-        },
-        min: {
-            message: minMaxErrorMessage(minValue, maxValue),
-            value: minValue
-        },
-        required: requiredValueErrorMessage(),
-        valueAsNumber: true
-    };
-
-    const renderNumberFormatTextField = useCallback(
-        ({onChange, value}) => {
-            const createChangeHanlder = (handleChange) => (values) => handleChange(values.floatValue);
-            return (
-                <NumberFormat
-                    className={inputItemClasses}
-                    customInput={TextField}
-                    error={Boolean(queryObject(errors, parentName ? `${parentName}.${parameter.name}` : parameter.name))}
-                    helperText={parameter.comment}
-                    isNumericString
-                    label={parameter.name}
-                    onValueChange={createChangeHanlder(onChange)}
-                    thousandSeparator
-                    value={value}
-                    variant="filled"
-                />
-            );
-        },
-        [errors, inputItemClasses, parameter, parentName]
-    );
-
+const createTextField = (parameter, parentName) => {
+    const dataType = parameter.dataType;
+    const minMaxLengths = textTypeMinMaxLengthDefaultMap[dataType];
+    const minLengthRule = minLengthErrorMessage(minMaxLengths.minLength);
+    const maxLengthRule = maxLengthErrorMessage(minMaxLengths.maxLength);
+    const requiredRule = parameter.required ? requiredValueErrorMessage : false;
+    const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
     return (
-        <>
-            <ErrorMessage
-                as="span"
-                errors={errors}
-                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-                style={{color: '#f44336'}}
-            />
-            <Controller
-                control={control}
-                defaultValue={parameter.value}
-                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-                render={renderNumberFormatTextField}
-                rules={registerOptions}
-            />
-        </>
+        <EnrichedTextField
+            defaultValue={parameter.value}
+            helperText={parameter.comment}
+            label={parameter.name}
+            maxLength={maxLengthRule}
+            minLength={minLengthRule}
+            name={name}
+            required={requiredRule}
+        />
     );
 };
 
-const CreateTextField = ({parameter, inputItemClasses, parentName}) => {
-    const {errors, register} = useFormContext();
-
-    const maxCharacterLength = parameter.dataType === 'CHAR' ? 1 : undefined;
-    const patternExpression = parameter.validator && parameter.validator.regExp || '';
-    const registerOptions = {
-        maxLength: {
-            message: singleCharErrorMessage(),
-            value: maxCharacterLength
-        },
-        pattern: {
-            message: patternErrorMessage(patternErrorMessage),
-            value: patternExpression
-        },
-        required: requiredValueErrorMessage()
-    };
-
+const createNumberField = (parameter, parentName) => {
+    const dataType = parameter.dataType;
+    const minMaxValues = numberTypeMinMaxDefaultMap[dataType];
+    const minRule = minErrorMessage(minMaxValues.minValue);
+    const maxRule = maxErrorMessage(minMaxValues.maxValue);
+    const requiredRule = parameter.required ? requiredValueErrorMessage : false;
+    const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
     return (
-        <>
-            <ErrorMessage
-                as="span"
-                errors={errors}
-                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-                style={{color: '#f44336'}}
-            />
-            <TextField
-                className={inputItemClasses}
-                defaultValue={parameter.value}
-                error={Boolean(queryObject(errors, parentName ? `${parentName}.${parameter.name}` : parameter.name))}
-                helperText={parameter.comment}
-                inputRef={register(registerOptions)}
-                label={parameter.name}
-                name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-                type="text"
-                variant="filled"
-            />
-        </>
+        <EnrichedNumberField
+            defaultValue={parameter.value}
+            helperText={parameter.comment}
+            label={parameter.name}
+            max={maxRule}
+            min={minRule}
+            name={name}
+            required={requiredRule}
+        />
     );
 };
 
-const createCheckbox = (parameter, inputItemClasses, parentName) => {
-    const controlledCheckbox =
-        <UncontrolledCheckbox
+const createCheckbox = (parameter, parentName) => {
+    const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
+    return (
+        <EnrichedCheckbox
             defaultChecked={parameter.value}
             helperText={parameter.comment}
-            inputItemClasses={inputItemClasses}
-            name={parentName ? `${parentName}.${parameter.name}` : parameter.name}
-        />;
-    return controlledCheckbox;
+            label={parameter.name}
+            name={name}
+        />
+    );
 };
 
-// TODO: We need the parent name of selection parameter here
-export const createSimpleParameterInput = (parameter, inputItemClasses, parentName) => {
+export const createSimpleParameterInput = (parameter, parentName) => {
     switch (parameter.dataType) {
     case 'CHAR':
     case 'STRING': {
-        return <CreateTextField
-            inputItemClasses={inputItemClasses}
-            parameter={parameter}
-            parentName={parentName}
-        />;
+        return createTextField(parameter, parentName);
     }
     case 'LONG':
     case 'INT':
@@ -165,14 +111,10 @@ export const createSimpleParameterInput = (parameter, inputItemClasses, parentNa
     case 'BYTE':
     case 'DOUBLE':
     case 'FLOAT': {
-        return <CreateNumberField
-            inputItemClasses={inputItemClasses}
-            parameter={parameter}
-            parentName={parentName}
-        />;
+        return createNumberField(parameter, parentName);
     }
     case 'BOOLEAN':
-        return createCheckbox(parameter, inputItemClasses, parentName);
+        return createCheckbox(parameter, parentName);
     default:
         console.error('Not supported data type');
         return undefined;

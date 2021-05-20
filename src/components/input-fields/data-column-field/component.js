@@ -10,7 +10,7 @@ const DataColumnField = ({name, defaultValue, fileFieldName, label, required, pl
     const {control, setValue} = useFormContext();
     const selectedFile = useWatch({
         control,
-        name: fileFieldName
+        name: `${fileFieldName}`
     });
 
     useEffect(() => {
@@ -26,7 +26,7 @@ const DataColumnField = ({name, defaultValue, fileFieldName, label, required, pl
                 value: index
             }));
             setOptions(readColumns);
-            setValue(name, defaultValue, {shouldValidate: true});
+            setValue(`${name}.selected`, defaultValue, {shouldValidate: true});
         });
     }, [defaultValue, name, selectedFile, setValue]);
 
@@ -38,7 +38,6 @@ const DataColumnField = ({name, defaultValue, fileFieldName, label, required, pl
             options={options}
             placeholder={placeholder}
             required={required}
-            showEnrichedHelperText
         />
     );
 };

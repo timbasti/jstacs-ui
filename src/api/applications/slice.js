@@ -54,7 +54,7 @@ export const slice = createSlice({
         }
     },
     initialState: {
-        available: [],
+        available: null,
         error: null,
         processing: false
     },

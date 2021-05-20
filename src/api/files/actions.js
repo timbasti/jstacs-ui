@@ -1,5 +1,5 @@
 import {createAction} from '@reduxjs/toolkit';
 
-const informSingleFilePost = createAction('files/single-file/post/inform');
+export const setFileSavingProgress = createAction('files/single-file/set/progress');
 
-export const actions = {singleFile: {post: {inform: informSingleFilePost}}};
+export const initFileSaving = createAction('files/all-files/init');

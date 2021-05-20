@@ -17,7 +17,7 @@ const newApplicationId = -1;
 
 const ApplicationSelectionFieldSet = ({onChange}) => {
     const {setValue, control} = useFormContext();
-    const selectedApplicationId = useWatch({
+    const {selected: selectedApplicationId} = useWatch({
         control,
         defaultValue: newApplicationId,
         name: 'applicationId'
@@ -141,13 +141,12 @@ const ToolSelectionFieldSet = ({selectedApplicationId, onChange}) => {
     }, [dispatch, allAvailableTools]);
 
     useEffect(() => {
-        if (!availableApplications || availableApplications.length === 0) {
+        if (availableApplications === null) {
             dispatch(listApplications());
         } else {
             const selectedApplication = availableApplications.find(({id}) => id === selectedApplicationId);
-            const alreadySelectedTools =
-                selectedApplication?.tools.map(({id}) => id) || [];
-            setSelectedTools(alreadySelectedTools);
+            const alreadySelectedTools = selectedApplication?.tools.map(({id}) => id) || [];
+            setSelectedTools(alreadySelectedTools || []);
         }
     }, [dispatch, availableApplications, selectedApplicationId]);
 
@@ -171,14 +170,15 @@ export const ApplicationsSection = () => {
 
     const doSubmit = useCallback(
         ({applicationId, applicationName, assignedTools}) => {
-            if (applicationId === newApplicationId) {
+            console.log(applicationId.selected, applicationName, assignedTools);
+            if (applicationId.selected === newApplicationId) {
                 dispatch(createApplication({
                     name: applicationName,
                     toolIds: assignedTools
                 }));
             } else {
                 dispatch(updateApplication({
-                    id: applicationId,
+                    id: applicationId.selected,
                     name: applicationName,
                     toolIds: assignedTools
                 }));

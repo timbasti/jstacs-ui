@@ -9,7 +9,7 @@ const UncontrolledRadioGroup = ({name, defaultValue, children, required}) => {
     const {field: {...fieldProps}} = useController({
         control,
         defaultValue,
-        name,
+        name: `${name}.selected`,
         rules: {required}
     });
 

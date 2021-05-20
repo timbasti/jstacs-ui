@@ -79,10 +79,12 @@ const TestEnvironmentView = () => {
                                 name="selectfield"
                                 options={[
                                     {
+                                        assignment: 3.14,
                                         label: 'Hello World',
                                         value: 0
                                     },
                                     {
+                                        assignment: 2,
                                         label: 'Foo bar',
                                         value: 1
                                     }
@@ -163,7 +165,15 @@ const TestEnvironmentView = () => {
                                 name="fieldsetselectfield"
                                 options={[
                                     {
-                                        content: 'Männertag ^^',
+                                        content:
+    <EnrichedTextField
+        defaultValue="Hello New World"
+        helperText="Some helper text"
+        label="Text Field"
+        name="fieldsetselectfield.textfield"
+        placeholder="Enter a text"
+        required={requiredValueErrorMessage}
+    />,
                                         label: 'Male',
                                         value: 'male'
                                     },

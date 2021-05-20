@@ -21,4 +21,4 @@ export const useAccordionSummaryStyles = makeStyles({
     }
 });
 
-export const useAccordionDetailsStyles = makeStyles({root: {padding: 20}});
+export const useAccordionDetailsStyles = makeStyles({root: {padding: 0}});

@@ -24,6 +24,9 @@ const HiddenSingleFileInput = ({accept, name, required, open, onOpen}) => {
     }, [onOpen, open]);
 
     const handleChange = useCallback(() => {
+        console.log(inputRef.current.files[0] instanceof File);
+        console.log(Object.values(inputRef.current.files[0]));
+        console.log(Object.keys(inputRef.current.files[0]));
         setValue(name, inputRef.current.files[0], {shouldValidate: true});
     }, [name, setValue]);
 
