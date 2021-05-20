@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const filesEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/files`;
 
-const getFileUrl = (name) => `${filesEndpoint}/${name}`;
+export const getFileUrl = (name) => `${filesEndpoint}/${name}`;
 
-const loadFile = (file, onLoad, onDownloadProgress) => {
-    if (!file.name) {
+export const loadFile = (fileName, onLoad, onDownloadProgress) => {
+    if (!fileName) {
         return;
     }
 
@@ -20,14 +20,14 @@ const loadFile = (file, onLoad, onDownloadProgress) => {
         },
         responseType: 'blob'
     };
-    const fileUrl = getFileUrl(file.name);
+    const fileUrl = getFileUrl(fileName);
     axios.get(fileUrl, config).then((response) => {
         const loadedFile = response.data;
         onLoad(loadedFile);
     });
 };
 
-const postFile = async (file, userId, onUploadProgress) => {
+export const saveFile = async (file, userId, toolExecutionId, onUploadProgress) => {
     const config = {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -41,14 +41,7 @@ const postFile = async (file, userId, onUploadProgress) => {
     };
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('toolExecutionId', toolExecutionId);
     const response = await axios.post(filesEndpoint, formData, config);
     return response;
-};
-
-export const requests = {
-    file: {
-        load: loadFile,
-        post: postFile
-    },
-    getFileUrl
 };

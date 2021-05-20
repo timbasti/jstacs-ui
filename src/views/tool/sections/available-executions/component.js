@@ -1,9 +1,9 @@
 import React from 'react';
 
-const StartExecution = () => {
+const AvailableExecutions = () => {
     return <div>
-        Start Tool Execution
+        Available Executions
     </div>;
 };
 
-export {StartExecution};
+export {AvailableExecutions};

@@ -15,7 +15,7 @@ const EnrichedTextField = ({helperText, label, name, placeholder, required, defa
         fieldState: {invalid}
     } = useController({
         control,
-        defaultValue,
+        defaultValue: defaultValue || '',
         name,
         rules: {
             maxLength,

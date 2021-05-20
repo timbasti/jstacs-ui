@@ -21,7 +21,12 @@ const useJstacsNavigationStyles = makeStyles((theme) => ({
     }
 }));
 
-const useNavigationDrawerStyles = makeStyles(() => ({root: {width: drawerWidth}}));
+const useNavigationDrawerStyles = makeStyles(() => ({
+    root: {
+        width: drawerWidth,
+        wordBreak: 'break-word'
+    }
+}));
 
 const useToolItemListStyles = makeStyles((theme) => {
     const nestedListPadding = 4;

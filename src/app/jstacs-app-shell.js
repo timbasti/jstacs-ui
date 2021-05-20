@@ -4,19 +4,17 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {selectMuiTheme} from '../api/theme/selectors';
-import {selectUserId} from '../api/users/selectors';
 import {initializeApplication} from '../store/root-thunk';
 import {JstacsApp} from './jstacs-app';
 
 export const JstacsAppShell = () => {
     const muiTheme = useSelector(selectMuiTheme);
-    const userId = useSelector(selectUserId);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(initializeApplication({userId}));
-    }, [dispatch, userId]);
+        dispatch(initializeApplication());
+    }, [dispatch]);
 
     return (
         <MuiThemeProvider theme={muiTheme}>

@@ -18,6 +18,9 @@ import PropTypes from 'prop-types';
 import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {Controller, useFormContext} from 'react-hook-form';
 
+import {EnrichedSelectField, FieldsetSelectField} from '../components/input-fields';
+import {ParameterGrid} from '../components/parameter-grid/component';
+import {requiredValueErrorMessage} from './error-messages';
 import {createParameterInput} from './parameter-factory';
 
 const RadioGroupContext = createContext();
@@ -121,19 +124,20 @@ const RadioGroup = withStyles({root: {display: 'block'}})(MuiRadioGroup);
 const UncontrolledRadioGroup = ({children, defaultSelected, name}) => {
     const {control} = useFormContext();
 
-    const renderRadioGroup = () => ({onChange, value}) => {
-        const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
-        const radioGroup =
-            <RadioGroupContext.Provider value={value}>
-                <RadioGroup
-                    onChange={createChangeHanlder(onChange)}
-                    value={value}
-                >
-                    {children}
-                </RadioGroup>
-            </RadioGroupContext.Provider>;
-        return radioGroup;
-    };
+    const renderRadioGroup =
+        () => ({onChange, value}) => {
+            const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
+            const radioGroup =
+                <RadioGroupContext.Provider value={value}>
+                    <RadioGroup
+                        onChange={createChangeHanlder(onChange)}
+                        value={value}
+                    >
+                        {children}
+                    </RadioGroup>
+                </RadioGroupContext.Provider>;
+            return radioGroup;
+        };
 
     return (
         <Controller
@@ -261,135 +265,60 @@ const createExtendedSelectionField = ({parametersInCollection, name}, inputItemC
     });
 };
 
-export const createSelectionForParameterSets = (parameter, inputItemClasses) => {
-    const inputSets = createExtendedSelectionField(parameter, inputItemClasses);
-    const setSelectionName = `${parameter.name}.selectedName`;
-    const inputSetSelection =
-        <InputSetSelection
-            className={inputItemClasses}
-            defaultSelected={parameter.selectedName}
-            helperText={parameter.comment}
-            inputSets={inputSets}
-            label={parameter.name}
-            name={setSelectionName}
-        />;
-    return inputSetSelection;
-};
-
-const UncontrolledSimpleSelect = ({className, defaultSelected, helperText, label, name, options}) => {
-    const {control} = useFormContext();
-
-    const renderOptions = useCallback(
-        () => options.map(({key}) => <MenuItem
-            key={key}
-            value={key}
-        >
-            {key}
-        </MenuItem>),
-        [options]
-    );
-
-    const renderOptionsDescription = useCallback(
-        () => options.map(({key, value}) => <Typography
-            component="div"
-            key={key}
-            variant="caption"
-        >
-            {key === value ? key : `${key}: ${value}`}
-        </Typography>),
-        [options]
-    );
-
-    const renderSelect = useCallback(
-        ({onChange, value}) => {
-            const createChangeHanlder = (handleChange) => (changeEvent) => handleChange(changeEvent.target.value);
-            return (
-                <TextField
-                    className={className}
-                    helperText={
-                        <>
-                            <Typography
-                                style={{
-                                    marginRight: 5,
-                                    verticalAlign: 'middle'
-                                }}
-                                variant="caption"
-                            >
-                                {helperText}
-                            </Typography>
-                            <Tooltip
-                                enterTouchDelay={0}
-                                title={
-                                    <>
-                                        <Typography>
-                                            The following options are available.
-                                        </Typography>
-                                        {renderOptionsDescription()}
-                                    </>
-                                }
-                            >
-                                <InfoIcon
-                                    style={{
-                                        fontSize: 15,
-                                        verticalAlign: 'middle'
-                                    }}
-                                />
-                            </Tooltip>
-                        </>
-                    }
-                    label={label}
-                    onChange={createChangeHanlder(onChange)}
-                    select
-                    value={value}
-                    variant="filled"
-                >
-                    {renderOptions()}
-                </TextField>
-            );
-        },
-        [className, helperText, label, renderOptions, renderOptionsDescription]
-    );
-
-    return <Controller
-        control={control}
-        defaultValue={defaultSelected}
-        name={name}
-        render={renderSelect}
-    />;
-};
-
-const createSimpleParameterSelection = (parameter, inputItemClasses) => {
-    const {
-        comment,
-        name,
-        parametersInCollection: {parameters},
-        selectedName
-    } = parameter;
-
-    const selectionName = `${name}.selectedName`;
-
-    const options = parameters.map(({name: optionName, value}) => ({
-        key: optionName,
-        value
-    }));
-
+export const createSelectionForParameterSets = (parameter, parentName) => {
+    const requiredRule = parameter.required ? requiredValueErrorMessage : false;
+    const options = parameter.parameters.map(({name: subName, parameters}) => {
+        const name = parentName ? `${parentName}.${subName}` : subName;
+        return {
+            content: <ParameterGrid
+                parameters={parameters}
+                parentName={name}
+            />,
+            label: subName,
+            value: subName
+        };
+    });
+    const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
     return (
-        <UncontrolledSimpleSelect
-            className={inputItemClasses}
-            defaultSelected={selectedName}
-            helperText={comment}
-            label={name}
-            name={selectionName}
+        <FieldsetSelectField
+            defaultValue={parameter.selected}
+            helperText={parameter.comment}
+            label={parameter.name}
+            name={name}
             options={options}
+            required={requiredRule}
         />
     );
 };
 
-export const createSelectionParameterInput = (parameter, inputItemClasses) => {
+const createSimpleParameterSelection = (parameter, parentName) => {
+    const requiredRule = parameter.required ? requiredValueErrorMessage : false;
+    const options = parameter.parameters.map(({name, value}) => {
+        return {
+            assignment: value,
+            label: name,
+            value: name
+        };
+    });
+    const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
+    return (
+        <EnrichedSelectField
+            defaultValue={parameter.selected}
+            helperText={parameter.comment}
+            label={parameter.name}
+            name={name}
+            options={options}
+            required={requiredRule}
+            showEnrichedHelperText
+        />
+    );
+};
+
+export const createSelectionParameterInput = (parameter, parentName) => {
     switch (parameter.dataType) {
     case 'PARAMETERSET':
-        return createSelectionForParameterSets(parameter, inputItemClasses);
+        return createSelectionForParameterSets(parameter, parentName);
     default:
-        return createSimpleParameterSelection(parameter, inputItemClasses);
+        return createSimpleParameterSelection(parameter, parentName);
     }
 };

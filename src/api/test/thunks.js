@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {produce} from 'immer';
 
-import {thunks as filesThunks} from '../files/thunks';
+import {saveAllFiles} from '../files/thunks';
 import {requests} from './requests';
 import {selectParameters, selectParameterSet} from './selectors';
 
@@ -133,14 +133,14 @@ const updateParameterSet = createAsyncThunk('test/parameterSet/update', async (f
         parameters: updatedParameters
     };
     if (newFiles.length > 0) {
-        await dispatch(filesThunks.allFiles.post(newFiles));
+        await dispatch(saveAllFiles(newFiles));
     }
     await dispatch(postParameterSet(updatedParameterSet));
 });
 
 const postParameterValues = createAsyncThunk('test/parameterSet/update', async ({formData, files}, {dispatch}) => {
     console.log(formData, files);
-    await dispatch(filesThunks.allFiles.post(files));
+    await dispatch(saveAllFiles(files));
     const {data} = await requests.parameterSet.post(formData);
     return {data};
 });

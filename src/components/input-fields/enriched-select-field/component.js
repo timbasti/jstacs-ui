@@ -6,15 +6,15 @@ import {useController, useFormContext} from 'react-hook-form';
 
 import {ErrorNotification} from '../../notifications';
 
-const getLabelValueEntry = (label, value) => {
-    return `${label}: ${value}`;
+const getLabelValueEntry = (assignment, label) => {
+    return `${label}: ${assignment}`;
 };
 
 const EnrichedHelperText = ({helperText, options}) => {
     const renderedOptionsDescription = useMemo(() => {
         return (
-            options?.map(({label, value}) => {
-                const text = getLabelValueEntry(label, value);
+            options?.map(({assignment, label, value}) => {
+                const text = getLabelValueEntry(assignment, label);
                 return (
                     <Typography
                         component="div"
@@ -65,6 +65,7 @@ const EnrichedHelperText = ({helperText, options}) => {
 EnrichedHelperText.propTypes = {
     helperText: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.shape({
+        assignment: PropTypes.any,
         label: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
     }))
@@ -86,7 +87,7 @@ const EnrichedSelectField = ({defaultValue, helperText, label, name, options, sh
     } = useController({
         control,
         defaultValue,
-        name,
+        name: `${name}.selected`,
         rules: {required}
     });
 
@@ -146,6 +147,7 @@ EnrichedSelectField.propTypes = {
     label: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     options: PropTypes.arrayOf(PropTypes.shape({
+        assignment: PropTypes.any,
         label: PropTypes.any.isRequired,
         value: PropTypes.any.isRequired
     })),

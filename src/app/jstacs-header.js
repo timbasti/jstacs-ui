@@ -1,15 +1,13 @@
 import {AppBar, Breadcrumbs, Hidden, IconButton, makeStyles, Toolbar, Typography} from '@material-ui/core';
 import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 import MenuIcon from '@material-ui/icons/Menu';
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useLocation} from 'react-router';
 
 import {open as openDrawer} from '../api/drawer/actions';
-import {selectSection, selectView} from '../api/route/selectors';
+import {selectView} from '../api/route/selectors';
 import {changeApplicationTheme} from '../api/theme/actions';
 import {selectPaletteType} from '../api/theme/selectors';
-// import logo from '../../assets/logo.png';
 
 const drawerWidth = 240;
 
@@ -21,13 +19,8 @@ const useStyles = makeStyles((theme) => {
                 marginLeft: drawerWidth,
                 width: `calc(100% - ${drawerWidth}px)`
             },
-            zIndex: theme.zIndex.drawer + 1
-        },
-        logo: {
-            height: 48,
-            marginLeft: -12,
-            padding: 12,
-            width: 48
+            color: 'white',
+            zIndex: theme.zIndex.drawer + 2
         },
         title: {
             flexGrow: 1,
@@ -62,7 +55,6 @@ export const JstacsHeader = () => {
         <AppBar
             className={classes.appBar}
             elevation={0}
-            position="fixed"
         >
             <Toolbar>
                 <Hidden mdUp>
@@ -77,7 +69,7 @@ export const JstacsHeader = () => {
                 </Hidden>
                 <Breadcrumbs
                     className={classes.title}
-                    color="textPrimary"
+                    color="inherit"
                 >
                     {viewBreadcrumb}
                 </Breadcrumbs>
