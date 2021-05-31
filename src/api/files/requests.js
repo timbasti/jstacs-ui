@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const filesEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/files`;
 
-export const getFileUrl = (name) => `${filesEndpoint}/${name}`;
+export const getFileUrl = (name) => `${filesEndpoint}?file=${name}`;
 
 export const loadFile = (fileName, onLoad, onDownloadProgress) => {
     if (!fileName) {

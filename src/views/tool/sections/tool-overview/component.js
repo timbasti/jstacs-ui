@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Card,
     CardActions,
@@ -14,9 +15,11 @@ import React, {useCallback, useMemo, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 
+import {useCitationDialogStyles} from './styles';
+
 const VersionTypography = ({version}) => {
     return (
-        <>
+        <Box>
             <Typography
                 color="textSecondary"
                 component="span"
@@ -29,27 +32,39 @@ const VersionTypography = ({version}) => {
             >
                 {version}
             </Typography>
-        </>
+        </Box>
     );
 };
 
 const DescriptionTypography = ({description}) => {
     return (
-        <>
-            <Typography color="textSecondary">
+        <Grid
+            alignItems="baseline"
+            container
+            spacing={1}
+        >
+            <Typography
+                color="textSecondary"
+                component={Grid}
+                item
+            >
                 Description:
             </Typography>
-            <Typography
-                component="p"
-                variant="body2"
-            >
-                {description}
-            </Typography>
-        </>
+            <Grid item>
+                <Typography
+                    component="pre"
+                    variant="body2"
+                >
+                    {description}
+                </Typography>
+            </Grid>
+        </Grid>
     );
 };
 
 const CitationDialog = ({references, onToggle, open}) => {
+    const classes = useCitationDialogStyles();
+
     return (
         <Dialog
             fullWidth
@@ -61,11 +76,16 @@ const CitationDialog = ({references, onToggle, open}) => {
                 Citation
             </DialogTitle>
             <DialogContent>
-                {references.map((reference) => <pre key={btoa(reference)}>
-                    <code>
-                        {reference}
-                    </code>
-                </pre>)}
+                <Box
+                    className={classes.content}
+                    p={1}
+                >
+                    {references.map((reference) => <pre key={btoa(reference)}>
+                        <code>
+                            {reference}
+                        </code>
+                    </pre>)}
+                </Box>
             </DialogContent>
             <DialogActions>
                 <Button
@@ -79,26 +99,7 @@ const CitationDialog = ({references, onToggle, open}) => {
     );
 };
 
-const HelpText = ({helpText}) => {
-    return (
-        <Card>
-            <CardContent>
-                <Typography
-                    component="h2"
-                    gutterBottom
-                    variant="h5"
-                >
-                    Help text
-                </Typography>
-                <ReactMarkdown plugins={[gfm]}>
-                    {helpText}
-                </ReactMarkdown>
-            </CardContent>
-        </Card>
-    );
-};
-
-const ToolOverview = ({references, version, description, helpText}) => {
+const GeneralInformation = ({description, references, version}) => {
     const [openCitation, setOpenCitation] = useState(false);
 
     const handleToggleCitation = useCallback(() => {
@@ -116,6 +117,7 @@ const ToolOverview = ({references, version, description, helpText}) => {
     const renderedShowCitation = useMemo(() => {
         return (
             references &&
+            references.length > 0 &&
                 <Button
                     onClick={handleToggleCitation}
                     size="small"
@@ -134,39 +136,77 @@ const ToolOverview = ({references, version, description, helpText}) => {
         />;
     }, [handleToggleCitation, openCitation, references]);
 
+    return (
+        <Card>
+            <CardContent>
+                <Typography
+                    component="h2"
+                    gutterBottom
+                    variant="h6"
+                >
+                    General information
+                </Typography>
+                {renderedVersion}
+                {renderedDescription}
+            </CardContent>
+            <CardActions>
+                {renderedShowCitation}
+                {renderedCitation}
+            </CardActions>
+        </Card>
+    );
+};
+
+const HelpText = ({helpText}) => {
+    return (
+        <Card>
+            <CardContent>
+                <Typography
+                    component="h2"
+                    gutterBottom
+                    variant="h6"
+                >
+                    Help text
+                </Typography>
+                <ReactMarkdown plugins={[gfm]}>
+                    {helpText}
+                </ReactMarkdown>
+            </CardContent>
+        </Card>
+    );
+};
+
+const ToolOverview = ({description, helpText, references, version}) => {
+    const renderedGeneralInformation = useMemo(() => {
+        return <GeneralInformation
+            description={description}
+            references={references}
+            version={version}
+        />;
+    }, [description, references, version]);
+
     const renderedHelpText = useMemo(() => {
         return helpText && <HelpText helpText={helpText} />;
     }, [helpText]);
 
     return (
-        <Grid
-            container
-            direction="column"
-            spacing={3}
+        <Box
+            p={3}
+            width="100%"
         >
-            <Grid item>
-                <Card>
-                    <CardContent>
-                        <Typography
-                            component="h2"
-                            gutterBottom
-                            variant="h5"
-                        >
-                            General information
-                        </Typography>
-                        {renderedVersion}
-                        {renderedDescription}
-                    </CardContent>
-                    <CardActions>
-                        {renderedShowCitation}
-                        {renderedCitation}
-                    </CardActions>
-                </Card>
+            <Grid
+                container
+                direction="column"
+                spacing={3}
+            >
+                <Grid item>
+                    {renderedGeneralInformation}
+                </Grid>
+                <Grid item>
+                    {renderedHelpText}
+                </Grid>
             </Grid>
-            <Grid item>
-                {renderedHelpText}
-            </Grid>
-        </Grid>
+        </Box>
     );
 };
 

@@ -9,12 +9,12 @@ const slice = createSlice({
             state.processing = true;
         },
         [thunks.listTools.fulfilled]: (state, action) => {
-            const {data: availableTools} = action.payload;
+            const availableTools = action.payload;
             state.processing = false;
             state.available = availableTools;
         },
         [thunks.listTools.rejected]: (state, action) => {
-            const {data: error} = action.payload;
+            const error = action.payload;
             state.error = error;
             state.processing = false;
         },
@@ -24,18 +24,18 @@ const slice = createSlice({
             state.processing = true;
         },
         [thunks.loadTool.fulfilled]: (state, action) => {
-            const {data: loadedTool} = action.payload;
+            const loadedTool = action.payload;
             state.processing = false;
             state.selected = loadedTool;
         },
         [thunks.loadTool.rejected]: (state, action) => {
-            const {data: error} = action.payload;
+            const error = action.payload;
             state.error = error;
             state.processing = false;
         }
     },
     initialState: {
-        available: [],
+        available: null,
         error: null,
         processing: false,
         selected: null

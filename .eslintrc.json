@@ -26,7 +26,7 @@
         "no-magic-numbers": [
             "error",
             {
-                "ignore": [-1, 0, 1, 2, 3],
+                "ignore": [-1, 0, 1, 2, 3, 100],
                 "ignoreArrayIndexes": true,
                 "ignoreDefaultValues": true
             }
@@ -107,7 +107,7 @@
         "max-lines": [
             "error",
             {
-                "max": 500
+                "max": 510
             }
         ],
         "no-console": "off",

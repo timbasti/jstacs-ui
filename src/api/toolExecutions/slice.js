@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-import {createToolExecution, deleteToolExecution, loadToolExecution, updateToolExecution} from './thunks';
+import {createToolExecution, deleteToolExecution, listToolExecutions, loadToolExecution, updateToolExecution} from './thunks';
 
 export const slice = createSlice({
     extraReducers: {
@@ -29,6 +29,18 @@ export const slice = createSlice({
             state.error = payload;
             state.processing = false;
         },
+        [listToolExecutions.pending]: (state) => {
+            state.error = null;
+            state.processing = true;
+        },
+        [listToolExecutions.fulfilled]: (state, {payload}) => {
+            state.available = payload;
+            state.processing = false;
+        },
+        [listToolExecutions.rejected]: (state, {payload}) => {
+            state.error = payload;
+            state.processing = false;
+        },
         [updateToolExecution.pending]: (state) => {
             state.error = null;
             state.processing = true;
@@ -54,6 +66,7 @@ export const slice = createSlice({
         }
     },
     initialState: {
+        available: null,
         created: null,
         error: null,
         loaded: null,

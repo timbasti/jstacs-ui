@@ -16,7 +16,7 @@ import {
 } from '../../components/input-fields';
 import {requiredValueErrorMessage} from '../../utils/error-messages';
 
-const TestEnvironmentView = () => {
+const TestEnvironmentView = ({className}) => {
     const {handleSubmit, ...formProperties} = useForm();
     const dispatch = useDispatch();
 
@@ -29,7 +29,10 @@ const TestEnvironmentView = () => {
     }, []);
 
     return (
-        <Box p={10}>
+        <Box
+            className={className}
+            p={10}
+        >
             <FormProvider
                 {...formProperties}
                 handleSubmit={handleSubmit}

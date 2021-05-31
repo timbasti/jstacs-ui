@@ -4,10 +4,10 @@ import * as requests from './requests';
 
 export const listTools = createAsyncThunk('tools/list', async () => {
     const {data} = await requests.listTools();
-    return {data};
+    return data;
 });
 
-export const loadTool = createAsyncThunk('tools/load', async (toolId) => {
-    const {data} = await requests.loadTool(toolId);
-    return {data};
+export const loadTool = createAsyncThunk('tools/load', async ({applicationId, toolId}) => {
+    const {data} = await requests.loadTool(applicationId, toolId);
+    return data;
 });

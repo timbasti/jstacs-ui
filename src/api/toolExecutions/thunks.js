@@ -1,16 +1,20 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+import setValue from 'set-value';
 
 import {extractAllFiles} from '../../helpers/file-helpers';
 import {saveAllFiles} from '../files/thunks';
 import {selectUserId} from '../users/selectors';
 import * as requests from './requests';
 
-export const createToolExecution = createAsyncThunk('toolExecutions/create', async ({toolId}, {getState}) => {
-    const state = getState();
-    const userId = selectUserId(state);
-    const {data} = await requests.createToolExecution(toolId, userId);
-    return data;
-});
+export const createToolExecution = createAsyncThunk(
+    'toolExecutions/create',
+    async ({toolId, executionInformation}, {getState}) => {
+        const state = getState();
+        const userId = selectUserId(state);
+        const {data} = await requests.createToolExecution(toolId, userId, executionInformation);
+        return data;
+    }
+);
 
 export const loadToolExecution = createAsyncThunk('toolExecutions/load', async ({toolExecutionId}, {getState}) => {
     const state = getState();
@@ -19,12 +23,22 @@ export const loadToolExecution = createAsyncThunk('toolExecutions/load', async (
     return data;
 });
 
-export const updateToolExecution = createAsyncThunk('toolExecutions/update', async ({toolExecutionId, values}, {getState}) => {
+export const listToolExecutions = createAsyncThunk('toolExecutions/list', async ({toolId}, {getState}) => {
     const state = getState();
     const userId = selectUserId(state);
-    const {data} = await requests.updateToolExecution(toolExecutionId, values, userId);
+    const {data} = await requests.listToolExecutions(toolId, userId);
     return data;
 });
+
+export const updateToolExecution = createAsyncThunk(
+    'toolExecutions/update',
+    async ({toolExecutionId, executionParameters}, {getState}) => {
+        const state = getState();
+        const userId = selectUserId(state);
+        const {data} = await requests.updateToolExecution(toolExecutionId, executionParameters, userId);
+        return data;
+    }
+);
 
 export const deleteToolExecution = createAsyncThunk('toolExecutions/delete', async ({toolExecutionId}, {getState}) => {
     const state = getState();
@@ -34,19 +48,22 @@ export const deleteToolExecution = createAsyncThunk('toolExecutions/delete', asy
 });
 
 export const startToolExecution = createAsyncThunk('toolExecutions/start', async ({toolId, values}, {dispatch}) => {
-    console.log('startToolExecution toolId, values', toolId, values);
-    const {payload: {toolExecutionId}} = await dispatch(createToolExecution({toolId}));
-    const {files, values: updatedValues} = extractAllFiles(values);
-    const fileNames = files.map((file) => file.name);
-    console.log('startToolExecution files', files);
-    const {payload} = await dispatch(saveAllFiles({
-        fileNames,
+    const {executionInformation, executionParameters} = values;
+    const {payload: {toolExecutionId}} = await dispatch(createToolExecution({
+        executionInformation,
+        toolId
+    }));
+    const files = extractAllFiles(executionParameters);
+    const {payload: savedFiles} = await dispatch(saveAllFiles({
         files,
         toolExecutionId
     }));
-    console.log('startToolExecution payload', payload);
-    await dispatch(updateToolExecution({
-        toolExecutionId,
-        values: updatedValues
+    savedFiles.forEach(({fileKey, fileName}) => {
+        setValue(executionParameters, fileKey, {name: fileName});
+    });
+    const {payload: data} = await dispatch(updateToolExecution({
+        executionParameters,
+        toolExecutionId
     }));
+    return data;
 });
