@@ -5,7 +5,7 @@ import {Link as RouterLink, useLocation} from 'react-router-dom';
 
 import {setRouteData} from '../../api/route/slice';
 
-const NoMatchView = () => {
+const NoMatchView = ({className}) => {
     const location = useLocation();
     const dispatch = useDispatch();
 
@@ -14,7 +14,10 @@ const NoMatchView = () => {
     }, [dispatch]);
 
     return (
-        <Typography variant="body1">
+        <Typography
+            className={className}
+            variant="body1"
+        >
             <Box>
                 Die Ansicht
                 {' '}

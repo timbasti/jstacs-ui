@@ -139,7 +139,6 @@ const updateParameterSet = createAsyncThunk('test/parameterSet/update', async (f
 });
 
 const postParameterValues = createAsyncThunk('test/parameterSet/update', async ({formData, files}, {dispatch}) => {
-    console.log(formData, files);
     await dispatch(saveAllFiles(files));
     const {data} = await requests.parameterSet.post(formData);
     return {data};

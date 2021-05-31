@@ -1,18 +1,30 @@
-import {AppBar, Breadcrumbs, Hidden, IconButton, makeStyles, Toolbar, Typography} from '@material-ui/core';
-import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
+import {
+    AppBar,
+    Breadcrumbs,
+    FormControlLabel,
+    Hidden,
+    IconButton,
+    makeStyles,
+    Menu,
+    MenuItem,
+    Switch,
+    Toolbar,
+    Typography
+} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import React, {useCallback, useMemo} from 'react';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {open as openDrawer} from '../api/drawer/actions';
 import {selectView} from '../api/route/selectors';
 import {changeApplicationTheme} from '../api/theme/actions';
 import {selectPaletteType} from '../api/theme/selectors';
+import {useAppHeaderControlsContext} from '../utils/app-header-controls-context';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => {
-    const titleSpacing = 2;
     return {
         appBar: {
             [theme.breakpoints.up('md')]: {
@@ -24,20 +36,32 @@ const useStyles = makeStyles((theme) => {
         },
         title: {
             flexGrow: 1,
-            marginLeft: theme.spacing(titleSpacing)
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+            whiteSpace: 'nowrap'
         }
     };
 });
 
 export const JstacsHeader = () => {
+    const [appMenuOpen, setAppMenuOpen] = useState(false);
+    const appMenuOpener = useRef(null);
     const themePaletteType = useSelector(selectPaletteType);
     const dispatch = useDispatch();
     const currentView = useSelector(selectView);
+    const {controls} = useAppHeaderControlsContext();
 
     const viewBreadcrumb = useMemo(() => {
-        return currentView && <Typography variant="h6">
-            {currentView}
-        </Typography>;
+        return (
+            currentView &&
+                <Typography
+                    component="h1"
+                    variant="h6"
+                >
+                    {currentView}
+                </Typography>
+
+        );
     }, [currentView]);
 
     const handleDrawerOpen = useCallback(() => {
@@ -48,6 +72,10 @@ export const JstacsHeader = () => {
         const newPaletteType = themePaletteType === 'dark' ? 'light' : 'dark';
         dispatch(changeApplicationTheme(newPaletteType));
     }, [dispatch, themePaletteType]);
+
+    const handleAppMenuToggle = useCallback(() => {
+        setAppMenuOpen(!appMenuOpen);
+    }, [appMenuOpen]);
 
     const classes = useStyles();
 
@@ -73,14 +101,46 @@ export const JstacsHeader = () => {
                 >
                     {viewBreadcrumb}
                 </Breadcrumbs>
+                {controls}
                 <IconButton
                     color="inherit"
                     edge="end"
-                    onClick={handleDarkThemeToggle}
-                    title="Toggle light/dark theme"
+                    onClick={handleAppMenuToggle}
+                    ref={appMenuOpener}
+                    title="Open app menu"
                 >
-                    <BrightnessMediumIcon />
+                    <MoreVertIcon />
                 </IconButton>
+                <Menu
+                    anchorEl={appMenuOpener.current}
+                    anchorOrigin={{
+                        horizontal: 'center',
+                        vertical: 'bottom'
+                    }}
+                    getContentAnchorEl={null}
+                    id="simple-menu"
+                    keepMounted
+                    onClose={handleAppMenuToggle}
+                    open={appMenuOpen}
+                    transformOrigin={{
+                        horizontal: 'center',
+                        vertical: 'top'
+                    }}
+                >
+                    <MenuItem>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={themePaletteType === 'dark'}
+                                    color="secondary"
+                                    onChange={handleDarkThemeToggle}
+                                />
+                            }
+                            label="Dark Theme"
+                            labelPlacement="start"
+                        />
+                    </MenuItem>
+                </Menu>
             </Toolbar>
         </AppBar>
     );

@@ -1,4 +1,4 @@
-import {AppBar, Box, makeStyles, Tab, Tabs, Toolbar, useMediaQuery, useTheme} from '@material-ui/core';
+import {AppBar, Box, Grid, makeStyles, Tab, Tabs, Toolbar, useMediaQuery, useTheme} from '@material-ui/core';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {NavLink, Route, Switch, useLocation, useParams} from 'react-router-dom';
@@ -11,7 +11,6 @@ import {AvailableExecutions, StartExecution, ToolOverview} from './sections';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => {
-    const titleSpacing = 2;
     return {
         appBar: {
             [theme.breakpoints.up('md')]: {
@@ -21,20 +20,28 @@ const useStyles = makeStyles((theme) => {
             color: 'white',
             zIndex: theme.zIndex.drawer + 1
         },
-        title: {
-            flexGrow: 1,
-            marginLeft: theme.spacing(titleSpacing)
+        content: {height: '100%'},
+        sectionContent: {
+            flex: 1,
+            overflow: 'auto',
+            width: '100%'
         }
     };
 });
 
 const TabPanel = ({children}) => {
-    return <Box p={3}>
-        {children}
-    </Box>;
+    return (
+        <Box
+            height="100%"
+            p={3}
+            width="100%"
+        >
+            {children}
+        </Box>
+    );
 };
 
-const ToolView = () => {
+const ToolView = ({className}) => {
     const {pathname} = useLocation();
     const {applicationId, toolId} = useParams();
     const [currentSection, setCurrentSection] = useState(0);
@@ -61,8 +68,11 @@ const ToolView = () => {
     }, [pathname, sectionPaths]);
 
     useEffect(() => {
-        dispatch(loadTool(toolId));
-    }, [dispatch, toolId]);
+        dispatch(loadTool({
+            applicationId,
+            toolId
+        }));
+    }, [dispatch, applicationId, toolId]);
 
     useEffect(() => {
         if (selectedTool) {
@@ -73,28 +83,31 @@ const ToolView = () => {
     const handleToolOverviewRender = useCallback(() => {
         return selectedTool && <ToolOverview
             {...selectedTool}
+            applicationId={applicationId}
             toolId={toolId}
         />;
-    }, [selectedTool, toolId]);
+    }, [applicationId, selectedTool, toolId]);
 
     const handleStartExecutionRender = useCallback(() => {
         return selectedTool && <StartExecution
             {...selectedTool}
+            applicationId={applicationId}
             toolId={toolId}
         />;
-    }, [selectedTool, toolId]);
+    }, [applicationId, selectedTool, toolId]);
 
     const handleAvailableExecutionsRender = useCallback(() => {
         return selectedTool && <AvailableExecutions
             {...selectedTool}
+            applicationId={applicationId}
             toolId={toolId}
         />;
-    }, [selectedTool, toolId]);
+    }, [applicationId, selectedTool, toolId]);
 
     const classes = useStyles();
 
     return (
-        <div>
+        <Box className={className}>
             <AppBar className={classes.appBar}>
                 <Toolbar />
                 <Tabs
@@ -118,26 +131,45 @@ const ToolView = () => {
                     />
                 </Tabs>
             </AppBar>
-            <TabPanel>
-                <Tabs />
-                <Switch>
-                    <Route
-                        exact
-                        path={sectionPaths[0]}
-                        render={handleToolOverviewRender}
-                    />
-                    <Route
-                        exact
-                        path={sectionPaths[1]}
-                        render={handleStartExecutionRender}
-                    />
-                    <Route
-                        path={sectionPaths[2]}
-                        render={handleAvailableExecutionsRender}
-                    />
-                </Switch>
-            </TabPanel>
-        </div>
+            <Grid
+                className={classes.content}
+                container
+                direction="column"
+                wrap="nowrap"
+            >
+                <Grid item>
+                    <Tabs
+                        value={0}
+                        variant={isNarrow ? 'fullWidth' : 'standard'}
+                    >
+                        <Tab label="Tool Overview" />
+                        <Tab label="Start Execution" />
+                        <Tab label="Available Executions" />
+                    </Tabs>
+                </Grid>
+                <Grid
+                    className={classes.sectionContent}
+                    item
+                >
+                    <Switch>
+                        <Route
+                            exact
+                            path={sectionPaths[0]}
+                            render={handleToolOverviewRender}
+                        />
+                        <Route
+                            exact
+                            path={sectionPaths[1]}
+                            render={handleStartExecutionRender}
+                        />
+                        <Route
+                            path={sectionPaths[2]}
+                            render={handleAvailableExecutionsRender}
+                        />
+                    </Switch>
+                </Grid>
+            </Grid>
+        </Box>
     );
 };
 

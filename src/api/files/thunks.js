@@ -1,13 +1,12 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {selectUserId} from '../users/selectors';
-import {initFileSaving, setFileSavingProgress} from './actions';
+import {setFileSavingProgress} from './actions';
 import * as requests from './requests';
 
 export const saveFile = createAsyncThunk(
     'files/single-file/save',
     async ({file, toolExecutionId, uploadIndex}, {dispatch, getState}) => {
-        console.log('saveFile file, uploadIndex', file, uploadIndex);
         const state = getState();
         const userId = selectUserId(state);
         const onUploadProgress = (progress) => dispatch(setFileSavingProgress({
@@ -16,21 +15,22 @@ export const saveFile = createAsyncThunk(
         }));
         const {data} = await requests.saveFile(file, userId, toolExecutionId, onUploadProgress);
         return {
-            data,
+            ...data,
             uploadIndex
         };
     }
 );
 
 export const saveAllFiles = createAsyncThunk('files/all-files/save', async ({files, toolExecutionId}, {dispatch}) => {
-    console.log('saveAllFiles files, toolExecutionId', files, toolExecutionId);
-    const actions = await Promise.all(files.map(({file, fileName}, uploadIndex) => dispatch(saveFile({
+    const actions = await Promise.all(files.map(({file, fileKey}, uploadIndex) => dispatch(saveFile({
         file,
-        fileName,
+        fileKey,
         toolExecutionId,
         uploadIndex
     }))));
-    // const fileNames = actions.map({meta, payload} => {});
-    // console.log('saveAllFiles data', data);
-    // return data;
+    const savedFiles = actions.map(({meta: {arg}, payload}) => ({
+        fileKey: arg.fileKey,
+        fileName: payload.fileName
+    }));
+    return savedFiles;
 });

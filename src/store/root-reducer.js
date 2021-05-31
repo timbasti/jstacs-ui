@@ -6,6 +6,7 @@ import {reducer as filesReducer} from '../api/files/slice';
 import {reducer as routeReducer} from '../api/route/slice';
 import {testReducer} from '../api/test/slice';
 import {themeReducer} from '../api/theme/slice';
+import {reducer as toolExecutionsReducer} from '../api/toolExecutions/slice';
 import {toolsReducer} from '../api/tools/slice';
 import {reducer as userReducer} from '../api/users/slice';
 
@@ -16,6 +17,7 @@ export const reducer = combineReducers({
     route: routeReducer,
     test: testReducer,
     theme: themeReducer,
+    toolExecutions: toolExecutionsReducer,
     tools: toolsReducer,
     user: userReducer
 });

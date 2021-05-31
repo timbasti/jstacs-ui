@@ -13,9 +13,8 @@ const createInitialUploadState = (name) => ({
 export const slice = createSlice({
     extraReducers: {
         [saveAllFiles.pending]: (state, {meta}) => {
-            console.log('saveAllFiles.pending meta', meta);
             const {arg: {files}} = meta;
-            const uploads = files.map((file) => createInitialUploadState(file.name));
+            const uploads = files.map(({file}) => createInitialUploadState(file.name));
             state.uploads = uploads;
             state.processing = true;
         },

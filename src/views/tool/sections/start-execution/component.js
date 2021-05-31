@@ -1,7 +1,19 @@
-import {Box, Button, Drawer, Grid, IconButton, Tabs, Toolbar} from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Drawer,
+    Grid,
+    IconButton,
+    Paper,
+    Slide,
+    Tabs,
+    Toolbar,
+    Typography
+} from '@material-ui/core';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import ReactMarkdown from 'react-markdown';
 import {useDispatch, useSelector} from 'react-redux';
@@ -9,25 +21,115 @@ import remarkGfm from 'remark-gfm';
 
 import {startToolExecution} from '../../../../api/toolExecutions/thunks';
 import {selectSelectedToolParameters} from '../../../../api/tools/selectors';
+import {EnrichedTextField} from '../../../../components/input-fields';
 import {ParameterGrid} from '../../../../components/parameter-grid/component';
-import {startExecutionStyles} from './styles';
+import {useAppHeaderControlsContext} from '../../../../utils/app-header-controls-context';
+import {helpTextDrawerStyles, startExecutionStyles} from './styles';
 
-const StartExecution = ({helpText, toolId}) => {
-    const [helpDrawerOpen, setHelpDrawerOpen] = useState(false);
+const ExecutionInformation = () => {
+    return (
+        <Paper
+            bgcolor="unset"
+            component={Box}
+            p={2}
+            variant="outlined"
+        >
+            <Grid
+                container
+                spacing={3}
+            >
+                <Grid
+                    item
+                    xs={12}
+                >
+                    <Typography
+                        component="h2"
+                        variant="h6"
+                    >
+                        General Information
+                    </Typography>
+                </Grid>
+                <Grid
+                    item
+                    sm={4}
+                    xs={12}
+                >
+                    <EnrichedTextField
+                        helperText="You can add a Name"
+                        label="Execution Name"
+                        name="executionInformation.name"
+                        placeholder="Enter a name"
+                    />
+                </Grid>
+                <Grid
+                    item
+                    sm={8}
+                    xs={12}
+                >
+                    <EnrichedTextField
+                        helperText="You can add some execution notes"
+                        label="Execution Notes"
+                        multiline
+                        name="executionInformation.notes"
+                        placeholder="Enter a text"
+                    />
+                </Grid>
+            </Grid>
+        </Paper>
+    );
+};
+
+const ExecutionParameters = () => {
     const selectedToolParameters = useSelector(selectSelectedToolParameters);
-    const {handleSubmit, ...formProperties} = useForm();
-    const dispatch = useDispatch();
+
+    const renderedTitleComponent = useMemo(() => {
+        return (
+            <Typography
+                component="h2"
+                gutterBottom
+                variant="h6"
+            >
+                Execution Parameters
+            </Typography>
+        );
+    }, []);
 
     const renderedParameterGrid = useMemo(() => {
-        return selectedToolParameters && <ParameterGrid parameters={selectedToolParameters} />;
-    }, [selectedToolParameters]);
+        return (
+            selectedToolParameters &&
+            renderedTitleComponent &&
+                <ParameterGrid
+                    parameters={selectedToolParameters}
+                    parentName="executionParameters"
+                    titleComponent={renderedTitleComponent}
+                />
+
+        );
+    }, [renderedTitleComponent, selectedToolParameters]);
+
+    return (
+        <Card
+            bgcolor="unset"
+            component={Box}
+            variant="outlined"
+        >
+            <CardContent>
+                {renderedParameterGrid}
+            </CardContent>
+        </Card>
+    );
+};
+
+const ExecutionForm = ({toolId}) => {
+    const dispatch = useDispatch();
+
+    const {handleSubmit, ...formProperties} = useForm();
 
     const doSubmit = useCallback(
         (values) => {
             if (!values || !toolId) {
                 return;
             }
-            console.log('doSubmit', values);
 
             dispatch(startToolExecution({
                 toolId,
@@ -37,28 +139,39 @@ const StartExecution = ({helpText, toolId}) => {
         [dispatch, toolId]
     );
 
-    const handleHelpDrawerToggle = useCallback(() => {
-        setHelpDrawerOpen(!helpDrawerOpen);
-    }, [helpDrawerOpen]);
-
     const handleFormSubmit = useMemo(() => {
         return handleSubmit(doSubmit);
     }, [handleSubmit, doSubmit]);
 
-    const classes = startExecutionStyles();
-
     return (
-        <Box className={helpDrawerOpen ? `${classes.root}-withHelpText` : classes.root}>
+        <Box p={3}>
             <FormProvider
                 {...formProperties}
                 handleSubmit={handleSubmit}
             >
-                <form
+                <Grid
+                    component="form"
+                    container
                     noValidate
                     onSubmit={handleFormSubmit}
+                    spacing={3}
                 >
-                    {renderedParameterGrid}
-                    <Box marginTop={3}>
+                    <Grid
+                        item
+                        xs={12}
+                    >
+                        <ExecutionInformation />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                    >
+                        <ExecutionParameters />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                    >
                         <Button
                             color="primary"
                             type="submit"
@@ -66,17 +179,28 @@ const StartExecution = ({helpText, toolId}) => {
                         >
                             Start Execution
                         </Button>
-                    </Box>
-                </form>
+                    </Grid>
+                </Grid>
             </FormProvider>
-            <Drawer
-                PaperProps={{className: classes.helpText}}
-                anchor="right"
-                open={helpDrawerOpen}
-                variant="persistent"
+        </Box>
+    );
+};
+
+const HelpTextDrawer = ({helpText, open}) => {
+    const classes = helpTextDrawerStyles();
+
+    return (
+        <Slide
+            className={classes.root}
+            direction="left"
+            in={open}
+            mountOnEnter
+            unmountOnExit
+        >
+            <Paper
+                square
+                variant="outlined"
             >
-                <Toolbar />
-                <Tabs />
                 <Box
                     className={classes.helpTextContent}
                     p={3}
@@ -85,21 +209,59 @@ const StartExecution = ({helpText, toolId}) => {
                         {helpText}
                     </ReactMarkdown>
                 </Box>
-                <Box p={3}>
-                    <Button
-                        onClick={handleHelpDrawerToggle}
-                        variant="outlined"
-                    >
-                        Close
-                    </Button>
-                </Box>
-            </Drawer>
+            </Paper>
+        </Slide>
+    );
+};
+
+const StartExecution = ({helpText, toolId}) => {
+    const [helpDrawerOpen, setHelpDrawerOpen] = useState(false);
+    const {setControls} = useAppHeaderControlsContext();
+
+    const handleHelpDrawerToggle = useCallback(() => {
+        setHelpDrawerOpen(!helpDrawerOpen);
+    }, [helpDrawerOpen]);
+
+    const classes = startExecutionStyles();
+
+    useEffect(() => {
+        setControls([
             <IconButton
-                className={classes.helpTextTrigger}
+                color="inherit"
+                key="helpTextTrigger"
                 onClick={handleHelpDrawerToggle}
             >
                 <HelpOutlineIcon />
             </IconButton>
+        ]);
+    }, [setControls, handleHelpDrawerToggle]);
+
+    return (
+        <Box
+            height="100%"
+            width="100%"
+        >
+            <Grid
+                className={classes.root}
+                container
+                wrap="nowrap"
+            >
+                <Grid
+                    className={classes.item}
+                    item
+                >
+                    <ExecutionForm toolId={toolId} />
+                </Grid>
+                <Grid
+                    className={classes.item}
+                    item
+                >
+                    <HelpTextDrawer
+                        helpText={helpText}
+                        open={helpDrawerOpen}
+                    />
+                </Grid>
+            </Grid>
         </Box>
     );
 };

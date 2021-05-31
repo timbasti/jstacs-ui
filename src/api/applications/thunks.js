@@ -12,8 +12,8 @@ export const createApplication = createAsyncThunk('applications/create', async (
     return data;
 });
 
-export const updateApplication = createAsyncThunk('applications/update', async ({id, toolIds = []}) => {
-    const {data} = await requests.updateApplication(id, toolIds);
+export const updateApplication = createAsyncThunk('applications/update', async ({id, name, toolIds = []}) => {
+    const {data} = await requests.updateApplication(id, name, toolIds);
     return data;
 });
 

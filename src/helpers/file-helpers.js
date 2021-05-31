@@ -15,9 +15,6 @@ export const saveFile = (file) => {
 };
 
 export const readFile = (file, onRead) => {
-    if (!file.name) {
-        return;
-    }
     if (file.size && typeof file.size === 'number') {
         file.text().then((fileContent) => {
             onRead(fileContent);
@@ -28,14 +25,13 @@ export const readFile = (file, onRead) => {
                 onRead(fileContent);
             });
         };
-        loadFile(file, readContent);
+        loadFile(file.name || file, readContent);
     }
 };
 
 export const selectAllFiles = (mixedValues) => {
     const files = [];
     Object.values(mixedValues).forEach((value) => {
-        console.log('selectAllFiles', value);
         if (value instanceof File) {
             files.push(value);
         } else if (value instanceof Object && Object.keys(value).length > 0) {
@@ -48,24 +44,18 @@ export const selectAllFiles = (mixedValues) => {
 
 export const extractAllFiles = (mixedValues, parentObjectKey) => {
     const extractedFiles = [];
-    const updatedValues = {};
     Object.keys(mixedValues).forEach((key) => {
         const value = mixedValues[key];
-        console.log('selectAllFiles', value);
         if (value instanceof File) {
-            extractedFiles.push(value);
-            updatedValues[key] = {name: value.name};
+            const keyPath = parentObjectKey ? `${parentObjectKey}.${key}` : key;
+            extractedFiles.push({
+                file: value,
+                fileKey: keyPath
+            });
         } else if (value instanceof Object && Object.keys(value).length > 0) {
-            const {files: nestedFiles, values: nestedValues} = extractAllFiles(value);
+            const nestedFiles = extractAllFiles(value, key);
             extractedFiles.push(...nestedFiles);
-            updatedValues[key] = nestedValues;
         }
     });
-    return {
-        files: extractedFiles,
-        values: {
-            ...mixedValues,
-            ...updatedValues
-        }
-    };
+    return extractedFiles;
 };

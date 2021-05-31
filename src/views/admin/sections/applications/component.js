@@ -43,13 +43,10 @@ const ApplicationSelectionFieldSet = ({onChange}) => {
     }, [availableApplications, onChange, setValue, selectedApplicationId]);
 
     const handleDeleteClick = useCallback(() => {
-        if (selectedApplicationId === undefined) {
-            return;
+        if (selectedApplicationId >= 0) {
+            setValue('applicationId.selected', newApplicationId, {shouldValidate: true});
+            dispatch(deleteApplication({id: selectedApplicationId}));
         }
-
-        dispatch(deleteApplication({id: selectedApplicationId}));
-        setValue('applicationId', newApplicationId, {shouldValidate: false});
-        setValue('applicationName', newApplicationName, {shouldValidate: false});
     }, [dispatch, selectedApplicationId, setValue]);
 
     const selectableOptions = useMemo(() => {
@@ -170,7 +167,6 @@ export const ApplicationsSection = () => {
 
     const doSubmit = useCallback(
         ({applicationId, applicationName, assignedTools}) => {
-            console.log(applicationId.selected, applicationName, assignedTools);
             if (applicationId.selected === newApplicationId) {
                 dispatch(createApplication({
                     name: applicationName,

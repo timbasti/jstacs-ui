@@ -4,7 +4,20 @@ import React, {useMemo} from 'react';
 
 import {createParameterInput} from '../../utils/parameter-factory';
 
-const ParameterGrid = ({parameters, parentName}) => {
+const ParameterGrid = ({parameters, parentName, titleComponent}) => {
+    const renderedTitleItem = useMemo(() => {
+        return (
+            titleComponent &&
+                <Grid
+                    item
+                    xs={12}
+                >
+                    {titleComponent}
+                </Grid>
+
+        );
+    }, [titleComponent]);
+
     const renderedParameterItems = useMemo(() => {
         return parameters?.map((parameter) => {
             const gridProps =
@@ -33,6 +46,7 @@ const ParameterGrid = ({parameters, parentName}) => {
             container
             spacing={3}
         >
+            {renderedTitleItem}
             {renderedParameterItems}
         </Grid>
     );
@@ -40,9 +54,13 @@ const ParameterGrid = ({parameters, parentName}) => {
 
 ParameterGrid.propTypes = {
     parameters: PropTypes.arrayOf(PropTypes.any).isRequired,
-    parentName: PropTypes.string
+    parentName: PropTypes.string,
+    titleComponent: PropTypes.node
 };
 
-ParameterGrid.defaultProps = {parentName: undefined};
+ParameterGrid.defaultProps = {
+    parentName: undefined,
+    titleComponent: undefined
+};
 
 export {ParameterGrid};

@@ -5,7 +5,7 @@ import {useController, useFormContext} from 'react-hook-form';
 
 import {ErrorNotification} from '../../notifications';
 
-const EnrichedTextField = ({helperText, label, name, placeholder, required, defaultValue, minLength, maxLength}) => {
+const EnrichedTextField = ({helperText, label, name, placeholder, required, defaultValue, minLength, maxLength, multiline}) => {
     const {control} = useFormContext();
 
     const textFieldRef = useRef();
@@ -41,6 +41,7 @@ const EnrichedTextField = ({helperText, label, name, placeholder, required, defa
                 required={Boolean(required)}
                 variant="filled"
                 {...fieldProps}
+                multiline={multiline}
             />
         </Box>
     );
@@ -52,6 +53,7 @@ EnrichedTextField.propTypes = {
     label: PropTypes.string.isRequired,
     maxLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     minLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    multiline: PropTypes.bool,
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
     required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
@@ -62,6 +64,7 @@ EnrichedTextField.defaultProps = {
     helperText: '',
     maxLength: undefined,
     minLength: undefined,
+    multiline: false,
     placeholder: '',
     required: false
 };
