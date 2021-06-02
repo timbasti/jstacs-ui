@@ -2,19 +2,20 @@ import {Box, Card, CardContent, Grid, IconButton, List, ListItem, ListItemText, 
 import RefreshIcon from '@material-ui/icons/Refresh';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {NavLink, useLocation} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 
+import {setRouteData} from '../../api/route/slice';
+import {toolExecutionStates} from '../../api/toolExecutions/selectors';
 import {
-    selectFulfilledToolExecutions,
-    selectInitializedToolExecutions,
-    selectPendingToolExecutions,
-    selectRejectedToolExecutions,
-    toolExecutionStates
-} from '../../../../api/toolExecutions/selectors';
-import {listToolExecutions} from '../../../../api/toolExecutions/thunks';
-import {SimpleSearchField} from '../../../../components/simple-search-field/component';
-import {useAppHeaderControlsContext} from '../../../../utils/contexts/app-header-controls-context';
-import {ExecutionOverview} from './execution-overview/component';
+    selectUserFulfilledToolExecutions,
+    selectUserId,
+    selectUserInitializedToolExecutions,
+    selectUserPendingToolExecutions,
+    selectUserRejectedToolExecutions
+} from '../../api/users/selectors';
+import {checkUser} from '../../api/users/thunks';
+import {SimpleSearchField} from '../../components/simple-search-field/component';
+import {useAppHeaderControlsContext} from '../../utils/contexts/app-header-controls-context';
 import {useStatefulExecutionsStyles, useToolExecutionListStyles, useToolExecutionsOverviewStyles} from './styles';
 
 const FallbackMessage = ({state}) => {
@@ -141,7 +142,7 @@ const ToolExecutionsOverview = ({filter, state, description, toolExecutions, app
 };
 
 const InitializedToolExecutionsOverview = (props) => {
-    const toolExecutions = useSelector(selectInitializedToolExecutions);
+    const toolExecutions = useSelector(selectUserInitializedToolExecutions);
 
     return (
         <ToolExecutionsOverview
@@ -154,7 +155,7 @@ const InitializedToolExecutionsOverview = (props) => {
 };
 
 const PendingToolExecutionsOverview = (props) => {
-    const toolExecutions = useSelector(selectPendingToolExecutions);
+    const toolExecutions = useSelector(selectUserPendingToolExecutions);
 
     return (
         <ToolExecutionsOverview
@@ -167,7 +168,7 @@ const PendingToolExecutionsOverview = (props) => {
 };
 
 const FulfilledToolExecutionsOverview = (props) => {
-    const toolExecutions = useSelector(selectFulfilledToolExecutions);
+    const toolExecutions = useSelector(selectUserFulfilledToolExecutions);
 
     return (
         <ToolExecutionsOverview
@@ -180,7 +181,7 @@ const FulfilledToolExecutionsOverview = (props) => {
 };
 
 const RejectedToolExecutionsOverview = (props) => {
-    const toolExecutions = useSelector(selectRejectedToolExecutions);
+    const toolExecutions = useSelector(selectUserRejectedToolExecutions);
 
     return (
         <ToolExecutionsOverview
@@ -192,7 +193,7 @@ const RejectedToolExecutionsOverview = (props) => {
     );
 };
 
-const StatefulExecutions = ({filter, applicationId, toolId}) => {
+const StatefulExecutions = ({filter}) => {
     const classes = useStatefulExecutionsStyles();
 
     return (
@@ -207,11 +208,7 @@ const StatefulExecutions = ({filter, applicationId, toolId}) => {
                 sm={6}
                 xs={12}
             >
-                <InitializedToolExecutionsOverview
-                    applicationId={applicationId}
-                    filter={filter}
-                    toolId={toolId}
-                />
+                <InitializedToolExecutionsOverview filter={filter} />
             </Grid>
             <Grid
                 className={classes.item}
@@ -219,11 +216,7 @@ const StatefulExecutions = ({filter, applicationId, toolId}) => {
                 sm={6}
                 xs={12}
             >
-                <PendingToolExecutionsOverview
-                    applicationId={applicationId}
-                    filter={filter}
-                    toolId={toolId}
-                />
+                <PendingToolExecutionsOverview filter={filter} />
             </Grid>
             <Grid
                 className={classes.item}
@@ -231,11 +224,7 @@ const StatefulExecutions = ({filter, applicationId, toolId}) => {
                 sm={6}
                 xs={12}
             >
-                <FulfilledToolExecutionsOverview
-                    applicationId={applicationId}
-                    filter={filter}
-                    toolId={toolId}
-                />
+                <FulfilledToolExecutionsOverview filter={filter} />
             </Grid>
             <Grid
                 className={classes.item}
@@ -243,34 +232,26 @@ const StatefulExecutions = ({filter, applicationId, toolId}) => {
                 sm={6}
                 xs={12}
             >
-                <RejectedToolExecutionsOverview
-                    applicationId={applicationId}
-                    filter={filter}
-                    toolId={toolId}
-                />
+                <RejectedToolExecutionsOverview filter={filter} />
             </Grid>
         </Grid>
     );
 };
 
-const AvailableExecutions = ({applicationId, toolId}) => {
+const DashboardView = () => {
     const [filter, setFilter] = useState('');
-    const [executionOpen, setExecutionOpen] = useState(false);
     const dispatch = useDispatch();
     const {setControls} = useAppHeaderControlsContext();
-    const {hash} = useLocation();
+
+    const userId = useSelector(selectUserId);
 
     const handleFilterChange = useCallback((changeEvent) => setFilter(changeEvent.target.value), []);
 
-    const handleRefreshClick = useCallback(() => dispatch(listToolExecutions({toolId})), [dispatch, toolId]);
+    const handleRefreshClick = useCallback(() => dispatch(checkUser(userId)), [dispatch, userId]);
 
     useEffect(() => {
-        setExecutionOpen(Boolean(hash));
-    }, [hash]);
-
-    useEffect(() => {
-        dispatch(listToolExecutions({toolId}));
-    }, [dispatch, toolId]);
+        dispatch(setRouteData({view: 'Dashboard'}));
+    }, [dispatch]);
 
     useEffect(() => {
         setControls([
@@ -291,23 +272,12 @@ const AvailableExecutions = ({applicationId, toolId}) => {
     return (
         <Box
             height="100%"
-            paddingLeft={3}
-            paddingRight={3}
-            paddingTop={3}
+            p={3}
             width="100%"
         >
-            <StatefulExecutions
-                applicationId={applicationId}
-                filter={filter}
-                toolId={toolId}
-            />
-            <ExecutionOverview
-                applicationId={applicationId}
-                open={executionOpen}
-                toolId={toolId}
-            />
+            <StatefulExecutions filter={filter} />
         </Box>
     );
 };
 
-export {AvailableExecutions};
+export default DashboardView;

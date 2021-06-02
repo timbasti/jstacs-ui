@@ -2,7 +2,7 @@ import {Grid} from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
 
-import {createParameterInput} from '../../utils/parameter-factory';
+import {createParameterInput} from '../../utils/factories/parameter-factory';
 
 const ParameterGrid = ({parameters, parentName, titleComponent}) => {
     const renderedTitleItem = useMemo(() => {

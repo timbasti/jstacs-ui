@@ -1,10 +1,9 @@
-import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles} from '@material-ui/core';
+import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemText, makeStyles} from '@material-ui/core';
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
-import EditIcon from '@material-ui/icons/Edit';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {NavLink, useLocation, useParams} from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 
 import {selectAvailableApplications} from '../api/applications/selectors';
 import {close as closeDrawer} from '../api/drawer/actions';
@@ -40,7 +39,7 @@ const ToolItemList = ({applicationId, toolItems}) => {
     return (
         <List disablePadding>
             {toolItems?.map(({id, name}) => {
-                const toolPathname = `/applications/${applicationId}/tools/${id}`;
+                const toolPathname = `/tools/${id}`;
                 const firstToolSection = `${toolPathname}/tool-overview`;
                 return (
                     <ListItem
@@ -69,12 +68,12 @@ ToolItemList.propTypes = {
 
 const ApplicationItem = ({id, name, tools}) => {
     const [open, setOpen] = useState(false);
-    const location = useLocation();
+    const {pathname} = useLocation();
 
     useEffect(() => {
-        const applicationPath = `/applications/${id}`;
-        setOpen(location.pathname.startsWith(applicationPath));
-    }, [id, location]);
+        const hasSelectedTool = tools.some((tool) => pathname.startsWith(`/tools/${tool.id}`));
+        setOpen(hasSelectedTool);
+    }, [pathname, tools]);
 
     const handleClick = useCallback(() => {
         setOpen(!open);
@@ -148,12 +147,17 @@ const NavigationDrawer = ({DrawerProps}) => {
                 <ListItem
                     button
                     component={NavLink}
+                    selected={location.pathname === '/'}
+                    to="/"
+                >
+                    <ListItemText primary="Dashboard" />
+                </ListItem>
+                <ListItem
+                    button
+                    component={NavLink}
                     selected={location.pathname === '/admin'}
                     to="/admin"
                 >
-                    <ListItemIcon>
-                        <EditIcon />
-                    </ListItemIcon>
                     <ListItemText primary="Admin" />
                 </ListItem>
                 <ListItem

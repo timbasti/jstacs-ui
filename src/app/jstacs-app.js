@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 
 import {selectProcessing as selectFilesProcessing} from '../api/files/selectors';
 import {UploadDialog} from '../components/upload-dialog/component';
-import {AppHeaderControlsProvider} from '../utils/app-header-controls-context';
+import {AppHeaderControlsProvider} from '../utils/contexts/app-header-controls-context';
 import {JstacsHeader} from './jstacs-header';
 import {JstacsMainContent} from './jstacs-main-content';
 import {JstacsNavigation} from './jstacs-navigation';

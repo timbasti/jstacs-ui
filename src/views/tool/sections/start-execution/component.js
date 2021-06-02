@@ -3,13 +3,10 @@ import {
     Button,
     Card,
     CardContent,
-    Drawer,
     Grid,
     IconButton,
     Paper,
     Slide,
-    Tabs,
-    Toolbar,
     Typography
 } from '@material-ui/core';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -23,7 +20,7 @@ import {startToolExecution} from '../../../../api/toolExecutions/thunks';
 import {selectSelectedToolParameters} from '../../../../api/tools/selectors';
 import {EnrichedTextField} from '../../../../components/input-fields';
 import {ParameterGrid} from '../../../../components/parameter-grid/component';
-import {useAppHeaderControlsContext} from '../../../../utils/app-header-controls-context';
+import {useAppHeaderControlsContext} from '../../../../utils/contexts/app-header-controls-context';
 import {helpTextDrawerStyles, startExecutionStyles} from './styles';
 
 const ExecutionInformation = () => {
@@ -189,6 +186,18 @@ const ExecutionForm = ({toolId}) => {
 const HelpTextDrawer = ({helpText, open}) => {
     const classes = helpTextDrawerStyles();
 
+    const cleanedHelpText = useMemo(() => {
+        const regex = /^\.\.\s+_(?<linkKey>.*?)\s*:\s*(?<linkTarget>.*)$/gmu;
+        let newHelpText = helpText;
+        let linkDef = null;
+        while ((linkDef = regex.exec(helpText)) !== null) {
+            const {0: line, groups: {linkKey, linkTarget}} = linkDef;
+            newHelpText = newHelpText.replace(`${linkKey}_`, `[${linkKey}](${linkTarget})`);
+            newHelpText = newHelpText.replace(line, '');
+        }
+        return newHelpText;
+    }, [helpText]);
+
     return (
         <Slide
             className={classes.root}
@@ -205,8 +214,8 @@ const HelpTextDrawer = ({helpText, open}) => {
                     className={classes.helpTextContent}
                     p={3}
                 >
-                    <ReactMarkdown plugins={[remarkGfm]}>
-                        {helpText}
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {cleanedHelpText}
                     </ReactMarkdown>
                 </Box>
             </Paper>

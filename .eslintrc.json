@@ -141,5 +141,8 @@
                 "ignoredNodes": ["TemplateLiteral"]
             }
         ]
+    },
+    "settings": {
+        "cache" : true
     }
 }

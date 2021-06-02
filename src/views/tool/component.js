@@ -29,18 +29,6 @@ const useStyles = makeStyles((theme) => {
     };
 });
 
-const TabPanel = ({children}) => {
-    return (
-        <Box
-            height="100%"
-            p={3}
-            width="100%"
-        >
-            {children}
-        </Box>
-    );
-};
-
 const ToolView = ({className}) => {
     const {pathname} = useLocation();
     const {applicationId, toolId} = useParams();
@@ -56,9 +44,9 @@ const ToolView = ({className}) => {
 
     useEffect(() => {
         setSectionPaths([
-            `/applications/${applicationId}/tools/${toolId}/tool-overview`,
-            `/applications/${applicationId}/tools/${toolId}/start-execution`,
-            `/applications/${applicationId}/tools/${toolId}/available-executions`
+            `/tools/${toolId}/tool-overview`,
+            `/tools/${toolId}/start-execution`,
+            `/tools/${toolId}/available-executions`
         ]);
     }, [applicationId, toolId]);
 
@@ -68,10 +56,7 @@ const ToolView = ({className}) => {
     }, [pathname, sectionPaths]);
 
     useEffect(() => {
-        dispatch(loadTool({
-            applicationId,
-            toolId
-        }));
+        dispatch(loadTool({toolId}));
     }, [dispatch, applicationId, toolId]);
 
     useEffect(() => {

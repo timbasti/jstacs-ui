@@ -15,11 +15,7 @@ import {
 } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Dialog from '@material-ui/core/Dialog';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -32,7 +28,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NavLink, useLocation} from 'react-router-dom';
 import remarkGfm from 'remark-gfm';
 
-import {getFileUrl, loadFile} from '../../../../../api/files/requests';
+import {getFileUrl} from '../../../../../api/files/requests';
 import {selectLoadedToolExecution, toolExecutionStates} from '../../../../../api/toolExecutions/selectors';
 import {loadToolExecution} from '../../../../../api/toolExecutions/thunks';
 import {readFile} from '../../../../../helpers/file-helpers';
@@ -172,7 +168,7 @@ const ProtocolDialog = ({protocol, onToggle, open}) => {
                     className={classes.content}
                     p={1}
                 >
-                    <ReactMarkdown plugins={[remarkGfm]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {protocol}
                     </ReactMarkdown>
                 </Box>
@@ -426,7 +422,7 @@ const TitleBar = ({applicationId, toolId}) => {
                 <IconButton
                     color="inherit"
                     component={NavLink}
-                    to={`/applications/${applicationId}/tools/${toolId}/available-executions`}
+                    to={`/tools/${toolId}/available-executions`}
                 >
                     <ArrowBack />
                 </IconButton>

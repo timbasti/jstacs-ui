@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {EnrichedFileInput} from '../components/input-fields';
-import {requiredValueErrorMessage} from './error-messages';
+import {EnrichedFileInput} from '../../components/input-fields';
+import {requiredValueErrorMessage} from '../error-messages';
 
 export const createFileParameterInput = (parameter, parentName) => {
     const accept = parameter?.acceptedExtensions

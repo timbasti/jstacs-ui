@@ -2,7 +2,6 @@ import {withStyles} from '@material-ui/core';
 import MuiAccordion from '@material-ui/core/Accordion';
 import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
-import MuiCollapse from '@material-ui/core/Collapse';
 import {ExpandMore} from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import React, {useCallback, useMemo, useRef} from 'react';
