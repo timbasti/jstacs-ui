@@ -42,6 +42,7 @@
     },
     "scripts": {
         "analyze": "source-map-explorer 'build/static/js/*.js'",
+        "eject": "react-scripts eject",
         "start": "react-scripts start",
         "build": "react-scripts build",
         "clear:index": "html-remove-empty-lines ./public/index.html && prettier --write \"./public/index.html\"",
