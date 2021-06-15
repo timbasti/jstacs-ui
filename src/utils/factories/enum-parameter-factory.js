@@ -15,7 +15,7 @@ const createEnumParameterSelection = (parameter, parentName) => {
     const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
     return (
         <EnrichedSelectField
-            defaultValue={parameter.selected}
+            defaultValue={parameter.value}
             helperText={parameter.comment}
             label={parameter.name}
             name={name}

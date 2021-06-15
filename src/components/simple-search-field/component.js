@@ -5,11 +5,11 @@ import React from 'react';
 
 import {useSimpleSearchFieldStyles} from './styles';
 
-const SimpleSearchField = ({onChange}) => {
+const SimpleSearchField = ({className, onChange, placeholder}) => {
     const classes = useSimpleSearchFieldStyles();
 
     return (
-        <div className={classes.search}>
+        <div className={`${classes.search} ${className}`}>
             <div className={classes.searchIcon}>
                 <SearchIcon />
             </div>
@@ -19,12 +19,21 @@ const SimpleSearchField = ({onChange}) => {
                     root: classes.inputRoot
                 }}
                 onChange={onChange}
-                placeholder="Search…"
+                placeholder={placeholder}
             />
         </div>
     );
 };
 
-SimpleSearchField.propTypes = {onChange: PropTypes.func.isRequired};
+SimpleSearchField.propTypes = {
+    className: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    placeholder: PropTypes.string
+};
+
+SimpleSearchField.defaultProps = {
+    className: '',
+    placeholder: 'Search…'
+};
 
 export {SimpleSearchField};

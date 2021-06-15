@@ -11,3 +11,10 @@ export const useToolExecutionsOverviewStyles = makeStyles((theme) => ({
 }));
 
 export const useToolExecutionListStyles = makeStyles((theme) => ({root: {overflow: 'auto'}}));
+
+export const useDashboardViewStyles = makeStyles((theme) => ({
+    content: {height: '100%'},
+    grid: {height: '100%'},
+    gridContent: {flex: 1},
+    root: {height: '100%'}
+}));

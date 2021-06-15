@@ -6,7 +6,7 @@ import {ErrorNotification} from '../../notifications';
 import {UncontrolledRadioGroup} from '../uncontrolled-radio-group/component';
 import {useEnrichedRadioGroupStyles} from './styles';
 
-const EnrichedRadioGroup = ({helperText, label, name, defaultValue, children, required}) => {
+const EnrichedRadioGroup = ({defaultValue, helperText, label, name, children, onChange}) => {
     const rootRef = useRef();
     const classes = useEnrichedRadioGroupStyles();
 
@@ -28,8 +28,7 @@ const EnrichedRadioGroup = ({helperText, label, name, defaultValue, children, re
             </FormLabel>
             <UncontrolledRadioGroup
                 defaultValue={defaultValue}
-                name={name}
-                required={required}
+                onChange={onChange}
             >
                 {children}
             </UncontrolledRadioGroup>
@@ -46,14 +45,14 @@ EnrichedRadioGroup.propTypes = {
     helperText: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string.isRequired,
-    required: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+    onChange: PropTypes.func
 };
 
 EnrichedRadioGroup.defaultProps = {
     defaultValue: '',
     helperText: '',
     label: '',
-    required: false
+    onChange: () => {}
 };
 
 export {EnrichedRadioGroup};

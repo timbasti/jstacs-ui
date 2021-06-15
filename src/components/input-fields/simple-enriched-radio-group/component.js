@@ -11,11 +11,12 @@ const SimpleEnrichedRadioGroup = ({helperText, label, name, defaultValue, option
                 return <EnrichedRadio
                     key={value}
                     label={optionLabel}
+                    name={name}
                     value={value}
                 />;
             }) || []
         );
-    }, [options]);
+    }, [name, options]);
 
     return (
         <EnrichedRadioGroup

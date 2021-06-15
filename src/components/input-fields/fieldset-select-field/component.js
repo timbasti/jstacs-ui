@@ -4,7 +4,7 @@ import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import {ExpandMore} from '@material-ui/icons';
 import PropTypes from 'prop-types';
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {useFormContext, useWatch} from 'react-hook-form';
 
 import {EnrichedRadio} from '../enriched-radio/component';
@@ -36,24 +36,8 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles((theme) => ({root: {padding: theme.spacing(2)}}))(MuiAccordionDetails);
 
-const SelectableAccordion = ({defaultValue, name, label, value, children}) => {
-    const inputRef = useRef();
-    const {control, setValue} = useFormContext();
-    const selectedValue = useWatch({
-        control,
-        defaultValue,
-        name: `${name}.selected`
-    });
-
-    const handleSummaryClick = useCallback(
-        (clickEvent) => {
-            if (inputRef?.current !== clickEvent.target) {
-                clickEvent.preventDefault();
-                setValue(`${name}.selected`, value, {shouldValidate: true});
-            }
-        },
-        [name, setValue, value]
-    );
+const SelectableAccordion = ({expanded, label, value, children, onChange}) => {
+    const radioRef = useRef();
 
     const renderedDetails = useMemo(() => {
         if (children) {
@@ -71,18 +55,30 @@ const SelectableAccordion = ({defaultValue, name, label, value, children}) => {
         return undefined;
     }, [children]);
 
+    const handleChange = useCallback(() => {
+        onChange(value);
+    }, [onChange, value]);
+
+    const handleSummaryClick = useCallback((clickEvent) => {
+        clickEvent.preventDefault();
+        if (clickEvent.target !== radioRef.current) {
+            radioRef.current.click();
+        }
+    }, []);
+
     return (
         <Accordion
             TransitionProps={{unmountOnExit: true}}
-            expanded={selectedValue === value}
+            expanded={expanded}
         >
             <AccordionSummary
                 expandIcon={renderedExpandIcon}
                 onClick={handleSummaryClick}
             >
                 <EnrichedRadio
-                    inputRef={inputRef}
+                    inputRef={radioRef}
                     label={label}
+                    onChange={handleChange}
                     value={value}
                 />
             </AccordionSummary>
@@ -92,15 +88,25 @@ const SelectableAccordion = ({defaultValue, name, label, value, children}) => {
 };
 
 const FieldsetSelectField = ({helperText, label, name, defaultValue, options, required}) => {
+    const [selected, setSelected] = useState(defaultValue);
+
+    const handleRadioChange = useCallback((changeEvent) => {
+        setSelected(changeEvent.target.value);
+    }, []);
+
+    const handleAccordionChange = useCallback((newSelectedValue) => {
+        setSelected(newSelectedValue);
+    }, []);
+
     const renderedOptions = useMemo(() => {
         return (
             options?.map(({label: optionLabel, value, content}) => {
                 return (
                     <SelectableAccordion
-                        defaultValue={defaultValue}
+                        expanded={selected === value}
                         key={value}
                         label={optionLabel}
-                        name={name}
+                        onChange={handleAccordionChange}
                         value={value}
                     >
                         {content}
@@ -108,7 +114,7 @@ const FieldsetSelectField = ({helperText, label, name, defaultValue, options, re
                 );
             }) || []
         );
-    }, [defaultValue, name, options]);
+    }, [handleAccordionChange, options, selected]);
 
     return (
         <EnrichedRadioGroup
@@ -116,6 +122,7 @@ const FieldsetSelectField = ({helperText, label, name, defaultValue, options, re
             helperText={helperText}
             label={label}
             name={name}
+            onChange={handleRadioChange}
             required={required}
         >
             {renderedOptions}

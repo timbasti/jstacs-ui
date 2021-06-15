@@ -26,7 +26,7 @@ const DataColumnField = ({name, defaultValue, fileFieldName, label, required, pl
                 value: index
             }));
             setOptions(readColumns);
-            setValue(`${name}.selected`, defaultValue, {shouldValidate: true});
+            setValue(`${name}`, defaultValue, {shouldValidate: true});
         });
     }, [defaultValue, name, selectedFile, setValue]);
 

@@ -87,7 +87,7 @@ const EnrichedSelectField = ({defaultValue, helperText, label, name, options, sh
     } = useController({
         control,
         defaultValue,
-        name: `${name}.selected`,
+        name: `${name}`,
         rules: {required}
     });
 

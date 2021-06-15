@@ -1,21 +1,19 @@
-// import loadable from '@loadable/component';
+import loadable from '@loadable/component';
 import {makeStyles, Toolbar} from '@material-ui/core';
 import React, {useCallback} from 'react';
 import {Route, Switch} from 'react-router-dom';
 
-import AdminView from '../views/admin/component';
+/* import AdminView from '../views/admin/component';
 import DashboardView from '../views/dashboard/component';
 import NoMatchView from '../views/no-match/component';
 import TestEnvironmentView from '../views/test-environment/component';
-import ToolView from '../views/tool/component';
+import ToolView from '../views/tool/component'; */
 
-/*
 const AdminView = loadable(() => import('../views/admin/component'));
 const DashboardView = loadable(() => import('../views/dashboard/component'));
 const NoMatchView = loadable(() => import('../views/no-match/component'));
 const TestEnvironmentView = loadable(() => import('../views/test-environment/component'));
 const ToolView = loadable(() => import('../views/tool/component'));
-*/
 
 const useStyles = makeStyles(() => {
     return {

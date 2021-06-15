@@ -42,7 +42,7 @@ const ToolExecutionItem = ({createdAt, id, name, progress, state, applicationId,
     }, [progress, state]);
 
     const itemText = useMemo(() => {
-        const cleanedName = name || 'No name';
+        const cleanedName = name || 'Empty name';
         return `${cleanedName} | ${createdAt}`;
     }, [name, createdAt]);
 
@@ -277,6 +277,7 @@ const AvailableExecutions = ({applicationId, toolId}) => {
             <SimpleSearchField
                 key="inlineSearch"
                 onChange={handleFilterChange}
+                placeholder="Search..."
             />,
             <IconButton
                 color="inherit"

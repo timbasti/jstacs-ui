@@ -1,22 +1,34 @@
+import '@inovua/reactdatagrid-community/base.css';
+import '@inovua/reactdatagrid-community/theme/default-light.css';
+import '@inovua/reactdatagrid-community/theme/default-dark.css';
+
+import ReactDataGrid from '@inovua/reactdatagrid-community';
 import {Box, Card, CardContent, Grid, IconButton, List, ListItem, ListItemText, Typography} from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {NavLink} from 'react-router-dom';
+import {NavLink, useHistory} from 'react-router-dom';
 
 import {setRouteData} from '../../api/route/slice';
+import {selectPaletteType} from '../../api/theme/selectors';
 import {toolExecutionStates} from '../../api/toolExecutions/selectors';
 import {
     selectUserFulfilledToolExecutions,
     selectUserId,
     selectUserInitializedToolExecutions,
     selectUserPendingToolExecutions,
-    selectUserRejectedToolExecutions
+    selectUserRejectedToolExecutions,
+    selectUserUsedTools
 } from '../../api/users/selectors';
 import {checkUser} from '../../api/users/thunks';
 import {SimpleSearchField} from '../../components/simple-search-field/component';
 import {useAppHeaderControlsContext} from '../../utils/contexts/app-header-controls-context';
-import {useStatefulExecutionsStyles, useToolExecutionListStyles, useToolExecutionsOverviewStyles} from './styles';
+import {
+    useDashboardViewStyles,
+    useStatefulExecutionsStyles,
+    useToolExecutionListStyles,
+    useToolExecutionsOverviewStyles
+} from './styles';
 
 const FallbackMessage = ({state}) => {
     const message = useMemo(() => {
@@ -43,7 +55,7 @@ const ToolExecutionItem = ({createdAt, id, name, progress, state, applicationId,
     }, [progress, state]);
 
     const itemText = useMemo(() => {
-        const cleanedName = name || 'No name';
+        const cleanedName = name || 'Empty name';
         return `${cleanedName} | ${createdAt}`;
     }, [name, createdAt]);
 
@@ -238,44 +250,146 @@ const StatefulExecutions = ({filter}) => {
     );
 };
 
-const DashboardView = () => {
-    const [filter, setFilter] = useState('');
+const usedToolsGridColumns = [
+    {
+        defaultFlex: 1,
+        header: 'Name',
+        minWidth: 150,
+        name: 'name',
+        type: 'string'
+    },
+    {
+        defaultFlex: 1,
+        header: 'Last used at',
+        minWidth: 150,
+        name: 'lastUsedAt',
+        type: 'string'
+    },
+    {
+        defaultFlex: 1,
+        header: '# Initialized',
+        minWidth: 150,
+        name: 'INITIALIZED',
+        type: 'string'
+    },
+    {
+        defaultFlex: 1,
+        header: '# Pending',
+        minWidth: 150,
+        name: 'PENDING',
+        type: 'string'
+    },
+    {
+        defaultFlex: 1,
+        header: '# Fulfilled',
+        minWidth: 150,
+        name: 'FULFILLED',
+        type: 'string'
+    },
+    {
+        defaultFlex: 1,
+        header: '# Rejected',
+        minWidth: 150,
+        name: 'REJECTED',
+        type: 'string'
+    }
+];
+
+const usedToolsGridFilters = [
+    {
+        name: 'name',
+        operator: 'contains',
+        type: 'string'
+    },
+    {
+        name: 'lastUsedAt',
+        operator: 'contains',
+        type: 'string'
+    },
+    {
+        name: 'INITIALIZED',
+        operator: 'contains',
+        type: 'string'
+    },
+    {
+        name: 'PENDING',
+        operator: 'contains',
+        type: 'string'
+    },
+    {
+        name: 'FULFILLED',
+        operator: 'contains',
+        type: 'string'
+    },
+    {
+        name: 'REJECTED',
+        operator: 'contains',
+        type: 'string'
+    }
+];
+
+const DashboardView = ({className}) => {
     const dispatch = useDispatch();
-    const {setControls} = useAppHeaderControlsContext();
+    const paletteType = useSelector(selectPaletteType);
+    const recentlyUsedTools = useSelector(selectUserUsedTools);
+    const classes = useDashboardViewStyles();
+    const history = useHistory();
 
-    const userId = useSelector(selectUserId);
+    const theme = useMemo(() => {
+        return `default-${paletteType}`;
+    }, [paletteType]);
 
-    const handleFilterChange = useCallback((changeEvent) => setFilter(changeEvent.target.value), []);
-
-    const handleRefreshClick = useCallback(() => dispatch(checkUser(userId)), [dispatch, userId]);
+    const handleSelectionChange = useCallback(
+        ({selected}) => {
+            const toolRoute = `/tools/${selected}/available-executions`;
+            history.push(toolRoute);
+        },
+        [history]
+    );
 
     useEffect(() => {
         dispatch(setRouteData({view: 'Dashboard'}));
     }, [dispatch]);
 
-    useEffect(() => {
-        setControls([
-            <SimpleSearchField
-                key="inlineSearch"
-                onChange={handleFilterChange}
-            />,
-            <IconButton
-                color="inherit"
-                key="refreshTrigger"
-                onClick={handleRefreshClick}
-            >
-                <RefreshIcon />
-            </IconButton>
-        ]);
-    }, [handleFilterChange, handleRefreshClick, setControls]);
-
     return (
         <Box
-            height="100%"
+            className={className}
             p={3}
-            width="100%"
         >
-            <StatefulExecutions filter={filter} />
+            <Card className={classes.root}>
+                <CardContent
+                    className={classes.content}
+                    component={Grid}
+                    container
+                    direction="column"
+                >
+                    <Grid item>
+                        <Typography
+                            component="h2"
+                            gutterBottom
+                            variant="h6"
+                        >
+                            Recently Used Tools
+                        </Typography>
+                    </Grid>
+                    <Grid
+                        className={classes.gridContent}
+                        item
+                    >
+                        <ReactDataGrid
+                            className={classes.grid}
+                            columns={usedToolsGridColumns}
+                            dataSource={recentlyUsedTools}
+                            defaultFilterValue={usedToolsGridFilters}
+                            defaultLimit={15}
+                            enableSelection
+                            onSelectionChange={handleSelectionChange}
+                            pagination="local"
+                            theme={theme}
+                        />
+                    </Grid>
+                </CardContent>
+            </Card>
         </Box>
     );
 };

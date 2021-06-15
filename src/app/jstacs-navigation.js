@@ -8,6 +8,7 @@ import {NavLink, useLocation} from 'react-router-dom';
 import {selectAvailableApplications} from '../api/applications/selectors';
 import {close as closeDrawer} from '../api/drawer/actions';
 import {selectDrawerOpenState} from '../api/drawer/selectors';
+import {SimpleSearchField} from '../components/simple-search-field/component';
 
 const drawerWidth = 240;
 
@@ -35,6 +36,11 @@ const useToolItemListStyles = makeStyles((theme) => {
 const ToolItemList = ({applicationId, toolItems}) => {
     const location = useLocation();
     const classes = useToolItemListStyles();
+    const dispatch = useDispatch();
+
+    const handleItemClick = useCallback(() => {
+        dispatch(closeDrawer());
+    }, [dispatch]);
 
     return (
         <List disablePadding>
@@ -47,6 +53,7 @@ const ToolItemList = ({applicationId, toolItems}) => {
                         className={classes.item}
                         component={NavLink}
                         key={id}
+                        onClick={handleItemClick}
                         selected={location.pathname.startsWith(toolPathname)}
                         to={firstToolSection}
                     >
@@ -122,6 +129,11 @@ const ApplicationItemList = () => {
 const NavigationDrawer = ({DrawerProps}) => {
     const classes = useNavigationDrawerStyles();
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const handleItemClick = useCallback(() => {
+        dispatch(closeDrawer());
+    }, [dispatch]);
 
     return (
         <Drawer
@@ -147,6 +159,7 @@ const NavigationDrawer = ({DrawerProps}) => {
                 <ListItem
                     button
                     component={NavLink}
+                    onClick={handleItemClick}
                     selected={location.pathname === '/'}
                     to="/"
                 >
@@ -155,6 +168,7 @@ const NavigationDrawer = ({DrawerProps}) => {
                 <ListItem
                     button
                     component={NavLink}
+                    onClick={handleItemClick}
                     selected={location.pathname === '/admin'}
                     to="/admin"
                 >
@@ -163,6 +177,7 @@ const NavigationDrawer = ({DrawerProps}) => {
                 <ListItem
                     button
                     component={NavLink}
+                    onClick={handleItemClick}
                     selected={location.pathname === '/test-environment'}
                     to="/test-environment"
                 >
@@ -178,11 +193,6 @@ const NavigationDrawer = ({DrawerProps}) => {
 export const JstacsNavigation = () => {
     const classes = useJstacsNavigationStyles();
     const isDrawerOpen = useSelector(selectDrawerOpenState);
-    const dispatch = useDispatch();
-
-    const handleDrawerBlur = useCallback(() => {
-        dispatch(closeDrawer());
-    }, [dispatch]);
 
     return (
         <nav
@@ -197,7 +207,6 @@ export const JstacsNavigation = () => {
                             keepMounted: true,
                             style: {position: 'absolute'}
                         },
-                        onBlur: handleDrawerBlur,
                         open: isDrawerOpen,
                         variant: 'temporary'
                     }}

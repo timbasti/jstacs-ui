@@ -21,7 +21,7 @@ export const createSelectionForParameterSets = (parameter, parentName) => {
 
     return (
         <FieldsetSelectField
-            defaultValue={parameter.selected}
+            defaultValue={parameter.value}
             helperText={parameter.comment}
             label={parameter.name}
             name={parameterName}
@@ -43,7 +43,7 @@ const createSimpleParameterSelection = (parameter, parentName) => {
     const name = parentName ? `${parentName}.${parameter.name}` : parameter.name;
     return (
         <EnrichedSelectField
-            defaultValue={parameter.selected}
+            defaultValue={parameter.value}
             helperText={parameter.comment}
             label={parameter.name}
             name={name}
