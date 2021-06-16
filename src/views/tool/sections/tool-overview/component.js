@@ -158,6 +158,18 @@ const GeneralInformation = ({description, references, version}) => {
 };
 
 const HelpText = ({helpText}) => {
+    const cleanedHelpText = useMemo(() => {
+        const regex = /^\.\.\s+_(?<linkKey>.*?)\s*:\s*(?<linkTarget>.*)$/gmu;
+        let newHelpText = helpText;
+        let linkDef = null;
+        while ((linkDef = regex.exec(helpText)) !== null) {
+            const {0: line, groups: {linkKey, linkTarget}} = linkDef;
+            newHelpText = newHelpText.replace(`${linkKey}_`, `[${linkKey}](${linkTarget})`);
+            newHelpText = newHelpText.replace(line, '');
+        }
+        return newHelpText;
+    }, [helpText]);
+
     return (
         <Card>
             <CardContent>
@@ -168,8 +180,8 @@ const HelpText = ({helpText}) => {
                 >
                     Help text
                 </Typography>
-                <ReactMarkdown plugins={[gfm]}>
-                    {helpText}
+                <ReactMarkdown remarkPlugins={[gfm]}>
+                    {cleanedHelpText}
                 </ReactMarkdown>
             </CardContent>
         </Card>

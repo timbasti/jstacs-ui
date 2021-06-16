@@ -1,13 +1,13 @@
 import React from 'react';
 
-import {EnrichedCheckbox, EnrichedNumberField, EnrichedTextField} from '../components/input-fields';
+import {EnrichedCheckbox, EnrichedNumberField, EnrichedTextField} from '../../components/input-fields';
 import {
     maxErrorMessage,
     maxLengthErrorMessage,
     minErrorMessage,
     minLengthErrorMessage,
     requiredValueErrorMessage
-} from './error-messages';
+} from '../error-messages';
 
 const numberTypeMinMaxDefaultMap = {
     BYTE: {

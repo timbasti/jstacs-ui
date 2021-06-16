@@ -1,4 +1,5 @@
 import {createDataColumnParameterInput} from './data-column-parameter-factory';
+import {createEnumParameterInput} from './enum-parameter-factory';
 import {createFileParameterInput} from './file-parameter-factory';
 import {createSelectionParameterInput} from './selection-parameter-factory';
 import {createSimpleParameterInput} from './simple-parameter-factory';
@@ -11,6 +12,7 @@ export const createParameterInput = (parameter, parentName) => {
     case 'FileParameter':
         return createFileParameterInput(parameter, parentName);
     case 'EnumParameter':
+        return createEnumParameterInput(parameter, parentName);
     case 'SelectionParameter':
         return createSelectionParameterInput(parameter, parentName);
     case 'DataColumnParameter':

@@ -9,8 +9,8 @@ export const listTools = async () => {
     return response;
 };
 
-export const loadTool = async (applicationId, toolId) => {
-    const toolEndpoint = createSpecificToolEndpoint([applicationId, toolId]);
+export const loadTool = async (toolId) => {
+    const toolEndpoint = createSpecificToolEndpoint([toolId]);
     const response = await axios.get(toolEndpoint);
     return response;
 };

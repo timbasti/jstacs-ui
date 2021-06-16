@@ -23,7 +23,10 @@ export const useResultsAreaStyles = makeStyles((theme) => ({
 
 export const useResultStyles = makeStyles((theme) => ({
     content: {
+        flexDirection: 'column',
         height: '66vh',
         width: '100%'
     }
 }));
+
+export const useGeneralInformationStyles = makeStyles((theme) => ({root: {height: '100%'}}));

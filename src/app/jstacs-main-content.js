@@ -3,8 +3,14 @@ import {makeStyles, Toolbar} from '@material-ui/core';
 import React, {useCallback} from 'react';
 import {Route, Switch} from 'react-router-dom';
 
+/* import AdminView from '../views/admin/component';
+import DashboardView from '../views/dashboard/component';
+import NoMatchView from '../views/no-match/component';
+import TestEnvironmentView from '../views/test-environment/component';
+import ToolView from '../views/tool/component'; */
+
 const AdminView = loadable(() => import('../views/admin/component'));
-const HomeView = loadable(() => import('../views/home/component'));
+const DashboardView = loadable(() => import('../views/dashboard/component'));
 const NoMatchView = loadable(() => import('../views/no-match/component'));
 const TestEnvironmentView = loadable(() => import('../views/test-environment/component'));
 const ToolView = loadable(() => import('../views/tool/component'));
@@ -27,8 +33,8 @@ const useStyles = makeStyles(() => {
 export const JstacsMainContent = () => {
     const classes = useStyles();
 
-    const handleHomeRender = useCallback(() => {
-        return <HomeView className={classes.contentFrame} />;
+    const handleDashboardRender = useCallback(() => {
+        return <DashboardView className={classes.contentFrame} />;
     }, [classes.contentFrame]);
 
     const handleAdminRender = useCallback(() => {
@@ -57,7 +63,7 @@ export const JstacsMainContent = () => {
                 <Route
                     exact
                     path="/"
-                    render={handleHomeRender}
+                    render={handleDashboardRender}
                 />
                 <Route
                     className={classes.contentFrame}
@@ -71,7 +77,7 @@ export const JstacsMainContent = () => {
                 />
                 <Route
                     className={classes.contentFrame}
-                    path="/applications/:applicationId/tools/:toolId"
+                    path="/tools/:toolId"
                     render={handleToolRender}
                 />
                 <Route

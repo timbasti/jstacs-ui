@@ -17,7 +17,7 @@ const newApplicationId = -1;
 
 const ApplicationSelectionFieldSet = ({onChange}) => {
     const {setValue, control} = useFormContext();
-    const {selected: selectedApplicationId} = useWatch({
+    const selectedApplicationId = useWatch({
         control,
         defaultValue: newApplicationId,
         name: 'applicationId'
@@ -44,7 +44,7 @@ const ApplicationSelectionFieldSet = ({onChange}) => {
 
     const handleDeleteClick = useCallback(() => {
         if (selectedApplicationId >= 0) {
-            setValue('applicationId.selected', newApplicationId, {shouldValidate: true});
+            setValue('applicationId', newApplicationId, {shouldValidate: true});
             dispatch(deleteApplication({id: selectedApplicationId}));
         }
     }, [dispatch, selectedApplicationId, setValue]);
@@ -167,14 +167,14 @@ export const ApplicationsSection = () => {
 
     const doSubmit = useCallback(
         ({applicationId, applicationName, assignedTools}) => {
-            if (applicationId.selected === newApplicationId) {
+            if (applicationId === newApplicationId) {
                 dispatch(createApplication({
                     name: applicationName,
                     toolIds: assignedTools
                 }));
             } else {
                 dispatch(updateApplication({
-                    id: applicationId.selected,
+                    id: applicationId,
                     name: applicationName,
                     toolIds: assignedTools
                 }));

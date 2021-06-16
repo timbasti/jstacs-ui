@@ -1,6 +1,6 @@
 import {Box, TextField} from '@material-ui/core';
 import PropTypes from 'prop-types';
-import React, {useRef} from 'react';
+import React, {useCallback, useRef} from 'react';
 import {useController, useFormContext} from 'react-hook-form';
 import NumberFormat from 'react-number-format';
 
@@ -12,7 +12,7 @@ const EnrichedNumberField = ({helperText, label, name, placeholder, required, de
     const numberFieldRef = useRef();
 
     const {
-        field: {ref, ...fieldProps},
+        field: {ref, onChange, ...fieldProps},
         fieldState: {invalid}
     } = useController({
         control,
@@ -25,6 +25,10 @@ const EnrichedNumberField = ({helperText, label, name, placeholder, required, de
         }
     });
 
+    const handleValueChange = useCallback(({floatValue}) => {
+        onChange(floatValue);
+    }, [onChange]);
+
     return (
         <Box>
             <ErrorNotification
@@ -33,13 +37,14 @@ const EnrichedNumberField = ({helperText, label, name, placeholder, required, de
             />
             <NumberFormat
                 customInput={TextField}
+                defaultValue={defaultValue}
                 error={invalid}
                 fullWidth
                 getInputRef={numberFieldRef}
                 helperText={helperText}
                 inputRef={ref}
-                isNumericString
                 label={label}
+                onValueChange={handleValueChange}
                 placeholder={placeholder}
                 required={Boolean(required)}
                 thousandSeparator

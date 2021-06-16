@@ -13,14 +13,14 @@ import {
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {open as openDrawer} from '../api/drawer/actions';
 import {selectView} from '../api/route/selectors';
 import {changeApplicationTheme} from '../api/theme/actions';
 import {selectPaletteType} from '../api/theme/selectors';
-import {useAppHeaderControlsContext} from '../utils/app-header-controls-context';
+import {useAppHeaderControlsContext} from '../utils/contexts/app-header-controls-context';
 
 const drawerWidth = 240;
 

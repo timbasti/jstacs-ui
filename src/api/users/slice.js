@@ -9,7 +9,7 @@ export const slice = createSlice({
             state.processing = true;
         },
         [thunks.checkUser.fulfilled]: (state, action) => {
-            const {id, executions: toolExecutions} = action.payload;
+            const {id, toolExecutions} = action.payload;
             state.processing = false;
             state.toolExecutions = toolExecutions;
             state.id = id;

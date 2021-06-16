@@ -7,7 +7,7 @@ export const listTools = createAsyncThunk('tools/list', async () => {
     return data;
 });
 
-export const loadTool = createAsyncThunk('tools/load', async ({applicationId, toolId}) => {
-    const {data} = await requests.loadTool(applicationId, toolId);
+export const loadTool = createAsyncThunk('tools/load', async ({toolId}) => {
+    const {data} = await requests.loadTool(toolId);
     return data;
 });

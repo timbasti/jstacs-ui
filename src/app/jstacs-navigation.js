@@ -1,14 +1,14 @@
-import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemIcon, ListItemText, makeStyles} from '@material-ui/core';
+import {Box, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemText, makeStyles} from '@material-ui/core';
 import {ExpandLess, ExpandMore} from '@material-ui/icons';
-import EditIcon from '@material-ui/icons/Edit';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {NavLink, useLocation, useParams} from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 
 import {selectAvailableApplications} from '../api/applications/selectors';
 import {close as closeDrawer} from '../api/drawer/actions';
 import {selectDrawerOpenState} from '../api/drawer/selectors';
+import {SimpleSearchField} from '../components/simple-search-field/component';
 
 const drawerWidth = 240;
 
@@ -36,11 +36,16 @@ const useToolItemListStyles = makeStyles((theme) => {
 const ToolItemList = ({applicationId, toolItems}) => {
     const location = useLocation();
     const classes = useToolItemListStyles();
+    const dispatch = useDispatch();
+
+    const handleItemClick = useCallback(() => {
+        dispatch(closeDrawer());
+    }, [dispatch]);
 
     return (
         <List disablePadding>
             {toolItems?.map(({id, name}) => {
-                const toolPathname = `/applications/${applicationId}/tools/${id}`;
+                const toolPathname = `/tools/${id}`;
                 const firstToolSection = `${toolPathname}/tool-overview`;
                 return (
                     <ListItem
@@ -48,6 +53,7 @@ const ToolItemList = ({applicationId, toolItems}) => {
                         className={classes.item}
                         component={NavLink}
                         key={id}
+                        onClick={handleItemClick}
                         selected={location.pathname.startsWith(toolPathname)}
                         to={firstToolSection}
                     >
@@ -69,12 +75,12 @@ ToolItemList.propTypes = {
 
 const ApplicationItem = ({id, name, tools}) => {
     const [open, setOpen] = useState(false);
-    const location = useLocation();
+    const {pathname} = useLocation();
 
     useEffect(() => {
-        const applicationPath = `/applications/${id}`;
-        setOpen(location.pathname.startsWith(applicationPath));
-    }, [id, location]);
+        const hasSelectedTool = tools.some((tool) => pathname.startsWith(`/tools/${tool.id}`));
+        setOpen(hasSelectedTool);
+    }, [pathname, tools]);
 
     const handleClick = useCallback(() => {
         setOpen(!open);
@@ -123,6 +129,11 @@ const ApplicationItemList = () => {
 const NavigationDrawer = ({DrawerProps}) => {
     const classes = useNavigationDrawerStyles();
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const handleItemClick = useCallback(() => {
+        dispatch(closeDrawer());
+    }, [dispatch]);
 
     return (
         <Drawer
@@ -148,21 +159,20 @@ const NavigationDrawer = ({DrawerProps}) => {
                 <ListItem
                     button
                     component={NavLink}
-                    selected={location.pathname === '/admin'}
-                    to="/admin"
+                    onClick={handleItemClick}
+                    selected={location.pathname === '/'}
+                    to="/"
                 >
-                    <ListItemIcon>
-                        <EditIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Admin" />
+                    <ListItemText primary="Dashboard" />
                 </ListItem>
                 <ListItem
                     button
                     component={NavLink}
-                    selected={location.pathname === '/test-environment'}
-                    to="/test-environment"
+                    onClick={handleItemClick}
+                    selected={location.pathname === '/admin'}
+                    to="/admin"
                 >
-                    <ListItemText primary="Test Environment" />
+                    <ListItemText primary="Admin" />
                 </ListItem>
             </List>
             <Divider />
@@ -174,11 +184,6 @@ const NavigationDrawer = ({DrawerProps}) => {
 export const JstacsNavigation = () => {
     const classes = useJstacsNavigationStyles();
     const isDrawerOpen = useSelector(selectDrawerOpenState);
-    const dispatch = useDispatch();
-
-    const handleDrawerBlur = useCallback(() => {
-        dispatch(closeDrawer());
-    }, [dispatch]);
 
     return (
         <nav
@@ -193,7 +198,6 @@ export const JstacsNavigation = () => {
                             keepMounted: true,
                             style: {position: 'absolute'}
                         },
-                        onBlur: handleDrawerBlur,
                         open: isDrawerOpen,
                         variant: 'temporary'
                     }}

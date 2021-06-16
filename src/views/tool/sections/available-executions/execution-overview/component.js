@@ -1,4 +1,6 @@
+/* eslint-disable max-lines */
 /* eslint-disable no-case-declarations */
+
 import {
     Accordion,
     AccordionDetails,
@@ -15,15 +17,10 @@ import {
 } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Dialog from '@material-ui/core/Dialog';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import {DataGrid} from '@material-ui/data-grid';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
@@ -32,12 +29,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NavLink, useLocation} from 'react-router-dom';
 import remarkGfm from 'remark-gfm';
 
-import {getFileUrl, loadFile} from '../../../../../api/files/requests';
+import {getFileUrl} from '../../../../../api/files/requests';
 import {selectLoadedToolExecution, toolExecutionStates} from '../../../../../api/toolExecutions/selectors';
 import {loadToolExecution} from '../../../../../api/toolExecutions/thunks';
-import {readFile} from '../../../../../helpers/file-helpers';
+import {ParameterValueViewer} from './components/parameter-value-viewer/component';
+import {TabularResult} from './components/results/tabular-result/component';
 import {
     useExecutionOverviewStyles,
+    useGeneralInformationStyles,
     useProtocolDialogStyles,
     useResultsAreaStyles,
     useResultStyles,
@@ -172,7 +171,7 @@ const ProtocolDialog = ({protocol, onToggle, open}) => {
                     className={classes.content}
                     p={1}
                 >
-                    <ReactMarkdown plugins={[remarkGfm]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {protocol}
                     </ReactMarkdown>
                 </Box>
@@ -190,12 +189,9 @@ const ProtocolDialog = ({protocol, onToggle, open}) => {
 };
 
 const Result = ({result}) => {
-    const [file, setFile] = useState();
-    const [columns, setColumns] = useState();
-    const [rows, setRows] = useState();
-
     const fileName = useMemo(() => {
-        return result?.match(/[^/^\\]*$/gu)[0];
+        const filePathParts = result?.split('/');
+        return filePathParts[filePathParts.length - 1];
     }, [result]);
 
     const fileExt = useMemo(() => {
@@ -204,61 +200,26 @@ const Result = ({result}) => {
     }, [result]);
 
     const fileURL = useMemo(() => {
-        return `${getFileUrl(result)}`;
+        return getFileUrl(result);
     }, [result]);
-
-    useEffect(() => {
-        if (fileExt === 'tsv' || fileExt === 'csv') {
-            result &&
-                readFile(result, (fileContent) => {
-                    setFile(fileContent);
-                });
-        }
-    }, [fileExt, result]);
-
-    useEffect(() => {
-        if (file) {
-            const fileLines = file.split('\n');
-
-            const header = fileLines.shift();
-            const readColumns = header.split('\t').map((column) => ({
-                field: column,
-                headerName: column,
-                width: '300px'
-            }));
-            setColumns(readColumns);
-
-            const readRows = fileLines.map((line, lineNumber) => {
-                const coulmnValues = line.split('\t');
-                const readRow = coulmnValues.reduce((row, currentValue, index) => {
-                    const column = readColumns[index].field;
-                    return {
-                        ...row,
-                        [column]: currentValue
-                    };
-                }, coulmnValues[0]);
-                return {
-                    ...readRow,
-                    id: lineNumber
-                };
-            });
-            setRows(readRows);
-        }
-    }, [file]);
 
     const classes = useResultStyles();
 
     const renderedContent = useMemo(() => {
         switch (fileExt) {
-        case 'pdf':
         case 'jpg':
         case 'jpeg':
         case 'png':
         case 'svg':
+            return <img
+                alt="Result"
+                src={fileURL}
+            />;
+        case 'pdf':
             return (
                 <object
                     className={classes.content}
-                    data={fileURL}
+                    data={`${fileURL}#view=Fit&zoom=page-fit`}
                 >
                     <a
                         href={fileURL}
@@ -269,23 +230,8 @@ const Result = ({result}) => {
                 </object>
             );
         case 'tsv':
-            if (!columns || !rows) {
-                return undefined;
-            }
-
-            return (
-                <Box
-                    height="66vh"
-                    width="100%"
-                >
-                    <DataGrid
-                        columns={columns}
-                        pageSize={10}
-                        rows={rows}
-                    />
-                </Box>
-            );
         case 'csv':
+            return <TabularResult fileURL={fileURL} />;
         default:
             return (
                 <a
@@ -296,33 +242,40 @@ const Result = ({result}) => {
                 </a>
             );
         }
-    }, [classes.content, fileExt, fileName, fileURL, columns, rows, result]);
+    }, [classes.content, fileExt, fileName, fileURL, result]);
 
     return (
-        <Accordion TransitionProps={{unmountOnExit: true}}>
+        <Accordion
+            TransitionProps={{
+                mountOnEnter: true,
+                unmountOnExit: false
+            }}
+        >
             <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography>
                     {fileName}
                 </Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails className={classes.content}>
                 {renderedContent}
             </AccordionDetails>
         </Accordion>
     );
 };
 
-const ResultsArea = ({results}) => {
+const ResultsArea = ({applicationId, toolId, results}) => {
     const classes = useResultsAreaStyles();
 
     const renderedResult = useMemo(() => {
         return results?.map((result) => {
             return <Result
+                applicationId={applicationId}
                 key={result}
                 result={result}
+                toolId={toolId}
             />;
         });
-    }, [results]);
+    }, [applicationId, toolId, results]);
 
     return (
         <Card
@@ -347,6 +300,7 @@ const ResultsArea = ({results}) => {
 
 const GeneralInformation = ({createdAt, name, notes, progress, protocol, state}) => {
     const [openProtocol, setOpenProtocol] = useState(false);
+    const classes = useGeneralInformationStyles();
 
     const handleToggleProtocol = useCallback(() => {
         setOpenProtocol(!openProtocol);
@@ -394,7 +348,7 @@ const GeneralInformation = ({createdAt, name, notes, progress, protocol, state})
     }, [handleToggleProtocol, openProtocol, protocol]);
 
     return (
-        <Card>
+        <Card className={classes.root}>
             <CardContent>
                 <Typography
                     component="h2"
@@ -426,7 +380,7 @@ const TitleBar = ({applicationId, toolId}) => {
                 <IconButton
                     color="inherit"
                     component={NavLink}
-                    to={`/applications/${applicationId}/tools/${toolId}/available-executions`}
+                    to={`/tools/${toolId}/available-executions`}
                 >
                     <ArrowBack />
                 </IconButton>
@@ -468,7 +422,15 @@ export const ExecutionOverview = ({open, applicationId, toolId}) => {
     }, [toolExecution]);
 
     const renderedResultsArea = useMemo(() => {
-        return toolExecution && <ResultsArea {...toolExecution} />;
+        return toolExecution && <ResultsArea
+            applicationId={applicationId}
+            toolId={toolId}
+            {...toolExecution}
+        />;
+    }, [applicationId, toolId, toolExecution]);
+
+    const renderedParameterViewer = useMemo(() => {
+        return toolExecution?.parameterValues && <ParameterValueViewer parameterValues={toolExecution.parameterValues} />;
     }, [toolExecution]);
 
     return (
@@ -489,13 +451,24 @@ export const ExecutionOverview = ({open, applicationId, toolId}) => {
             >
                 <Grid
                     container
-                    direction="column"
                     spacing={3}
                 >
-                    <Grid item>
+                    <Grid
+                        item
+                        xs={4}
+                    >
                         {renderedGeneralInformation}
                     </Grid>
-                    <Grid item>
+                    <Grid
+                        item
+                        xs={8}
+                    >
+                        {renderedParameterViewer}
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                    >
                         {renderedResultsArea}
                     </Grid>
                 </Grid>

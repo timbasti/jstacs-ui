@@ -6,7 +6,7 @@ import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
 
 import {JstacsAppShell} from './app/jstacs-app-shell';
-import * as serviceWorker from './serviceWorker';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import {store} from './store';
 
 ReactDOM.render(
@@ -18,4 +18,4 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
-serviceWorker.register();
+serviceWorkerRegistration.register();
