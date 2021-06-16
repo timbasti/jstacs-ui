@@ -174,15 +174,6 @@ const NavigationDrawer = ({DrawerProps}) => {
                 >
                     <ListItemText primary="Admin" />
                 </ListItem>
-                <ListItem
-                    button
-                    component={NavLink}
-                    onClick={handleItemClick}
-                    selected={location.pathname === '/test-environment'}
-                    to="/test-environment"
-                >
-                    <ListItemText primary="Test Environment" />
-                </ListItem>
             </List>
             <Divider />
             <ApplicationItemList />
