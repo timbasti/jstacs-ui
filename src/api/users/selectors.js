@@ -61,8 +61,8 @@ export const selectUserUsedTools = createSelector(selectUserToolExecutions, (use
         };
     }, {});
 
-    return Object.keys(toolMap).map((toolId) => ({
+    return toolMap && Object.keys(toolMap).map((toolId) => ({
         ...toolMap[toolId],
         id: toolId
-    }));
+    })) || [];
 });
