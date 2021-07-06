@@ -3,9 +3,9 @@
     "version": "1.0.0-alpha",
     "private": true,
     "engines": {
-        "node": ">=14.17.3",
-        "npm": ">=7.19.1",
-        "yarn": ">=1.22.10"
+        "node": "^14.17.3",
+        "npm": "^7.19.1",
+        "yarn": "^1.22.10"
     },
     "dependencies": {
         "@hookform/error-message": "^2.0.0",
