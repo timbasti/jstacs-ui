@@ -3,7 +3,7 @@
 # 2) nginx stage to serve frontend assets
 
 # Name the node stage "builder"
-FROM node:14 AS builder
+FROM node:lts-alpine AS builder
 # Set working directory
 WORKDIR /app
 # Copy all files from current directory to working dir in image
@@ -12,7 +12,7 @@ COPY . .
 RUN yarn install && yarn build
 
 # nginx state for serving content
-FROM nginx:alpine
+FROM nginx:stable-alpine
 # Set working directory to nginx asset directory
 WORKDIR /usr/share/nginx/html
 # Remove default nginx static assets
