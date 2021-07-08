@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const userEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/users`;
+const userEndpoint = `${process.env.SERVICE_HOST}/users`;
 
 const checkUserEndpoint = `${userEndpoint}/check`;
 
