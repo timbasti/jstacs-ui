@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const toolsEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/tools`;
+const toolsEndpoint = `${process.env.SERVICE_HOST}/tools`;
 
 const createSpecificToolEndpoint = (pathSegments = []) => `${toolsEndpoint}/${pathSegments.join('/')}`;
 

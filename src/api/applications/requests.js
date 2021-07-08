@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const applicationsEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/applications`;
+const applicationsEndpoint = `${process.env.SERVICE_HOST}/applications`;
 
 const createSpecificEndpointForApplication = (applicationId) => `${applicationsEndpoint}/${applicationId}`;
 
