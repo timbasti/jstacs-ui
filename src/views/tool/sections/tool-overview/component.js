@@ -162,11 +162,22 @@ const HelpText = ({helpText}) => {
         const regex = /^\.\.\s+_(?<linkKey>.*?)\s*:\s*(?<linkTarget>.*)$/gmu;
         let newHelpText = helpText;
         let linkDef = null;
-        while ((linkDef = regex.exec(helpText)) !== null) {
+        while ((linkDef = regex.exec(newHelpText)) !== null) {
             const {0: line, groups: {linkKey, linkTarget}} = linkDef;
             newHelpText = newHelpText.replace(`${linkKey}_`, `[${linkKey}](${linkTarget})`);
             newHelpText = newHelpText.replace(line, '');
         }
+
+        const quoteRegex = /\\\\/gmu;
+        let quoteDef = null;
+        console.log('test');
+        while ((quoteDef = quoteRegex.exec(newHelpText)) !== null) {
+            console.log(quoteDef);
+            const {0: line, groups: {linkKey, linkTarget}} = quoteDef;
+            newHelpText = newHelpText.replace(`${linkKey}_`, `[${linkKey}](${linkTarget})`);
+            newHelpText = newHelpText.replace(line, '');
+        }
+
         return newHelpText;
     }, [helpText]);
 
