@@ -142,14 +142,13 @@ const NotesTypography = ({notes}) => {
             >
                 Notes:
             </Typography>
-            <Grid item>
-                <Typography
-                    component="pre"
-                    variant="body2"
-                >
-                    {notes}
-                </Typography>
-            </Grid>
+            <Typography
+                component={Grid}
+                item
+                variant="body2"
+            >
+                {notes}
+            </Typography>
         </Grid>
     );
 };

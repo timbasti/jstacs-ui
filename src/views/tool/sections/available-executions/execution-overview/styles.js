@@ -29,4 +29,11 @@ export const useResultStyles = makeStyles((theme) => ({
     }
 }));
 
-export const useGeneralInformationStyles = makeStyles((theme) => ({root: {height: '100%'}}));
+export const useGeneralInformationStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        justifyContent: 'space-between'
+    }
+}));
