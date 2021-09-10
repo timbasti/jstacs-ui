@@ -4,6 +4,11 @@
 
 # Name the node stage "builder"
 FROM node:lts-alpine AS builder
+
+ARG SERVICE_HOST
+
+ENV REACT_APP_SERVICE_HOST $SERVICE_HOST
+
 # Set working directory
 WORKDIR /app
 # Copy all files from current directory to working dir in image
