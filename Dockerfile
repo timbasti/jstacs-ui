@@ -32,4 +32,4 @@ RUN apk add --no-cache bash
 RUN chmod +x env.sh
 
 # Containers run nginx with global directives and daemon off
-ENTRYPOINT ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh", "nginx", "-g", "daemon off;"]
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh", "nginx", "-g", "daemon off;"]
