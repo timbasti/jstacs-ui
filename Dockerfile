@@ -5,10 +5,6 @@
 # Name the node stage "builder"
 FROM node:lts-alpine AS builder
 
-ARG SERVICE_HOST
-
-ENV REACT_APP_SERVICE_HOST $SERVICE_HOST
-
 # Set working directory
 WORKDIR /app
 # Copy all files from current directory to working dir in image
@@ -24,5 +20,16 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 # Copy static assets from builder stage
 COPY --from=builder /app/build .
+
+# Copy .env file and shell script to container
+COPY ./env.sh .
+COPY ./.env .
+
+# Add bash
+RUN apk add --no-cache bash
+
+# Make our shell script executable
+RUN chmod +x env.sh
+
 # Containers run nginx with global directives and daemon off
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh", "nginx", "-g", "daemon off;"]

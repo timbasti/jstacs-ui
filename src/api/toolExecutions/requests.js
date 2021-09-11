@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const toolExecutionsEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/tool-executions`;
+const toolExecutionsEndpoint = `${window._env_.SERVICE_HOST}/tool-executions`;
 
 const createSpecificEndpointForToolExecution = (toolExecutionId) => `${toolExecutionsEndpoint}/${toolExecutionId}`;
 

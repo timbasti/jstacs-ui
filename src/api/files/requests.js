@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const filesEndpoint = `${process.env.REACT_APP_SERVICE_HOST}/files`;
+const filesEndpoint = `${window._env_.SERVICE_HOST}/files`;
 
 export const getFileUrl = (name) => `${filesEndpoint}?file=${name}`;
 
