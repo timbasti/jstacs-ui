@@ -1,1 +1,3 @@
 src/serviceWorker.js
+/public/*
+env-config.js

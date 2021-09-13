@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const toolsEndpoint = `${window._env_.SERVICE_HOST}/tools`;
+const toolsEndpoint = `${window.appEnv.SERVICE_HOST}/tools`;
 
 const createSpecificToolEndpoint = (pathSegments = []) => `${toolsEndpoint}/${pathSegments.join('/')}`;
 

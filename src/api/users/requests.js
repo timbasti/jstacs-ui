@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const userEndpoint = `${window._env_.SERVICE_HOST}/users`;
+const userEndpoint = `${window.appEnv.SERVICE_HOST}/users`;
 
 const checkUserEndpoint = `${userEndpoint}/check`;
 

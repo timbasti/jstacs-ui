@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const applicationsEndpoint = `${window._env_.SERVICE_HOST}/applications`;
+const applicationsEndpoint = `${window.appEnv.SERVICE_HOST}/applications`;
 
 const createSpecificEndpointForApplication = (applicationId) => `${applicationsEndpoint}/${applicationId}`;
 

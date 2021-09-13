@@ -60,8 +60,8 @@
     "scripts": {
         "analyze": "source-map-explorer 'build/static/js/*.js'",
         "eject": "react-scripts eject",
-        "start": "chmod +x ./env.sh && ./env.sh && cp env-config.js ./public/ && react-scripts start",
-        "build": "react-scripts build",
+        "start": "chmod +x ./env.sh && ./env.sh && mv env-config.js ./public/env-config.js && react-scripts start",
+        "build": "sh -ac '. ./.env; react-scripts build'",
         "clear:index": "html-remove-empty-lines ./public/index.html && prettier --write \"./public/index.html\"",
         "make:pwa": "pwa-asset-generator src/logo.svg -f -i ./public/index.html -m ./public/manifest.json --opaque false --padding \"0\" -a %PUBLIC_URL% ./public/assets && yarn clear:index",
         "test": "react-scripts test",
