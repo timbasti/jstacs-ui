@@ -1,6 +1,6 @@
 {
-    "name": "jstacs-online",
-    "version": "1.0.0-alpha",
+    "name": "jstacs-ui",
+    "version": "1.0.0",
     "private": true,
     "engines": {
         "node": "^14.0.0",
